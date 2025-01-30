@@ -13,16 +13,16 @@ classifiers = [
 keywords = [
     "python"
 ]
-packages = [{include="mojo", from="source/packages"}]
+packages = [{include="automojo", from="source/packages"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
 automojo-errors = { git = "git@github.com:automationmojo/automojo-errors.git", branch = "main" }
+automojo-foundation-kit = { git = "git@github.com:automationmojo/automojo-foundation-kit.git", branch = "main" }
 
 [tool.poetry.group.dev.dependencies]
 myst-parser = "^0.18.1"
-sphinx = ">=1.6,<6"
-sphinx-rtd-theme = "^1.1.1"
+
 
 [tool.poetry.group.dbio.dependencies]
 

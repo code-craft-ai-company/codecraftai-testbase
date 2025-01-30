@@ -33,7 +33,6 @@ from automojo.testbase.injection.validatorsource import ValidatorSource
 from automojo.testbase.injection.injectionregistry import injection_registry
 
 
-
 _IntegrationSubscriberType = TypeVar("_IntegrationSubscriberType", bound=Callable[..., object])
 
 

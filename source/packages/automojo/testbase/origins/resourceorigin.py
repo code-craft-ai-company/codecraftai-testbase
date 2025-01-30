@@ -9,14 +9,13 @@ from typing import Any, Callable, Dict, Optional, Type
 
 import inspect
 
-from mojo.xmods.injection.constraintscatalog import ConstraintsCatalog
-from mojo.xmods.injection.constraints import ConstraintsOrigin
-from mojo.xmods.injection.sourcebase import SourceBase
-from mojo.xmods.injection.resourcelifespan import ResourceLifespan
+from automojo.testbase.constraints import ConstraintsCatalog, ConstraintsOrigin
+from automojo.testbase.sources.sourcebase import SourceBase
+from automojo.testbase.resourcelifespan import ResourceLifespan
 
 constraints_catalog = ConstraintsCatalog()
 
-class InjectableOrigin:
+class ResourceOrigin:
 
     def __init__(self, originating_scope: str, identifier: str, life_span: ResourceLifespan,
                  source: Optional[SourceBase] = None, implied: bool = False,
@@ -79,7 +78,7 @@ class InjectableOrigin:
 
     def describe_source(self):
         descstr = self.source_id
-        cval = self.constraints
+        cval = self.constraints_key
         if cval is not None:
             descstr += " constraints={}".format(repr(cval))
         return descstr

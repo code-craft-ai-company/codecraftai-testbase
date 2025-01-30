@@ -9,10 +9,9 @@ from typing import Any, Callable, Dict, Optional, Type, Union
 
 import inspect
 
-from mojo.xmods.injection.constraintscatalog import ConstraintsCatalog
-from mojo.xmods.injection.constraints import ConstraintsOrigin
-from mojo.xmods.injection.sourcebase import SourceBase
-from mojo.xmods.injection.resourcelifespan import ResourceLifespan
+from automojo.testbase.constraints import ConstraintsCatalog, ConstraintsOrigin
+from automojo.testbase.sources.sourcebase import SourceBase
+from automojo.testbase.resourcelifespan import ResourceLifespan
 
 constraints_catalog = ConstraintsCatalog()
 

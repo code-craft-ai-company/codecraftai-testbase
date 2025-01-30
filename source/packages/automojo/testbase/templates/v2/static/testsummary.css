@@ -1,0 +1,798 @@
+/* =======================================================================
+    Author: "Myron Walker"
+    Copyright: "Copyright 2024, Myron W Walker"
+    Version: = "2.0.0"
+    Email: myron.walker@gmail.com
+ =======================================================================*/
+
+ .zero-margins-and-padding {
+    margin: 0px;
+    padding: 0px;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+ }
+
+
+.page-style {
+    background-color: lightgray;
+    box-sizing: border-box;
+}
+
+.code-font-lt {
+    font-family: monospace;
+    font-weight: 500;
+    white-space: pre-wrap;
+    color: gray;
+}
+
+.code-font-dk {
+    font-family: monospace;
+    font-weight: 500;
+    white-space: pre-wrap;
+    color: black;
+}
+
+/* =======================================================================
+                               SIZING CLASSES
+   =======================================================================*/
+
+.full_available_width {
+    width: 100%;
+}
+
+.fit_content_width {
+    width: fit-content;
+}
+
+.flex_grow_content_width {
+    flex-grow: 1;
+}
+
+/* =======================================================================
+                           LAYOUT AND VISUAL CLASSES
+   =======================================================================*/
+
+.ts-collapsible {
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    text-align: center;
+    outline: none;
+    font-size: 15px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    background-color: #a5a7b5;
+    color: black;
+}
+
+.ts-collapsible-button {
+
+}
+
+.ts-collapsible-button:hover {
+    background-color: #92a8c8;
+}
+
+.ts-collapsible-content {
+    padding: 0 18px;
+    display: none;
+}
+
+.ts-pgrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: max-content auto max-content;
+}
+
+.ts-pgrid-label {
+    height: 24px;
+    margin-bottom: 4px;
+    background-color: darkgray;
+    color: black;
+    text-align: right;
+    font-weight: bold;
+    border-style: solid;
+    border-color: black;
+    border-width: 2px 1px 2px 2px;
+    padding: 3px 5px 0px 5px
+}
+
+.ts-pgrid-value {
+    height: 24px;
+    margin-bottom: 4px;
+    background-color: lightgray;
+    text-align: left;
+    border-style: solid;
+    border-color: black;
+    border-width: 2px 2px 2px 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 3px 5px 0px 5px
+}
+
+.ts-pgrid-copy {
+    width: 50px;
+    margin-bottom: 4px;
+    height: 30px;
+    padding: 4px 5px 4px 5px
+}
+
+.ts_horizontal_tiling_panel {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.ts_vertical_tiling_panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ts-section-header {
+    text-align: center;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-radius: 10px 10px 0px 0px;
+    background-color: var(--color-section-header-background-color);
+    color: var(--color-section-header-color);
+}
+
+.ts-section-detail {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 0px 0px 10px 10px ;
+    background-color: white;
+}
+
+.ts-banner {
+    border-radius: 10px;
+    box-shadow: 4px 4px 8px gray;
+    background-color: var(--color-banner-color-background);
+    color: var(--color-banner-color);
+}
+
+.ts-banner-job {
+    padding: 0px;
+    border-radius: 10px 10px 0px 0px;
+    background-color: #21224b;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.ts-banner-column {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px
+}
+
+.ts-banner-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    margin-top: 20px;
+    width: 100%;
+    text-shadow: 5px 5px 6px black;
+}
+
+.ts-banner-prop-label {
+    width: fit-content;
+    height: fit-content;
+    text-align: right;
+    min-width: 60px;
+    font-weight: bolder;
+    font-size: 14pt;
+    padding-right: 10px;
+}
+
+.ts-banner-prop-value {
+    width: fit-content;
+    height: fit-content;
+    text-align: left;
+    min-width: 80px;
+    font-size: 14pt;
+    padding-left: 8px;
+    padding-right: 20px;
+}
+
+.ts-banner-prop-pair {
+    display: flex;
+    flex-flow: row nowrap;
+    flex-grow: 1;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+.ts-banner-logo {
+    width: 100px;
+    height: 100px;
+    background-color: indigo;
+    margin: 10px;
+    content: var(--image-logo);
+}
+
+.ts-banner-metrics {
+    padding: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 4px 4px 8px lightgrey;
+    background-color:  white;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.ts-banner-metrics-panel {
+    display: flex;
+    flex-direction: row;
+    padding-left: 50px;
+    padding-right: 50px;
+    justify-content: flex-end;
+}
+
+.ts-banner-metrics-column {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px
+}
+
+.ts-banner-metrics-value-pair {
+    display: flex;
+    flex-flow: row nowrap;
+    flex-grow: 1;
+    text-align: left;
+    justify-content: flex-start;
+    height: 30px;
+}
+
+.ts-banner-metrics-label {
+    width: fit-content;
+    height: fit-content;
+    text-align: right;
+    min-width: 60px;
+    font-weight: bolder;
+    font-size: 14pt;
+    padding-right: 10px;
+    color: black;
+}
+
+.ts-banner-metrics-value {
+    width: fit-content;
+    height: fit-content;
+    text-align: left;
+    min-width: 80px;
+    font-size: 14pt;
+    padding-left: 8px;
+    padding-right: 20px;
+    color: black;
+}
+
+
+.ts-artifacts-card {
+    margin-top: 10px;
+    border-radius: 10px;
+    box-shadow: 4px 4px 8px gray;
+    background-color: white;
+    min-height: 100px;
+}
+
+.ts-artifact-tab-iframe {
+    display: block;
+    width: 100%;
+    height: 400px;
+    box-sizing: border-box;
+}
+
+.ts-configuration-card {
+    margin-top: 10px;
+    border-radius: 10px;
+    box-shadow: 4px 4px 8px gray;
+    background-color: white;
+}
+
+.ts-configuration-landscape-content {
+    padding: 4px 18px;
+    display: flex;
+    flex-flow: column;
+}
+
+.ts-filesandfolders-card {
+    margin-top: 10px;
+    border-radius: 10px;
+    box-shadow: 4px 4px 8px gray;
+    background-color: white;
+    min-height: 100px;
+}
+
+.ts-file-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.ts-folder-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.ts-importfailures-card {
+    margin-top: 10px;
+    border-radius: 10px;
+    box-shadow: 4px 4px 8px gray;
+    background-color: white;
+    min-height: 100px;
+}
+
+.ts-importfailure-item {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border-style: solid;
+    border-color: darkgray;
+    padding: 5px;
+    margin-bottom: 5px;
+    box-shadow: 3px 3px #929191;
+}
+
+.ts-importfailure-trace {
+    box-sizing: border-box;
+    width: inherit;
+    background-color: var(--color-fail); 
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    border: solid;
+    border-color: var(--color-fail);
+    border-width: 2px;
+    border-radius: 4px;
+    text-align: center;
+    outline: none;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.ts-importfailure-trace-button {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    background-color: var(--color-fail);
+}
+
+.ts-importfailure-trace-header {
+    flex-grow: 1;
+    padding-bottom: 2px;
+    padding-top: 2px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.ts-importfailure-trace-icon {
+    fill: white;
+    font-size: 20;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+}
+
+.ts-importfailure-trace-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    color: black;
+    text-align: left;
+}
+
+.ts-lscape-collapsable-content {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 4px 18px;
+    display: flex;
+    flex-flow: column;
+    justify-content: left;
+    text-align: left;
+}
+
+.ts-lscape-dataprofiles-list {
+    display: flex;
+    flex-direction: row;
+}
+
+.ts-lscape-dataprofiles-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.ts-lscape-object-item {
+    display: inline-grid;
+    flex-direction: column;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 10px;
+    background-color: white;
+    grid-template-columns: minmax(40px, max-content) minmax(40px, max-content);
+}
+
+.ts-lscape-device-group {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.ts-lscape-device-group-name {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    font-weight: bold;
+    background-color: navy;
+    color: white;
+    height: 20px;
+}
+
+.ts-lscape-device-group-items {
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 5px;
+    background-color: lightgrey;
+    gap: 10px;
+}
+
+.ts-lscape-device-groups-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ts-lscape-services-list {
+    display: flex;
+    flex-direction: row;
+}
+
+.ts-lscape-item-prop-lbl {
+    font-weight: bold;
+    text-align: right;
+}
+
+.ts-lscape-item-prop-val {
+    text-align: left;
+    margin-left: 4px;
+}
+
+.ts-lscape-item-value-list {
+    display: flex;
+    flex-flow: column;
+}
+
+
+.ts-lscape-item-value-row-pair {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+}
+
+.ts-lscape-item-value-row-lbl {
+    font-weight: bold;
+    color: gray;
+}
+
+.ts-lscape-item-value-row-val {
+    margin-left: 4px;
+}
+
+
+.ts-resultdetail-card {
+    margin-top: 10px;
+    border-radius: 10px;
+    box-shadow: 4px 4px 8px gray;
+    background-color: white;
+    min-height: 100px;
+}
+
+.ts-results-hdr-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(160px, max-content) auto minmax(60px, max-content) minmax(60px, max-content) minmax(60px, max-content) minmax(60px, max-content);
+}
+
+.ts-results-hdr-start {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bolder;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-hdr-name {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bolder;
+    flex-grow: 1;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-hdr-e {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bolder;
+    color: maroon;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-hdr-f {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bolder;
+    color: red;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-hdr-s {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bolder;
+    color: gray;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-hdr-p {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bolder;
+    color: green;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-hdr-w {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bolder;
+    color: orange;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-grp-grid {
+    display: inline-grid;
+    grid-template-columns: auto minmax(60px, max-content) minmax(60px, max-content) minmax(60px, max-content) minmax(60px, max-content);
+    width: calc(100% - 18px);
+}
+
+.ts-results-grp-start {
+    text-align: center;
+    font-size: 13pt;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-grp-name {
+    text-align: left;
+    font-size: 13pt;
+    flex-grow: 1;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-grp-score {
+    text-align: center;
+    font-size: 13pt;
+    color: maroon;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-items-grid {
+    width: calc(100% - 18px);
+    display: inline-grid;
+    grid-template-columns: minmax(140px, max-content) auto minmax(60px, max-content) minmax(60px, max-content) minmax(60px, max-content) minmax(60px, max-content);
+}
+
+.ts-results-item-detail {
+    margin-bottom: 10px;
+    
+}
+
+.ts-results-item-indent {
+    width: 10px;
+}
+
+.ts-results-item-start {
+    text-align: center;
+    font-size: 13pt;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-item-name {
+    text-align: left;
+    font-size: 13pt;
+    flex-grow: 1;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.ts-results-item-score {
+    text-align: center;
+    font-size: 13pt;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+.ts-results-item-prop-label {
+    width: fit-content;
+    height: fit-content;
+    text-align: right;
+    min-width: 60px;
+    font-weight: bolder;
+    font-size: 13pt;
+    padding-right: 10px;
+}
+
+.ts-results-item-prop-value {
+    width: fit-content;
+    height: fit-content;
+    text-align: left;
+    min-width: 80px;
+    font-size: 13pt;
+    padding-left: 8px;
+    padding-right: 20px;
+}
+
+.ts-results-item-prop-pair {
+    display: flex;
+    flex-flow: row nowrap;
+    flex-grow: 1;
+    text-align: left;
+    justify-content: flex-start;
+    margin-top: 2px;
+}
+
+.ts-results-item-prop-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-left: 50px;
+    padding-right: 50px;
+    justify-content: flex-end;
+}
+
+.ts-errors-collapsible {
+    box-sizing: border-box;
+    width: inherit;
+    background-color: var(--color-error); 
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    border: solid;
+    border-color: var(--color-error);
+    border-width: 2px;
+    border-radius: 4px;
+    text-align: center;
+    outline: none;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.ts-errors-collapsible-button {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    background-color: inherit;
+}
+
+.ts-errors-collapsible-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+}
+
+.ts-errors-collapsible-header {
+    flex-grow: 1;
+    padding-bottom: 2px;
+    padding-top: 2px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.ts-errors-collapsible-icon {
+    fill: white;
+    font-size: 20;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+}
+
+.ts-failures-collapsible {
+    box-sizing: border-box;
+    width: inherit;
+    background-color: var(--color-fail); 
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    border: solid;
+    border-color: var(--color-fail);
+    border-width: 2px;
+    border-radius: 4px;
+    text-align: center;
+    outline: none;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.ts-failures-collapsible-button {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    background-color: var(--color-fail);
+}
+
+.ts-failures-collapsible-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+}
+
+.ts-failures-collapsible-header {
+    flex-grow: 1;
+    padding-bottom: 2px;
+    padding-top: 2px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.ts-failures-collapsible-icon {
+    fill: white;
+    font-size: 20;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+}
+
+
+.ts-results-item-failures-coll {
+    fill: var(--color-fail);
+    background-color: var(--color-fail);
+    color: white;
+}
+
+.ts-results-item-failures-list {
+    display: flex;
+    flex-direction: row;
+}
+
+.ts-exception-content {
+    text-align: left;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 8px;
+}
+

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!--
+        __author__ = "Myron Walker"
+        __copyright__ = "Copyright 2020, Myron W Walker"
+        __credits__ = []
+        __version__ = "2.0.0"
+        __maintainer__ = "Myron Walker"
+    -->
+    <head>
+        <title>Images</title>
+
+        <script type="text/javascript" src="/static/v2/testsummary-helpers.js"></script>
+
+        <style>
+
+            .page-style {
+                margin: 0px;
+                padding: 10px;
+                box-sizing: border-box;
+                width: 100%;
+            }
+
+            .flex-container {
+                display: flex;
+                width: auto;
+                height: auto;
+            }
+            
+            .item-container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .item-label {
+                width: 100%;
+                height: 30px;
+                justify-content: center;
+                font-weight: bold;
+            }
+
+            .item-content {
+                width: 100%;
+                height: auto;
+            }
+        </style>
+    
+        <script type="text/javascript">
+            var g_items_ext_list = ["png", "jpg"]
+            var g_items = [];
+
+            async function refresh_items() {
+                var itemsContainerEl = document.getElementById('flex-container');
+
+                for (var findex in g_items) {
+                    var filename = g_items[findex];
+
+                    g_items.push(filename);
+
+                    var containerEl = document.createElement("div");
+                    containerEl.classList.add("item-container");
+
+                    var headerEl = document.createElement('span');
+                    headerEl.style.width = "100%";
+                    headerEl.innerHTML = filename;
+
+                    containerEl.appendChild(headerEl);
+
+                    var contentEl = document.createElement('img');
+                    contentEl.setAttribute("src", filename);
+
+                    containerEl.appendChild(contentEl);
+
+                    itemsContainerEl.appendChild(containerEl);
+                }
+            }
+
+            async function refresh_page() {
+                fetch_items(g_items_ext_list).then((items) => {
+                    g_items = items;
+                
+                    refresh_items();
+                });
+            }
+
+            refresh_page().then(function() {
+                console.log("Page loaded");
+            }, function(err) {
+                console.log("ERROR:\n" + err);
+                console.log(err.stack)
+            });
+
+        </script>
+    </head>
+
+    <body class="page-style">
+        <h3>Images</h3>
+        <div id='flex-container' class='flex-container'>
+        </div>
+    </body>
+
+</html>

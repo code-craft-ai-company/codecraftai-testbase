@@ -12,6 +12,7 @@ import sys
 import click
 
 from automojo.foundation.xlogging.levels import LOG_LEVEL_NAMES
+from automojo.interfaces.itestjob import ITestJob
 
 from automojo.testbase.cli.cmdtree.testing.constants import (
     HELP_ROOT,
@@ -27,7 +28,6 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
     HELP_JOB_LABEL,
     HELP_JOB_NAME,
     HELP_JOB_OWNER,
-    HELP_DEFAULT_CONFIGS,
     HELP_RUNTIME,
     HELP_RUNTIME_NAMES,
     HELP_RUNTIME_SOURCES,
@@ -57,20 +57,9 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
 @click.option("--job-label", default=None, required=False, help=HELP_JOB_LABEL)
 @click.option("--job-name", default=None, required=False, help=HELP_JOB_NAME)
 @click.option("--job-owner", default=None, required=False, help=HELP_JOB_OWNER)
-@click.option("--default-configs", "default_configs", multiple=True, default=None, required=False, type=click.Choice(CONFIGURATION_CHOICES), help=HELP_DEFAULT_CONFIGS)
-@click.option("--config-name", "config_name", multiple=False, default=None, required=False, help=HELP_CONFIG_NAME)
-@click.option("--credential", "credential_files", multiple=True, default=None, required=False, help=HELP_CREDENTIAL)
-@click.option("--credential-name", "credential_names", multiple=True, default=None, required=False, help=HELP_CREDENTIAL_NAMES)
-@click.option("--credential-source", "credential_sources", multiple=True, default=None, required=False, help=HELP_CREDENTIAL_SOURCES)
-@click.option("--landscape", "landscape_files", multiple=True, default=None, required=False, help=HELP_LANDSCAPE)
-@click.option("--landscape-name", "landscape_names", multiple=True, default=None, required=False, help=HELP_LANDSCAPE_NAMES)
-@click.option("--landscape-source", "landscape_sources", multiple=True, default=None, required=False, help=HELP_LANDSCAPE_SOURCES)
 @click.option("--runtime", "runtime_files", multiple=True, default=None, required=False, help=HELP_RUNTIME)
 @click.option("--runtime-name", "runtime_names", multiple=True, default=None, required=False, help=HELP_RUNTIME_NAMES)
 @click.option("--runtime-source", "runtime_sources", multiple=True, default=None, required=False, help=HELP_RUNTIME_SOURCES)
-@click.option("--topology", "topology_files", multiple=True, default=None, required=False, help=HELP_TOPOLOGY)
-@click.option("--topology-name", "topology_names", multiple=True, default=None, required=False, help=HELP_TOPOLOGY_NAMES)
-@click.option("--topology-source", "topology_sources", multiple=True, default=None, required=False, help=HELP_TOPOLOGY_SOURCES)
 @click.option("--console-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_CONSOLE_LOG_LEVEL)
 @click.option("--logfile-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_FILE_LOG_LEVEL)
 @click.option("--debugger", default=None, required=False, type=click.Choice(['pdb', 'debugpy']), help=HELP_DEBUGGER)
@@ -101,15 +90,15 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
     # IMPORTANT: We need to load the context first because it will trigger the loading
     # of the default user configuration
 
-    from mojo.collections.contextpaths import ContextPaths
-    from mojo.collections.wellknown import ContextSingleton
+    from automojo.foundation.collections.contextpaths import ContextPaths
+    from automojo.foundation.collections.wellknown import ContextSingleton
 
-    from mojo.xmods.xpython import extend_path
+    from automojo.foundation.xpython import prepend_python_path
 
-    from mojo.runtime.activation import activate_runtime, ActivationProfile
-    from mojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+    from automojo.foundation.runtime.activation import activate_runtime, ActivationProfile
+    from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
     
-    from mojo.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
+    from automojo.foundation.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
 
     # STEP 1 - Initialize the Runtime (Performed by the root command)
 
@@ -145,7 +134,7 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
         if "topology" in default_configs:
             use_topology = True
 
-    from mojo.xmods.markers import MetaFilter, parse_marker_expression
+    from automojo.testbase.markers import MetaFilter, parse_marker_expression
 
     if branch is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_build_branch(branch)
@@ -155,7 +144,6 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
     
     if flavor is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_build_flavor(flavor)
-    
 
     if job_initiator is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_job_id(job_id)
@@ -172,54 +160,6 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
     if job_owner is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_job_owner(job_owner)
 
-
-    if len(credential_files) > 0:
-        use_credentials = True
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_credentials_files(credential_files)
-
-    if len(credential_names) > 0:
-        use_credentials = True
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_credentials_names(credential_names)
-    
-    if len(credential_sources) > 0:
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_credentials_sources(credential_sources)
-
-
-    if len(landscape_files) > 0:
-        use_landscape = True
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_landscape_files(landscape_files)
-
-    if len(landscape_names) > 0:
-        use_landscape = True
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_landscape_names(landscape_names)
-    
-    if len(landscape_sources) > 0:
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_landscape_sources(landscape_sources)
-
-
-    if len(runtime_files) > 0:
-        use_runtime = True
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_runtime_files(runtime_files)
-    
-    if len(runtime_names) > 0:
-        use_runtime = True
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_runtime_names(runtime_names)
-
-    if len(runtime_sources) > 0:
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_runtime_sources(runtime_sources)
-
-
-    if len(topology_files) > 0:
-        use_topology = True
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_topology_files(topology_files)
-    
-    if len(topology_names) > 0:
-        use_topology = True
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_topology_names(topology_names)
-
-    if len(topology_sources) > 0:
-        AM_RUNTIME_OPTION_OVERRIDES.override_config_topology_sources(topology_sources)
-
     if console_level is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_loglevel_console(console_level)
 
@@ -234,13 +174,6 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
     
     if runid is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_run_id(runid)
-
-
-    # STEP 5 - Resolve the Configuration Maps
-    from mojo.config.configurationmaps import resolve_configuration_maps
-    resolve_configuration_maps(use_credentials=use_credentials, use_landscape=use_landscape,
-                               use_runtime=use_runtime, use_topology=use_topology)
-
 
     # STEP 6 - Applying runtime options must happen after we have resolved configuration
     # maps because some of those settings will get overridden by the options.  So the runtime
@@ -285,7 +218,7 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
     # Make sure we extend PATH to include the test roots parent folder so imports will
     # work properly.
     test_root_parent = os.path.dirname(test_root)
-    extend_path(test_root_parent)
+    prepend_python_path(test_root_parent)
 
     metafilters: List[MetaFilter] = []
     for imexp in include_marker_exp:
@@ -313,7 +246,7 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
 
     # STEP 8 - Create and kick off the job
 
-    from mojo.extension.wellknown import ConfiguredSuperFactorySingleton
+    from automojo.foundation.extension.wellknown import ConfiguredSuperFactorySingleton
     from automojo.testbase.extensionprotocols import TestBaseExtensionProtocol
 
     # At this point in the code, we either lookup an existing test job or we create a test job
@@ -322,6 +255,8 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
     TestJobType = sfactory.get_override_types_by_order(TestBaseExtensionProtocol.get_testbase_default_job_type)
 
     result_code = 0
+    tjob: ITestJob
+
     with TestJobType(logger, test_root, includes=includes, excludes=excludes, metafilters=metafilters) as tjob:
         result_code = tjob.execute()
 

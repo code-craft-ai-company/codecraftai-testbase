@@ -2,6 +2,7 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
+
 from automojo.foundation.constants import URL_SEPARATOR
 
 
@@ -18,7 +19,6 @@ HELP_JOB_INITIATOR = "The name of the initiator of the job."
 HELP_JOB_LABEL = "The label associated with the job."
 HELP_JOB_NAME = "The name of the job."
 HELP_JOB_OWNER = "The ownerid and possibly appended ';(display name)' of the test run result owner."
-HELP_DEFAULT_CONFIGS = "Indicates that one or more default configurations should be used."
 HELP_RUNTIME = "The full path of the runtime file to use for the testrun."
 HELP_RUNTIME_NAMES = "The base name of the runtime files to search for in the runtime path."
 HELP_RUNTIME_SOURCES = f"A '{URL_SEPARATOR}' seperated list of source uris to search for runtime documents."

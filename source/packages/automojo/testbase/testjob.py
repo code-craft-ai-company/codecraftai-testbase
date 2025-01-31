@@ -41,9 +41,9 @@ from automojo.testbase.results.model.renderinfo import RenderInfo
 from automojo.testbase.results.recorders.jsonresultrecorder import ResultRecorder, JsonResultRecorder
 
 from automojo.testbase.sequencing.testsequencer import TestSequencer
+from automojo.interfaces.itestjob import ITestJob
 
-
-class TestJob(ContextUser):
+class TestJob(ContextUser, ITestJob):
     """
         The :class:`TestJob` spans the execution of all :class:`TestPack` and organizes the
         flow of execution of test packs.  It allows for the sequencing of the execution of test
@@ -154,7 +154,7 @@ class TestJob(ContextUser):
         
         return
 
-    def execute(self):
+    def execute(self) -> int:
         """
             Runs the tests that are included in the given :class:'TestPack'.
         """

@@ -47,7 +47,23 @@ debugpy = "^1.8.12"
 type = "git"
 url = "git@github.com:automationmojo/automojo-foundation-kit.git"
 reference = "main"
-resolved_reference = "268b40a64d20e393a3fb13daaa2de17b702127c2"
+resolved_reference = "b72df94754d9d47ea8cd0d13983ff1d7438e7f6a"
+
+[[package]]
+name = "automojo-interfaces"
+version = "0.0.1"
+description = "Automation Mojo - Interfaces Package"
+category = "main"
+optional = false
+python-versions = ">=3.10,<4.0"
+files = []
+develop = false
+
+[package.source]
+type = "git"
+url = "git@github.com:automationmojo/automojo-interfaces.git"
+reference = "main"
+resolved_reference = "41f203f66863a2e687808cd39cb1cea9180376de"
 
 [[package]]
 name = "automojo-waiting"
@@ -761,4 +777,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "6b8c5517ce3295f787dda47818a21a9b51185b97764d94f521edbf806f39d510"
+content-hash = "33c9d6ee8819671742f6ae9a011d43b73c30f065b574c1649d510579470d679a"

@@ -8,7 +8,7 @@
 """
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
@@ -26,9 +26,9 @@ from automojo.testbase.coupling.configurationcoupling import ConfigurationCoupli
 from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 from automojo.testbase.coupling.validatorcoupling import ValidatorCoupling
 
-from automojo.testbase.injection.integrationsource import IntegrationSource
-from automojo.testbase.injection.resourcesource import ResourceSource
-from automojo.testbase.injection.validatorsource import ValidatorSource
+from automojo.testbase.sources.integrationsource import IntegrationSource
+from automojo.testbase.sources.resourcesource import ResourceSource
+from automojo.testbase.sources.validatorsource import ValidatorSource
 
 from automojo.testbase.injection.injectionregistry import injection_registry
 

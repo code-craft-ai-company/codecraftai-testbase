@@ -28,4 +28,4 @@ class ValidatorCoupling:
             test scope.
         """
         raise NotOverloadedError("'ValidatorCoupling' derived objects must overload the 'attach_to_test' method.")
-    
+

@@ -1,5 +1,5 @@
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 
 
 from typing import Any, Dict, List, Union
@@ -24,6 +24,7 @@ class Constraints(dict):
         inst = dict(self)
         inst.update(kwargs)
         return inst
+
 
 class ConstraintsCatalog:
     """

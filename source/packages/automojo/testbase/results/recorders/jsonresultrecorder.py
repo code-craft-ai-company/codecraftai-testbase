@@ -7,7 +7,7 @@
 """
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
@@ -18,18 +18,18 @@ import json
 
 from datetime import datetime
 
-from mojo.xmods.jsos import CHAR_RECORD_SEPERATOR
+from automojo.foundation.jsos import CHAR_RECORD_SEPERATOR
 
-from mojo.results.model.buildinfo import BuildInfo
-from mojo.results.model.jobinfo import JobInfo
-from mojo.results.model.pipelineinfo import PipelineInfo
-from mojo.results.model.renderinfo import RenderInfo
+from automojo.testbase.results.model.buildinfo import BuildInfo
+from automojo.testbase.results.model.jobinfo import JobInfo
+from automojo.testbase.results.model.pipelineinfo import PipelineInfo
+from automojo.testbase.results.model.renderinfo import RenderInfo
 
-from mojo.results.model.resultcode import ResultCode
-from mojo.results.model.resultnode import ResultNode
-from mojo.results.model.resulttype import ResultType
+from automojo.testbase.results.model.resultcode import ResultCode
+from automojo.testbase.results.model.resultnode import ResultNode
+from automojo.testbase.results.model.resulttype import ResultType
 
-from mojo.results.recorders.resultrecorder import ResultRecorder
+from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 
 
 class JsonResultEncoder(json.JSONEncoder):

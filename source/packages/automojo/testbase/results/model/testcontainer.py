@@ -8,13 +8,13 @@
 """
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
 
-from mojo.results.model.resulttype import ResultType
-from mojo.results.model.resultcontainer import ResultContainer
+from automojo.testbase.results.model.resulttype import ResultType
+from automojo.testbase.results.model.resultcontainer import ResultContainer
 
 class TestContainer(ResultContainer):
     """

@@ -1,11 +1,11 @@
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
 
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Callable, Dict, Optional, Type
 
 import inspect
 

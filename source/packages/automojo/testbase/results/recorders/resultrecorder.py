@@ -7,9 +7,8 @@
 """
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
-
 
 
 from typing import List, Optional
@@ -24,28 +23,25 @@ import threading
 
 from datetime import datetime
 
-from mojo.errors.exceptions import NotOverloadedError
+from automojo.errors.exceptions import NotOverloadedError
 
-from mojo.xmods.jsos import CHAR_RECORD_SEPERATOR
+from automojo.testbase.results.model.buildinfo import BuildInfo
+from automojo.testbase.results.model.jobinfo import JobInfo
+from automojo.testbase.results.model.pipelineinfo import PipelineInfo
+from automojo.testbase.results.model.renderinfo import RenderInfo
 
-from mojo.results.model.buildinfo import BuildInfo
-from mojo.results.model.jobinfo import JobInfo
-from mojo.results.model.pipelineinfo import PipelineInfo
-from mojo.results.model.renderinfo import RenderInfo
+from automojo.testbase.results.model.resultnode import ResultNode
 
-from mojo.results.model.resultcode import ResultCode
-from mojo.results.model.resultnode import ResultNode
-from mojo.results.model.resulttype import ResultType
-
-from mojo.results.utilities import (
+from automojo.testbase.results.utilities import (
     catalog_tree,
     DEFAULT_DO_NOT_CATALOG_DIRS,
     DEFAULT_DO_NOT_DESCEND_DIRS
 )
 
-from mojo.results.model.progresscode import ProgressCode
-from mojo.results.model.progressinfo import ProgressInfo
-from mojo.results.model.forwardinginfo import ForwardingInfo
+from automojo.testbase.results.model.progresscode import ProgressCode
+from automojo.testbase.results.model.progressinfo import ProgressInfo
+from automojo.testbase.results.model.forwardinginfo import ForwardingInfo
+
 
 class ResultRecorder:
     """

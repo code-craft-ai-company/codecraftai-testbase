@@ -8,7 +8,7 @@
 """
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
@@ -22,7 +22,7 @@ import collections
 import inspect
 
 
-from mojo.xmods.markers import MetaFilter
+from automojo.testbase.markers import MetaFilter
 
 
 class InjectableRef:

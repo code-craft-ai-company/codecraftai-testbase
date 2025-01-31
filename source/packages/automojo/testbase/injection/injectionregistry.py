@@ -1,6 +1,6 @@
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
@@ -11,13 +11,12 @@ from automojo.errors.exceptions import SemanticError
 
 from automojo.testbase.resourcelifespan import ResourceLifespan
 
-from automojo.testbase.sources.configurationsource import ConfigurationSource
 from automojo.testbase.sources.integrationsource import IntegrationSource
 from automojo.testbase.sources.resourcesource import ResourceSource
 from automojo.testbase.sources.validatorsource import ValidatorSource
 
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
-from automojo.testbase.injection.validatororigin import ValidatorOrigin
+from automojo.testbase.origins.validatororigin import ValidatorOrigin
 
 from automojo.testbase.injection.injectableref import InjectableRef
 from automojo.testbase.injection.injectionscope import InjectionScope

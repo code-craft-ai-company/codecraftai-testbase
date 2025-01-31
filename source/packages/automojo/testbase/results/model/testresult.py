@@ -8,7 +8,7 @@
 """
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
@@ -19,11 +19,11 @@ import collections
 
 from dataclasses import asdict as dataclass_as_dict
 
-from mojo.results.model.resultcode import ResultCode
-from mojo.results.model.resultnode import ResultNode
-from mojo.results.model.resulttype import ResultType
+from automojo.testbase.results.model.resultcode import ResultCode
+from automojo.testbase.results.model.resultnode import ResultNode
+from automojo.testbase.results.model.resulttype import ResultType
 
-from mojo.xmods.xdatetime import format_datetime_with_fractional
+from automojo.foundation.xdatetime import format_datetime_with_fractional
 
 class TestResult(ResultNode):
     """

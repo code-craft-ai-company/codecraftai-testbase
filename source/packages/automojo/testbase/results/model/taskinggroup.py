@@ -8,7 +8,7 @@
 """
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
@@ -17,10 +17,10 @@ import collections
 
 from datetime import datetime
 
-from mojo.results.model.resulttype import ResultType
-from mojo.results.model.resultcontainer import ResultContainer
+from automojo.testbase.results.model.resulttype import ResultType
+from automojo.testbase.results.model.resultcontainer import ResultContainer
 
-from mojo.xmods.xdatetime import format_datetime_with_fractional
+from automojo.foundation.xdatetime import format_datetime_with_fractional
 
 
 class TaskingGroup(ResultContainer):

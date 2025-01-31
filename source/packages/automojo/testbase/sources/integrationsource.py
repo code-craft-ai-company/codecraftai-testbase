@@ -1,14 +1,14 @@
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2023, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
 from typing import Callable
 
-from mojo.xmods.injection.coupling.integrationcoupling import IntegrationCoupling
+from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 
-from mojo.xmods.injection.sourcebase import SourceBase
+from automojo.testbase.sources.sourcebase import SourceBase
 
 class IntegrationSource(SourceBase):
 

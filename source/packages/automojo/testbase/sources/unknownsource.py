@@ -1,0 +1,21 @@
+
+__author__ = "Myron Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__credits__ = []
+__version__ = "1.0.0"
+
+
+from typing import Callable, Type
+
+from automojo.testbase.sources.sourcebase import SourceBase
+
+class UnknownSource(SourceBase):
+    """
+        The :class:`UnknownSource` object is used when a parameter is declared for a
+        injectable method of other resource function that cannot be resolved to a source
+        function.  The :class:`UnknownSource` enables the injectable parameters to be queried
+        by acting as a placeholder.
+    """
+    def __init__(self, source_func: Callable, resource_type: Type, constraints: dict):
+        SourceBase.__init__(self, source_func, resource_type, constraints)
+        return

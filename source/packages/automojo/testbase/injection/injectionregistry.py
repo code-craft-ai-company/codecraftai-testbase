@@ -119,15 +119,47 @@ class InjectionRegistry:
         self._scope_tree_root.add_descendent_parameter_origination("<session>", origin)
         return
 
-    def rename_resource_origins_from_main(self, new_origin):
+    def finalize_startup(self, inj_references: Dict[str, InjectableRef]):
         """
-            Walks the scope tree and corrects the resource origin name for resources.
+            ..note: During injectable discovery process, the parameter decorators are executed and the resource
+                    identifier names and source functions are registered and available for consumption via
+                    a query interface or by the sequencer when generating the injectable execution flow code.
 
-            ..note: This is a special use method that is typically use to replace the
-            name '__main__' in resources loaded from a injectable file that is being debugged
-            from a script entry point.
+                    The source functions and identifiers being registered are stored in the scope tree in
+                    order to build data structure that allows for the resolution of scope for the parameters
+                    that and associated identifiers that will be consumed by injectables during the execution of
+                    the execution sequence flow. (This is an implicit step)
         """
-        self._scope_tree_root.rename_resource_origins_from_main(new_origin)
+        # 1. After all the injectables have been imported and injectable references have been created, we
+        #    go through all of the injectable references and ensure we have a completely filled out scope
+        #    tree.  As we go we mark scopes as relavant so we can later go back through the tree and prune
+        #    scope nodes that are not relavant to executing an injectable.
+        for _, inj_ref in inj_references.items():
+            self._scope_tree_root.ensure_injection_scopes_for_injectable(inj_ref)
+
+        # 2. Walk through the entire scope tree and prune non-relevant nodes starting at the leaves and
+        #    working backwards until a relavant node is reached or the root of the tree is reached.
+        self._scope_tree_root.prune_unreference_scopes()
+
+        # 3. Iterate over the injectable references and for each reference, walk through the now pruned
+        #    scope tree utilizing a parameter visibility dictionary chain assigning usages to each
+        #    ResourceOrigin object as a reference is found.  As we walk, we make sure that any parameters
+        #    reference in the current scope are visible in the current parameter dictionary and if not
+        #    store information about the missing parameter.
+        for _, inj_ref in inj_references.items():
+            missing_params = []
+
+            self._scope_tree_root.resolve_resource_originations_for_injectable(inj_ref, missing_params)
+
+            if len(missing_params) > 0:
+                self._unknown_parameters[inj_ref.name] = missing_params
+
+        # 4. Go through all of the injectable references and for each reference, collect integration and
+        #    scope couplings that are referenced so we can build a combined picture of everything that
+        #    is being coupled into the execution run.
+        for _, inj_ref in inj_references.items():
+            self._scope_tree_root.collect_integrations_and_scopes_for_injectable(self._referenced_integrations, self._referenced_scopes)
+
         return
 
     def lookup_resource_scope(self, scope_name):
@@ -240,47 +272,16 @@ class InjectionRegistry:
 
         return
 
-    def finalize_startup(self, inj_references: Dict[str, InjectableRef]):
+    def rename_resource_origins_from_main(self, new_origin):
         """
-            ..note: During injectable discovery process, the parameter decorators are executed and the resource
-                    identifier names and source functions are registered and available for consumption via
-                    a query interface or by the sequencer when generating the injectable execution flow code.
+            Walks the scope tree and corrects the resource origin name for resources.
 
-                    The source functions and identifiers being registered are stored in the scope tree in
-                    order to build data structure that allows for the resolution of scope for the parameters
-                    that and associated identifiers that will be consumed by injectables during the execution of
-                    the execution sequence flow. (This is an implicit step)
+            ..note: This is a special use method that is typically use to replace the
+            name '__main__' in resources loaded from a injectable file that is being debugged
+            from a script entry point.
         """
-        # 1. After all the injectables have been imported and injectable references have been created, we
-        #    go through all of the injectable references and ensure we have a completely filled out scope
-        #    tree.  As we go we mark scopes as relavant so we can later go back through the tree and prune
-        #    scope nodes that are not relavant to executing an injectable.
-        for _, inj_ref in inj_references.items():
-            self._scope_tree_root.ensure_injection_scopes_for_injectable(inj_ref)
-
-        # 2. Walk through the entire scope tree and prune non-relevant nodes starting at the leaves and
-        #    working backwards until a relavant node is reached or the root of the tree is reached.
-        self._scope_tree_root.prune_unreference_scopes()
-
-        # 3. Iterate over the injectable references and for each reference, walk through the now pruned
-        #    scope tree utilizing a parameter visibility dictionary chain assigning usages to each
-        #    ResourceOrigin object as a reference is found.  As we walk, we make sure that any parameters
-        #    reference in the current scope are visible in the current parameter dictionary and if not
-        #    store information about the missing parameter.
-        for _, inj_ref in inj_references.items():
-            missing_params = []
-
-            self._scope_tree_root.resolve_resource_originations_for_injectable(inj_ref, missing_params)
-
-            if len(missing_params) > 0:
-                self._unknown_parameters[inj_ref.name] = missing_params
-
-        # 4. Go through all of the injectable references and for each reference, collect integration and
-        #    scope couplings that are referenced so we can build a combined picture of everything that
-        #    is being coupled into the execution run.
-        for _, inj_ref in inj_references.items():
-            self._scope_tree_root.collect_integrations_and_scopes_for_injectable(self._referenced_integrations, self._referenced_scopes)
-
+        self._scope_tree_root.rename_resource_origins_from_main(new_origin)
         return
+
 
 injection_registry = InjectionRegistry()

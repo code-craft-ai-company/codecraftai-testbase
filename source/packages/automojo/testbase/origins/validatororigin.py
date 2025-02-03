@@ -17,7 +17,8 @@ constraints_catalog = ConstraintsCatalog()
 
 class ValidatorOrigin:
 
-    def __init__(self, originating_scope: str, identifier: str, suffix: str, source: Optional[SourceBase] = None, implied: bool = False, constraints: Optional[Dict] = None):
+    def __init__(self, originating_scope: str, identifier: str, suffix: str, source: Optional[SourceBase] = None,
+                 implied: bool = False, constraints: Optional[Dict] = None):
         self._originating_scope = originating_scope
         self._identifier = identifier
         self._suffix = suffix

@@ -44,6 +44,7 @@ def param(source, *, identifier: Optional[None], constraints: Optional[Dict[str,
         return subscriber
     return decorator
 
+
 def validate(source, *, suffix: str, identifier: Optional[None]=None, constraints: Optional[Dict[str, Any]]=None):
     def decorator(subscriber: Callable) -> Callable:
         nonlocal source

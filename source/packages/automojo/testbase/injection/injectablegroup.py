@@ -32,9 +32,9 @@ class InjectableGroup:
               -------------
               |  Group A  |
         ---------------------------
-        |  Group AA  |  Scope AB  |
+        |  Group AA  |  Group AB  |
         -------------------------------
-        |         Scope AAA/ABA       |
+        |         Group AAA/ABA       |
         -------------------------------
     """
 

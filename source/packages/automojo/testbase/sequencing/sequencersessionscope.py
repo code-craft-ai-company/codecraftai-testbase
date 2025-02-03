@@ -19,20 +19,20 @@ import os
 
 from types import TracebackType
 
-from mojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
+from automojo.errors.exceptions import SkipError
+from automojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
 
-from mojo.results.recorders.resultrecorder import ResultRecorder
-from mojo.results.model.jobcontainer import JobContainer
+from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
+from automojo.testbase.results.model.jobcontainer import JobContainer
 
-from mojo.errors.exceptions import SkipError
-from mojo.testbase.sequencing.sequencerscopebase import SequencerScopeBase
+from automojo.testbase.sequencing.sequencerscopebase import SequencerScopeBase
 
 
 logger = logging.getLogger()
 
 
 if TYPE_CHECKING:
-    from mojo.testbase.sequencing.testsequencer import TestSequencer
+    from automojo.testbase.sequencing.testsequencer import TestSequencer
 
 
 class SequencerSessionScope(SequencerScopeBase):

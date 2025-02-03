@@ -18,15 +18,15 @@ from typing import TYPE_CHECKING
 import logging
 import uuid
 
-from mojo.errors.xtraceback import TracebackDetail
+from automojo.errors.xtraceback import TracebackDetail
 
-from mojo.results.recorders.resultrecorder import ResultRecorder
+from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 
-from mojo.testbase.testgroup import TestGroup
-from mojo.testbase.testref import TestRef
+from automojo.testbase.testgroup import TestGroup
+from automojo.testbase.testref import TestRef
 
 if TYPE_CHECKING:
-    from mojo.testbase.sequencing.testsequencer import TestSequencer
+    from automojo.testbase.sequencing.testsequencer import TestSequencer
 
 
 logger = logging.getLogger()

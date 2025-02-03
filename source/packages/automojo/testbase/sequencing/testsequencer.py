@@ -85,7 +85,7 @@ import logging
 
 logger = logging.getLogger()
 
-from mojo.testbase import ConstraintsCatalog
+from automojo.testbase.cconstraints import ConstraintsCatalog
 
 constraints_catalog = ConstraintsCatalog()
 

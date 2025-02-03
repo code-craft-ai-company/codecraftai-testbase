@@ -22,19 +22,20 @@ from types import TracebackType
 
 from collections import OrderedDict
 
-from mojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
-from mojo.results.recorders.resultrecorder import ResultRecorder
-from mojo.runtime.paths import get_path_for_testcase_by_products
+from automojo.errors.exceptions import SkipError
+from automojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
 
-from mojo.testbase.exceptions import SkipError
-from mojo.testbase.sequencing.testactivity import TestActivity
+from automojo.foundation.runtime.paths import get_path_for_testcase_by_products
 
+from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
+
+from automojo.testbase.sequencing.testactivity import TestActivity
 
 logger = logging.getLogger()
 
 
 if TYPE_CHECKING:
-    from mojo.testbase.sequencing.testsequencer import TestSequencer
+    from automojo.testbase.sequencing.testsequencer import TestSequencer
 
 
 

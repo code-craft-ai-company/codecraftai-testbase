@@ -1,6 +1,6 @@
 
 __author__ = "Myron Walker"
-__copyright__ = "Copyright 2020, Myron W Walker"
+__copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
@@ -10,8 +10,8 @@ import json
 
 from datetime import datetime
 
-from mojo.xmods.xdatetime import format_datetime_with_fractional
-from mojo.xmods.jsos import CHAR_RECORD_SEPERATOR
+from automojo.foundation.xdatetime import format_datetime_with_fractional
+from automojo.foundation.jsos import CHAR_RECORD_SEPERATOR
 
 from types import TracebackType
 

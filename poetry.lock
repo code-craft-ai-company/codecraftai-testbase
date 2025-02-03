@@ -67,7 +67,7 @@ develop = false
 type = "git"
 url = "git@github.com:automationmojo/automojo-waiting.git"
 reference = "main"
-resolved_reference = "fa2247a33ec671c790773ca514740ab6c39875c0"
+resolved_reference = "c0ed77ea1791bee68488a49d44127e35c849b5b0"
 
 [[package]]
 name = "click"
@@ -135,4 +135,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "00ad75648285fdb617bb24086d6a82bbe0a743293c1e8189e4ed38813bcbb087"
+content-hash = "c97c623b4bd6b056190efe079bf4d67730eb6ba120b20aeb116fc1bf8e9e038d"

@@ -28,9 +28,6 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
     HELP_JOB_LABEL,
     HELP_JOB_NAME,
     HELP_JOB_OWNER,
-    HELP_RUNTIME,
-    HELP_RUNTIME_NAMES,
-    HELP_RUNTIME_SOURCES,
     HELP_RUNID,
     HELP_CONSOLE_LOG_LEVEL,
     HELP_FILE_LOG_LEVEL,
@@ -57,9 +54,6 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
 @click.option("--job-label", default=None, required=False, help=HELP_JOB_LABEL)
 @click.option("--job-name", default=None, required=False, help=HELP_JOB_NAME)
 @click.option("--job-owner", default=None, required=False, help=HELP_JOB_OWNER)
-@click.option("--runtime", "runtime_files", multiple=True, default=None, required=False, help=HELP_RUNTIME)
-@click.option("--runtime-name", "runtime_names", multiple=True, default=None, required=False, help=HELP_RUNTIME_NAMES)
-@click.option("--runtime-source", "runtime_sources", multiple=True, default=None, required=False, help=HELP_RUNTIME_SOURCES)
 @click.option("--console-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_CONSOLE_LOG_LEVEL)
 @click.option("--logfile-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_FILE_LOG_LEVEL)
 @click.option("--debugger", default=None, required=False, type=click.Choice(['pdb', 'debugpy']), help=HELP_DEBUGGER)
@@ -69,7 +63,7 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
 @click.option("--include-marker-exp", required=False, multiple=True, help=HELP_INCLUDE_MARKER_EXP)
 @click.option("--exclude-marker-exp", required=False, multiple=True, help=HELP_EXCLUDE_MARKER_EXP)
 def command_testbase_testing_run(root, includes, excludes, output, start, runid, branch, build, flavor, job_id, job_initiator,
-                        job_label, job_name, job_owner, default_configs, console_level, logfile_level,
+                        job_label, job_name, job_owner, console_level, logfile_level,
                         debugger, breakpoints, prerun_diagnostic, postrun_diagnostic, include_marker_exp,
                         exclude_marker_exp):
 
@@ -102,8 +96,7 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
     
     ctx = ContextSingleton()
 
-
-    # STEP 4 - Apply any 'Environment' Option Overrides
+    # STEP 4 - Apply any "Command Line" option overrides
 
     from automojo.testbase.markers import MetaFilter, parse_marker_expression
 

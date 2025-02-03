@@ -1,0 +1,22 @@
+
+{
+    "activity-name": "first activity",
+    "detail": null,
+    "target": "NA",
+    "begin": "2025-01-19T13:20:26.433559",
+    "end": "2025-01-19T13:20:28.439165"
+}
+{
+    "activity-name": "second activity",
+    "detail": null,
+    "target": "NA",
+    "begin": "2025-01-19T13:20:28.441117",
+    "end": "2025-01-19T13:20:28.441125"
+}
+{
+    "activity-name": "third activity",
+    "detail": null,
+    "target": "NA",
+    "begin": "2025-01-19T13:20:28.441555",
+    "end": "2025-01-19T13:20:30.444240"
+}

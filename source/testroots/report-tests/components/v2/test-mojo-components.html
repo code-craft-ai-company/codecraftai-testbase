@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!--
+        __author__ = "Myron Walker"
+        __copyright__ = "Copyright 2024, Myron W Walker"
+        __version__ = "2.0.0"
+    -->
+    <head>
+
+        <link rel="stylesheet" href="/static/v2/styles/icon-styles.css" ></link>
+        <link rel="stylesheet" href="/static/v2/styles/mojo-components.css" ></link>
+
+        <script type="text/javascript" src="/static/v2/javascript/webcomponent-helpers.js"></script>
+        <script type="text/javascript" src="/static/v2/javascript/icon-components.js"></script>
+        <script type="text/javascript" src="/static/v2/javascript/mojo-components.js"></script>
+
+        <script type="text/javascript">
+
+            function on_page_load() {
+                
+                register_mojo_components();
+
+                var collapsibleEl = document.querySelector("#id-test-collapsible");
+                collapsibleEl.syncData("Expand Me", "<h1>Hello World</h1>", false);
+
+                var propSingleEl = document.querySelector("#id-test-property-single");
+                propSingleEl.syncData("Hello", "World");
+
+                var propTableEl = document.querySelector("#id-test-property-table");
+                propTableEl.syncData({
+                    "Color": "Blue",
+                    "Width": 5,
+                    "Height": 10,
+                });
+
+                var tabs = [
+                    new MojoTabPage("A", "A", "<h2>Hello A</h2>"),
+                    new MojoTabPage("B", "B", "<h2>Hello B</h2>"),
+                    new MojoTabPage("C", "C", "<h2>Hello C</h2>")
+                ];
+
+                var tabSetEl = document.querySelector("#id-test-tabset");
+                tabSetEl.syncData(tabs);
+                
+                var projectInfo = {
+                    "name": "Big Widget",
+                    "startdate": "2024-3-1 08:00:00",
+                    "enddate": "2025-3-1 08:00:00",
+                    "branches" : {
+                        "release": {
+                            "id": "2fa91b50-5793-4b78-a027-cde5bc3bdb59",
+                            "name": "Release",
+                            "role": "Release Delivery",
+                            "type": "persistent",
+                            "style": { "color": "gray" }
+                        },
+                        "main" : {
+                            "id": "fe0cbc78-4e82-480b-bea5-4a945dfd44e5",
+                            "name": "Main",
+                            "role": "Production Main",
+                            "type": "persistent",
+                            "upstream": "2fa91b50-5793-4b78-a027-cde5bc3bdb59",
+                            "style": { "color": "gray" }
+                        },
+                        "merge": [
+                            {
+                                "id": "31458869-311e-4091-9cca-e478507a5673",
+                                "name": "Big Widget - Phase 1 Merge",
+                                "role": "Phase 1 Merge",
+                                "upstream": "fe0cbc78-4e82-480b-bea5-4a945dfd44e5",
+                                "creation": "2024-1-1 08:00:00",
+                                "codecomplete": "2024-3-1 08:00:00",
+                                "upmerge": "2024-3-15 08:00:00",
+                                "completion": "2024-3-20 08:00:00",
+                                "refreshes": [],
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "8697d556-f9d8-42fc-9fd4-07baa437829d",
+                                "name": "Big Widget - Phase 2 Merge",
+                                "role": "Phase 2 Merge",
+                                "upstream": "fe0cbc78-4e82-480b-bea5-4a945dfd44e5",
+                                "creation": "2024-1-1 08:00:00",
+                                "codecomplete": "2024-6-1 08:00:00",
+                                "upmerge": "2024-6-15 08:00:00",
+                                "completion": "2024-6-20 08:00:00",
+                                "refreshes": [
+                                    "2024-6-21 08:00:00"
+                                ],
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "66ec6cb9-77bf-4e3f-9f8e-1c47bcde33b8",
+                                "name": "Big Widget - Phase 3 Merge",
+                                "role": "Phase 3 Merge",
+                                "upstream": "fe0cbc78-4e82-480b-bea5-4a945dfd44e5",
+                                "creation": "2024-3-21 08:00:00",
+                                "codecomplete": "2024-9-1 08:00:00",
+                                "upmerge": "2024-9-15 08:00:00",
+                                "completion": "2024-9-20 08:00:00",
+                                "refreshes": [],
+                                "style": { "color": "gray" }
+                            }
+                        ],
+                        "feature": [
+                            {
+                                "id": "43956418-a8b9-4268-8e84-df726d2a7a80",
+                                "name": "Big Widget - Feature A",
+                                "role": "Development - Feature A",
+                                "upstream": "31458869-311e-4091-9cca-e478507a5673",
+                                "creation": "2024-1-1 08:00:00",
+                                "codecomplete": "2024-3-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "59b1b6ad-0fd5-45d7-8a73-bd328c0492cf",
+                                "name": "Big Widget - Feature B",
+                                "role": "Development - Feature B",
+                                "upstream": "31458869-311e-4091-9cca-e478507a5673",
+                                "creation": "2024-1-1 08:00:00",
+                                "codecomplete": "2024-3-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "f36add7b-6ffd-4530-9fd8-dc453a45be40",
+                                "name": "Big Widget - Feature C",
+                                "role": "Development - Feature C",
+                                "upstream": "31458869-311e-4091-9cca-e478507a5673",
+                                "creation": "2024-1-1 08:00:00",
+                                "codecomplete": "2024-3-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "f434369e-97c5-489b-be7b-31c72ae284b1",
+                                "name": "Big Widget - Feature A2",
+                                "role": "Development - Feature A2",
+                                "upstream": "8697d556-f9d8-42fc-9fd4-07baa437829d",
+                                "creation": "2024-1-1 08:00:00",
+                                "codecomplete": "2024-6-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "5335ef50-ea9b-4e99-9f4c-dc2ce5232528",
+                                "name": "Big Widget - Feature D",
+                                "role": "Development - Feature D",
+                                "upstream": "8697d556-f9d8-42fc-9fd4-07baa437829d",
+                                "creation": "2024-1-1 08:00:00",
+                                "codecomplete": "2024-6-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "9eca2a58-74ae-48aa-bd31-d3f15da8e8c5",
+                                "name": "Big Widget - Feature E",
+                                "role": "Development - Feature E",
+                                "upstream": "8697d556-f9d8-42fc-9fd4-07baa437829d",
+                                "creation": "2024-1-1 08:00:00",
+                                "codecomplete": "2024-6-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "c6c48608-5cba-4e09-a3df-2bb2ccfc4351",
+                                "name": "Big Widget - Feature B2",
+                                "role": "Development - Feature B2",
+                                "upstream": "66ec6cb9-77bf-4e3f-9f8e-1c47bcde33b8",
+                                "creation": "2024-3-21 08:00:00",
+                                "codecomplete": "2024-9-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "0dd49c71-4af8-4e28-bcce-40c89a0b4599",
+                                "name": "Big Widget - Feature F",
+                                "role": "Development - Feature F",
+                                "upstream": "66ec6cb9-77bf-4e3f-9f8e-1c47bcde33b8",
+                                "creation": "2024-3-21 08:00:00",
+                                "codecomplete": "2024-9-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "43e4db60-723b-43ef-9dad-76e8ec562c00",
+                                "name": "Big Widget - Feature D2",
+                                "role": "Development - Feature D2",
+                                "upstream": "66ec6cb9-77bf-4e3f-9f8e-1c47bcde33b8",
+                                "creation": "2024-3-21 08:00:00",
+                                "codecomplete": "2024-9-1 08:00:00",
+                                "style": { "color": "gray" }
+                            },
+                            {
+                                "id": "e86a7d76-f1e9-4799-abba-7d5df915e4b7",
+                                "name": "Big Widget - Feature G",
+                                "role": "Development - Feature G",
+                                "upstream": "66ec6cb9-77bf-4e3f-9f8e-1c47bcde33b8",
+                                "creation": "2024-3-21 08:00:00",
+                                "codecomplete": "2024-9-1 08:00:00",
+                                "style": { "color": "gray" }
+                            }
+                        ]
+                    }
+                }
+
+                var projectTimelineEl = document.querySelector("#id-test-project-timeline");
+                projectTimelineEl.syncData(projectInfo);
+
+
+            }
+
+        </script>
+
+    </head>
+    <body onload="on_page_load()">
+        <style>
+            .test-icon-target {
+                height: 24px;
+                width: 24px;
+                fill:white;
+                background-color: #a8bad4;
+            }
+        </style>
+
+        <div class='section-body mojo-page'>
+            <h3>Collapsible</h3>
+            <mojo-collapsible id="id-test-collapsible">
+                <p>Blah Blah</p>
+            </mojo-collapsible>
+            <br></br>
+
+            <h3>Icon Target</h3>
+            <div style="display: flex; flex-flow: row; gap: 2px;">
+                <mojo-icon-target id="id-test-icon-bug" class="test-icon-target" tooltip="Report Bug">
+                    <icon-bug></icon-bug>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-copy" class="test-icon-target" tooltip="Copy">
+                    <icon-copy></icon-copy>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-file" class="test-icon-target">
+                    <icon-file></icon-file>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-filter" class="test-icon-target">
+                    <icon-filter></icon-filter>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-folder" class="test-icon-target">
+                    <icon-folder></icon-folder>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-folder-code" class="test-icon-target">
+                    <icon-folder-code></icon-folder-code>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-folder-data" class="test-icon-target">
+                    <icon-folder-data></icon-folder-data>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-folder-eye" class="test-icon-target">
+                    <icon-folder-eye></icon-folder-eye>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-folder-managed" class="test-icon-target">
+                    <icon-folder-managed></icon-folder-managed>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-note-add" class="test-icon-target" tooltip="Add Note">
+                    <icon-note-add></icon-note-add>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-note-stack" class="test-icon-target" tooltip="Add Note">
+                    <icon-note-stack></icon-note-stack>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-search" class="test-icon-target" tooltip="Search">
+                    <icon-search></icon-search>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-settings" class="test-icon-target">
+                    <icon-settings></icon-settings>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-question" class="test-icon-target">
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-question" class="test-icon-target">
+                    <icon-question-mark></icon-question-mark>
+                </mojo-icon-target>
+                <mojo-icon-target id="id-test-icon-warning" class="test-icon-target">
+                    <icon-warning></icon-warning>
+                </mojo-icon-target>
+            </div>
+            <br></br>
+
+            <h3>Poperty Single</h3>
+            <mojo-property-single id="id-test-property-single">
+            </mojo-property-single>
+            <br></br>
+            
+            <h3>Property Table</h3>
+            <mojo-property-table id="id-test-property-table">
+            </mojo-property-table>
+            <br></br>
+
+            <h3>Tab Set</h3>
+            <mojo-tabset id="id-test-tabset">
+            </mojo-tabset>
+            <br></br>
+
+            <h3>Project Timeline</h3>
+            <mojo-project-timeline id="id-test-project-timeline">
+            </mojo-project-timeline>
+        </div>
+          
+        <div class='section-footer'>
+            <testsummary-filesandfolders id="testsummary-filesandfolders"/>
+        </div>
+        
+    </body>
+</html>

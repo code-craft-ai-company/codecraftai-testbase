@@ -69,17 +69,10 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
 @click.option("--include-marker-exp", required=False, multiple=True, help=HELP_INCLUDE_MARKER_EXP)
 @click.option("--exclude-marker-exp", required=False, multiple=True, help=HELP_EXCLUDE_MARKER_EXP)
 def command_testbase_testing_run(root, includes, excludes, output, start, runid, branch, build, flavor, job_id, job_initiator,
-                        job_label, job_name, job_owner, default_configs, config_name, credential_files, credential_names, credential_sources,
-                        landscape_files, landscape_names, landscape_sources, runtime_files, runtime_names, runtime_sources,
-                        topology_files, topology_names, topology_sources, console_level, logfile_level,
+                        job_label, job_name, job_owner, default_configs, console_level, logfile_level,
                         debugger, breakpoints, prerun_diagnostic, postrun_diagnostic, include_marker_exp,
                         exclude_marker_exp):
 
-    if config_name is not None:
-        if config_name not in landscape_names:
-            landscape_names.append(config_name)
-        if config_name not in topology_names:
-            topology_names.append(config_name)
 
     # pylint: disable=unused-import,import-outside-toplevel
 
@@ -111,28 +104,6 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
 
 
     # STEP 4 - Apply any 'Environment' Option Overrides
-
-    # We need to default these to 'None' so they do not effect the runtime behavior unless
-    # this command explicitly sets them later.
-    use_credentials = None
-    use_landscape = None
-    use_runtime = None
-    use_topology = None
-
-    if "all" in default_configs:
-        use_credentials = True
-        use_landscape = True
-        use_runtime = True
-        use_topology = True
-    else:
-        if "credentials" in default_configs:
-            use_credentials = True
-        if "landscape" in default_configs:
-            use_landscape = True
-        if "runtime" in default_configs:
-            use_runtime = True
-        if "topology" in default_configs:
-            use_topology = True
 
     from automojo.testbase.markers import MetaFilter, parse_marker_expression
 

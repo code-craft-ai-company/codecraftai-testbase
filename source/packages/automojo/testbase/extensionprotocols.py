@@ -12,7 +12,7 @@ from automojo.foundation.extension.extensionprotocolbase import ExtensionProtoco
 
 class TestBaseExtensionProtocol(ExtensionProtocolBase):
 
-    ext_protocol_name = "mojo-testbase"
+    ext_protocol_name = "automojo-testbase"
 
     def get_testbase_default_job_type() -> Type[TestJob]:
         """

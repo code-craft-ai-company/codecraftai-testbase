@@ -1,18 +1,18 @@
 
 
-import mojo.testplus as testplus
+import automojo.testbase as testbase
 
 import time
 
-from mojo.testplus.sequencing.sequencertestscope import SequencerTestScope as TestScope
+from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope as TestScope
 
 def test_constraint_constrained_parameter(blah: str):
-    testplus.logger.info(f"test_constraint_constrained_parameter: blah={blah}.")
+    testbase.logger.info(f"test_constraint_constrained_parameter: blah={blah}.")
     return
 
 
 def test_tscope_parameter(tscope: TestScope, blah: str):
-    testplus.logger.info(f"test_constraint_constrained_parameter: blah={blah}.")
+    testbase.logger.info(f"test_constraint_constrained_parameter: blah={blah}.")
     return
 
 def test_activity_logging(tscope: TestScope):
@@ -29,5 +29,5 @@ def test_activity_logging(tscope: TestScope):
 
 
 if __name__ == "__main__":
-    from mojo.testplus.entrypoints import generic_test_entrypoint
+    from automojo.testbase.entrypoints import generic_test_entrypoint
     generic_test_entrypoint()

@@ -12,6 +12,21 @@
             "console": "integratedTerminal",
             "justMyCode": false,
             "envFile": "${workspaceFolder}/.env"
-        }
+        },
+        {
+            "name": "Python: Internal Tests - Run",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/source/packages/automojo/testbase/cli/testbase_command.py",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "testing",
+                "run",
+                "--root=${workspaceFolder}/source/testroots/automojo",
+                "--includes=automojo.tests.testbase"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
     ]
 }

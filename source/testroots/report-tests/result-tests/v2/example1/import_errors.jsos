@@ -1,6 +1,6 @@
 
 {
-    "module": "mojo.tests.testplus.local.test_import_failure",
+    "module": "automojo.tests.testbase.local.test_import_failure",
     "filename": "/Users/myron/repos/testplus/source/testroots/mojo/tests/testplus/local/test_import_failure.py",
     "trace": [
         "Traceback (most recent call last):",

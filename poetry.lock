@@ -35,7 +35,7 @@ debugpy = "^1.8.12"
 type = "git"
 url = "git@github.com:automationmojo/automojo-foundation-kit.git"
 reference = "main"
-resolved_reference = "f2370c165fc5e368f91cdb0c6a1c26eac320f92a"
+resolved_reference = "cc5be49c6cccc0e61825c3da632e38976b69f1a8"
 
 [[package]]
 name = "automojo-interfaces"

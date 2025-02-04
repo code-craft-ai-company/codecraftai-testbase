@@ -97,7 +97,7 @@ def command_testbase_testing_jobs_run(root, job, output, start, branch, build, f
 
         logger = logging.getLogger()
 
-        tpmod = sys.modules["mojo.testbase"]
+        tpmod = sys.modules["automojo.testbase"]
         tpmod.logger = logger
 
         from automojo.foundation.extension.wellknown import ConfiguredSuperFactorySingleton

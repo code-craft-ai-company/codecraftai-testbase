@@ -6,43 +6,43 @@
     "rtype": "JOB"
 }
 {
-    "name": "mojo",
+    "name": "automojo",
     "instance": "6765a520-edf7-4c39-aa92-a27eed2d6ad3",
     "parent": "7f280df5-f48d-4251-adc7-1c6e9e520e50",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests",
+    "name": "automojo.tests",
     "instance": "b0983c0d-6d75-4114-957e-fcc5c1ffefe5",
     "parent": "6765a520-edf7-4c39-aa92-a27eed2d6ad3",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop",
+    "name": "automojo.tests.interop",
     "instance": "ffa784ae-ad2b-4e46-ad3e-a6923e4340b5",
     "parent": "b0983c0d-6d75-4114-957e-fcc5c1ffefe5",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop.casey",
+    "name": "automojo.tests.interop.casey",
     "instance": "bab291de-a7fd-4ad8-a74c-9fc0b06e98d4",
     "parent": "ffa784ae-ad2b-4e46-ad3e-a6923e4340b5",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop.casey.protocols",
+    "name": "automojo.tests.interop.casey.protocols",
     "instance": "5f89b053-7e85-4027-abd8-a128e5f8a600",
     "parent": "bab291de-a7fd-4ad8-a74c-9fc0b06e98d4",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.tasker",
+    "name": "automojo.tests.interop.casey.protocols.tasker",
     "instance": "1cf4b29a-959e-48e1-92eb-faa00fa4f729",
     "parent": "5f89b053-7e85-4027-abd8-a128e5f8a600",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.tasker#test_tasker_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.tasker#test_tasker_say_hello",
     "monikers": [
         "<mojo.interop.protocols.tasker.taskingadapter.TaskingAdapter object at 0x110bd5d00>"
     ],
@@ -65,7 +65,7 @@
     "stop": ""
 }
 {
-    "name": "mojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+    "name": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
     "instance": "e1d4b858-9ab3-40f7-9bbe-e3a3b7a921e9",
     "parent": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
     "rtype": "TASKING",
@@ -82,7 +82,7 @@
     }
 }
 {
-    "name": "mojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+    "name": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
     "instance": "d502af64-0d70-44e2-8814-b57630df570b",
     "parent": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
     "rtype": "TASKING",
@@ -99,7 +99,7 @@
     }
 }
 {
-    "name": "mojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+    "name": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
     "instance": "7c8aee68-e9fd-4f63-ae99-ba82c7ecabf6",
     "parent": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
     "rtype": "TASKING",
@@ -116,7 +116,7 @@
     }
 }
 {
-    "name": "mojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+    "name": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
     "instance": "8139ce29-c83a-4375-ac2c-7e3556f035dd",
     "parent": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
     "rtype": "TASKING",
@@ -141,7 +141,7 @@
     "stop": "2025-01-19T12:11:21.737141"
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.tasker#test_tasker_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.tasker#test_tasker_say_hello",
     "monikers": [
         "<mojo.interop.protocols.tasker.taskingadapter.TaskingAdapter object at 0x110bd5d00>"
     ],

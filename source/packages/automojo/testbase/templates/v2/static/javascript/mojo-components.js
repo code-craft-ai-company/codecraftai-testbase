@@ -10,7 +10,7 @@ class MojoIconTarget extends HTMLElement {
     static tagname = 'mojo-icon-target'
 
     static template = `
-        <div id="id-icon-target" class="mojo-icon-target">
+        <div id="id-icon-target" class="automojo-icon-target">
             <icon-question-mark></icon-question-mark>
         </div>
     `
@@ -92,7 +92,7 @@ class MojoIconTarget extends HTMLElement {
         var ttEl = containerEl.querySelector(this.sel_tooltip);
 
         if (tooltip.trim().length == 0) {
-            containerEl.classList.remove("mojo-tooltip");
+            containerEl.classList.remove("automojo-tooltip");
 
             if (ttEl != undefined) {
                 containerEl.removeChild(ttEl);
@@ -102,12 +102,12 @@ class MojoIconTarget extends HTMLElement {
                 ttEl = document.createElement("span");
 
                 ttEl.setAttribute("id", "id-tooltip");
-                ttEl.classList.add("mojo-tooltip-text");
+                ttEl.classList.add("automojo-tooltip-text");
 
                 containerEl.appendChild(ttEl);
             }
 
-            containerEl.classList.add("mojo-tooltip");
+            containerEl.classList.add("automojo-tooltip");
             ttEl.innerHTML = tooltip;
         }
     
@@ -121,12 +121,12 @@ class MojoCollapsible extends HTMLElement {
     static tagname = 'mojo-collapsible'
 
     static template = `
-        <div id="id-collapsible-container" class="mojo-collapsible" >
-            <div id="id-collapsible-button" class="mojo-collapsible-button">
-                <div id="id-header-text" class="mojo-collapsible-header"></div>
-                <div id="id-header-icon" class="mojo-collapsible-icon">+</div>
+        <div id="id-collapsible-container" class="automojo-collapsible" >
+            <div id="id-collapsible-button" class="automojo-collapsible-button">
+                <div id="id-header-text" class="automojo-collapsible-header"></div>
+                <div id="id-header-icon" class="automojo-collapsible-icon">+</div>
             </div>
-            <div id="id-collapsible-content" class="mojo-collapsible-content">
+            <div id="id-collapsible-content" class="automojo-collapsible-content">
             </div>
         </div>
     `
@@ -209,12 +209,12 @@ class MojoCollapsibleLvl2 extends MojoCollapsible {
     static tagname = 'mojo-collapsible-lvl2'
 
     static template = `
-        <div id="id-collapsible-container" class="mojo-collapsible-lvl2" >
-            <div id="id-collapsible-button" class="mojo-collapsible-lvl2-button">
-                <div id="id-header-text" class="mojo-collapsible-lvl2-header"></div>
-                <div id="id-header-icon" class="mojo-collapsible-lvl2-icon">+</div>
+        <div id="id-collapsible-container" class="automojo-collapsible-lvl2" >
+            <div id="id-collapsible-button" class="automojo-collapsible-lvl2-button">
+                <div id="id-header-text" class="automojo-collapsible-lvl2-header"></div>
+                <div id="id-header-icon" class="automojo-collapsible-lvl2-icon">+</div>
             </div>
-            <div id="id-collapsible-content" class="mojo-collapsible-lvl2-content">
+            <div id="id-collapsible-content" class="automojo-collapsible-lvl2-content">
             </div>
         </div>
     `
@@ -234,12 +234,12 @@ class MojoCollapsibleLvl3 extends MojoCollapsible {
     static tagname = 'mojo-collapsible-lvl3'
 
     static template = `
-        <div id="id-collapsible-container" class="mojo-collapsible-lvl3" >
-            <div id="id-collapsible-button" class="mojo-collapsible-lvl3-button">
-                <div id="id-header-text" class="mojo-collapsible-lvl3-header"></div>
-                <div id="id-header-icon" class="mojo-collapsible-lvl3-icon">+</div>
+        <div id="id-collapsible-container" class="automojo-collapsible-lvl3" >
+            <div id="id-collapsible-button" class="automojo-collapsible-lvl3-button">
+                <div id="id-header-text" class="automojo-collapsible-lvl3-header"></div>
+                <div id="id-header-icon" class="automojo-collapsible-lvl3-icon">+</div>
             </div>
-            <div id="id-collapsible-content" class="mojo-collapsible-lvl3-content">
+            <div id="id-collapsible-content" class="automojo-collapsible-lvl3-content">
             </div>
         </div>
     `
@@ -257,10 +257,10 @@ class MojoCollapsibleLvl3 extends MojoCollapsible {
 
 class MojoProjectTimeline extends HTMLElement {
 
-    static tagname = "mojo-project-timeline"
+    static tagname = "automojo-project-timeline"
 
     static template = `
-        <div class="mojo-project-timeline">
+        <div class="automojo-project-timeline">
         </div>
     `
 
@@ -304,20 +304,20 @@ class MojoProjectTimeline extends HTMLElement {
 
 class MojoPropertySingle extends HTMLElement {
 
-    static tagname = "mojo-property-single"
+    static tagname = "automojo-property-single"
 
     static template = `
-        <div id="id-property-single-container" class="mojo-prop-single">
-            <div id="id-property-single-label" class="mojo-prop-single-label"></div>
-            <div id="id-property-single-value" class="mojo-prop-single-value"></div>
-            <div id="id-property-single-copy" class="mojo-prop-single-copy"><icon-copy></icon-copy></div>
+        <div id="id-property-single-container" class="automojo-prop-single">
+            <div id="id-property-single-label" class="automojo-prop-single-label"></div>
+            <div id="id-property-single-value" class="automojo-prop-single-value"></div>
+            <div id="id-property-single-copy" class="automojo-prop-single-copy"><icon-copy></icon-copy></div>
         </div>
     `
 
-    default_classes_container = ["mojo-prop-single"]
-    default_classes_copy = ["mojo-prop-single-copy"]
-    default_classes_label = ["mojo-prop-single-label"]
-    default_classes_value = ["mojo-prop-single-value"]
+    default_classes_container = ["automojo-prop-single"]
+    default_classes_copy = ["automojo-prop-single-copy"]
+    default_classes_label = ["automojo-prop-single-label"]
+    default_classes_value = ["automojo-prop-single-value"]
 
     sel_copy = "#id-property-single-copy"
     sel_label = "#id-property-single-label"
@@ -387,17 +387,17 @@ class MojoPropertySingle extends HTMLElement {
 
 class MojoPropertyTable extends HTMLElement {
 
-    static tagname = "mojo-property-table";
+    static tagname = "automojo-property-table";
 
     static template = `
-        <div id="id-property-table-container" class="mojo-prop-table">
+        <div id="id-property-table-container" class="automojo-prop-table">
         </div>
     `
 
-    default_classes_container = ["mojo-prop-table"]
-    default_classes_item_copy = ["mojo-prop-table-item-copy"]
-    default_classes_item_label = ["mojo-prop-table-item-label"]
-    default_classes_item_value = ["mojo-prop-table-item-value"]
+    default_classes_container = ["automojo-prop-table"]
+    default_classes_item_copy = ["automojo-prop-table-item-copy"]
+    default_classes_item_label = ["automojo-prop-table-item-label"]
+    default_classes_item_value = ["automojo-prop-table-item-value"]
 
     sel_container = "#id-property-table-container"
 
@@ -540,12 +540,12 @@ class MojoPropertyTable extends HTMLElement {
 }
 
 class MojoTabLabel extends HTMLElement {
-    static tagname = "mojo-tab-label";
+    static tagname = "automojo-tab-label";
 
     static observedAttributes = ["selected"]
 
     static template = `
-        <div id="id-tab-label-container" class="mojo-tab-label-container">
+        <div id="id-tab-label-container" class="automojo-tab-label-container">
         </div>
     `
 
@@ -578,12 +578,12 @@ class MojoTabLabel extends HTMLElement {
 
 
 class MojoTabContent extends HTMLElement {
-    static tagname = "mojo-tab-content";
+    static tagname = "automojo-tab-content";
 
     static observedAttributes = ["selected"]
 
     static template = `
-        <div id="id-tab-content-container" class="mojo-tab-content-container">
+        <div id="id-tab-content-container" class="automojo-tab-content-container">
         </div>
     `
 
@@ -628,9 +628,9 @@ class MojoTabPage {
 
     createContentElement() {
 
-        var contentEl = document.createElement("mojo-tab-content");
+        var contentEl = document.createElement("automojo-tab-content");
 
-        contentEl.classList.add("mojo-tab-content");
+        contentEl.classList.add("automojo-tab-content");
         contentEl.syncData(this.content);
 
         this.contentEl = contentEl;
@@ -641,9 +641,9 @@ class MojoTabPage {
 
     createLabelElement() {
 
-        var labelEl = document.createElement("mojo-tab-label");
+        var labelEl = document.createElement("automojo-tab-label");
         
-        labelEl.classList.add("mojo-tab-label");
+        labelEl.classList.add("automojo-tab-label");
         labelEl.syncData(this.label);
         
         this.labelEl = labelEl;
@@ -679,13 +679,13 @@ class MojoTabPage {
 
 class MojoTabSet extends HTMLElement {
 
-    static tagname = "mojo-tabset";
+    static tagname = "automojo-tabset";
 
     static template = `
-        <div id="id-tabset-container" class="mojo-tabset">
-            <div id="id-tabset-labels-collection" class="mojo-tabset-label-collection">
+        <div id="id-tabset-container" class="automojo-tabset">
+            <div id="id-tabset-labels-collection" class="automojo-tabset-label-collection">
             </div>
-            <div id="id-tabset-content-collection" class="mojo-tabset-content-collection">
+            <div id="id-tabset-content-collection" class="automojo-tabset-content-collection">
             </div>
         </div>
     `

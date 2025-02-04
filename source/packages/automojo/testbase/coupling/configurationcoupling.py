@@ -36,7 +36,7 @@ class ConfigurationCoupling(BaseCoupling):
             This API is called so that the ScopeCoupling can process configuration information.  The :class:`ScopeCoupling`
             will verify that it has a valid environment and configuration to run in.
 
-            :raises :class:`automojo.errors.exceptions.AKitMissingConfigError`, :class:`mojo.errors.exceptions.ConfigurationError`:
+            :raises :class:`automojo.errors.exceptions.AKitMissingConfigError`, :class:`automojo.errors.exceptions.ConfigurationError`:
         """
         return
     

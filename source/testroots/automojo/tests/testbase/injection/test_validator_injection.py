@@ -1,7 +1,10 @@
 
 import time
 
-import automojo.testbase as testplus
+import automojo.testbase as testbase
+
+factory = testbase.factory
+originate = testbase.originate
 
 
 from automojo.testbase.tandem.validators import Validator, LoopingValidator, TimeIntervalValidator
@@ -41,7 +44,7 @@ class TestTimeIntervalValidator(TimeIntervalValidator):
         return
 
 
-@testplus.validator()
+@factory.validator()
 def create_validator() -> TestValidator:
 
     validator = TestValidator()
@@ -49,7 +52,7 @@ def create_validator() -> TestValidator:
 
     return validator
 
-@testplus.validator()
+@factory.validator()
 def create_looping_validator() -> TestLoopingValidator:
 
     validator = TestLoopingValidator()
@@ -57,7 +60,7 @@ def create_looping_validator() -> TestLoopingValidator:
 
     return validator
 
-@testplus.validator()
+@factory.validator()
 def create_time_interval_validator() -> TimeIntervalValidator:
 
     validator = TestTimeIntervalValidator(interval=1)
@@ -66,11 +69,11 @@ def create_time_interval_validator() -> TimeIntervalValidator:
     return validator
 
 
-@testplus.validate(create_validator, suffix="vcheck", identifier="nvalidator")
-@testplus.validate(create_looping_validator, suffix="vlcheck", identifier="lvalidator")
-@testplus.validate(create_time_interval_validator, suffix="vticheck", identifier="tivalidator")
+@originate.validate(create_validator, suffix="vcheck", identifier="nvalidator")
+@originate.validate(create_looping_validator, suffix="vlcheck", identifier="lvalidator")
+@originate.validate(create_time_interval_validator, suffix="vticheck", identifier="tivalidator")
 def test_no_parameters():
-    testplus.logger.info("test_no_parameters: was run.")
+    testbase.logger.info("test_no_parameters: was run.")
     time.sleep(10)
     return
 

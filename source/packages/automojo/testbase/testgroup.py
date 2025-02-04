@@ -17,7 +17,7 @@ import logging
 
 from automojo.testbase.testref import TestRef
 
-from automojo.testbase.injection.InjectionGroup import InjectionGroup
+from automojo.testbase.injection.injectiongroup import InjectionGroup
 
 logger = logging.getLogger()
 

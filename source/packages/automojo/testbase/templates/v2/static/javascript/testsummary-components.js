@@ -568,10 +568,10 @@ class TestSummaryConfigurationEnvironment extends HTMLElement {
     static tagname = 'testsummary-config-environment'
 
     static template = `
-        <div id="id-collapsible-container" class="mojo-collapsible" >
-            <div id="id-collapsible-button" class="mojo-collapsible-button">
-                <div id="id-header-text" class="mojo-collapsible-header"></div>
-                <div id="id-header-icon" class="mojo-collapsible-icon">+</div>
+        <div id="id-collapsible-container" class="automojo-collapsible" >
+            <div id="id-collapsible-button" class="automojo-collapsible-button">
+                <div id="id-header-text" class="automojo-collapsible-header"></div>
+                <div id="id-header-icon" class="automojo-collapsible-icon">+</div>
             </div>
             <div id="id-collapsible-content" class="ts-collapsible-content">
                 <property-table id="id-ts-configuration-environment"></property-table>
@@ -602,10 +602,10 @@ class TestSummaryConfigurationLandscape extends MojoCollapsible {
     static tagname = 'testsummary-config-landscape'
 
     static template = `
-        <div id="id-collapsible-container" class="mojo-collapsible" >
-            <div id="id-collapsible-button" class="mojo-collapsible-button">
-                <div id="id-header-text" class="mojo-collapsible-header"></div>
-                <div id="id-header-icon" class="mojo-collapsible-icon">+</div>
+        <div id="id-collapsible-container" class="automojo-collapsible" >
+            <div id="id-collapsible-button" class="automojo-collapsible-button">
+                <div id="id-header-text" class="automojo-collapsible-header"></div>
+                <div id="id-header-icon" class="automojo-collapsible-icon">+</div>
             </div>
             <div id="id-collapsible-content" class="ts-lscape-collapsable-content">
                 <mojo-collapsible-lvl2 id="id-ts-configuration-landscape-dataprofiles">
@@ -734,10 +734,10 @@ class TestSummaryConfigurationPackages extends MojoCollapsible {
     static tagname = 'testsummary-config-packages'
 
     static template = `
-        <div id="id-collapsible-container" class="mojo-collapsible" >
-            <div id="id-collapsible-button" class="mojo-collapsible-button">
-                <div id="id-header-text" class="mojo-collapsible-header"></div>
-                <div id="id-header-icon" class="mojo-collapsible-icon">+</div>
+        <div id="id-collapsible-container" class="automojo-collapsible" >
+            <div id="id-collapsible-button" class="automojo-collapsible-button">
+                <div id="id-header-text" class="automojo-collapsible-header"></div>
+                <div id="id-header-icon" class="automojo-collapsible-icon">+</div>
             </div>
             <div id="id-collapsible-content" class="ts-collapsible-content">
                 <property-table id="id-ts-configuration-packages"></property-table>

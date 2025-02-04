@@ -69,7 +69,7 @@ class IntegrationCoupling(BaseCoupling):
             This API is called so that the IntegrationCoupling can process configuration information.  The :class:`IntegrationCoupling`
             will verify that it has a valid environment and configuration to run in.
 
-            :raises :class:`mojo.errors.exceptions.AKitMissingConfigError`, :class:`mojo.errors.exceptions.ConfigurationError`:
+            :raises :class:`automojo.errors.exceptions.AKitMissingConfigError`, :class:`automojo.errors.exceptions.ConfigurationError`:
         """
         errmsg = "The 'attach_to_environment' method must be overloaded by derived integration coupling types."
         raise NotOverloadedError(errmsg)
@@ -80,7 +80,7 @@ class IntegrationCoupling(BaseCoupling):
             This API is called so the `IntegrationCoupling` can connect with a resource management
             system and gain access to the resources required for the automation run.
 
-            :raises :class:`mojo.errors.exceptions.AKitResourceError`:
+            :raises :class:`automojo.errors.exceptions.AKitResourceError`:
         """
         errmsg = "The 'collect_resources' method must be overloaded by derived integration coupling types."
         raise NotOverloadedError(errmsg)

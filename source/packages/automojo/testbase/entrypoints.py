@@ -2,7 +2,7 @@
 .. module:: entrypoints
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: A set of standaridized entry point functions that provide standardized test environment
-               startup and test run commencement utilizing the :class:`mojo.testplus.testsequencer.TestSequencer`
+               startup and test run commencement utilizing the :class:`automojo.testbase.testsequencer.TestSequencer`
                object.
 
 .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
@@ -78,7 +78,7 @@ def generic_test_entrypoint():
 
     logger = logging.getLogger()
 
-    tpmod = sys.modules["mojo.testbase"]
+    tpmod = sys.modules["automojo.testbase"]
     tpmod.logger = logger
 
     testroot = find_testmodule_root(test_module)

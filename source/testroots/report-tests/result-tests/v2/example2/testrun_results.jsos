@@ -6,43 +6,43 @@
     "rtype": "JOB"
 }
 {
-    "name": "mojo",
+    "name": "automojo",
     "instance": "64ed6127-e5a5-4d25-a24e-95cdadaa277c",
     "parent": "3a1c8f00-b768-4ced-8fbc-669e1cf90934",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests",
+    "name": "automojo.tests",
     "instance": "5b6864ad-6157-4b85-85f1-4a0882b4be65",
     "parent": "64ed6127-e5a5-4d25-a24e-95cdadaa277c",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop",
+    "name": "automojo.tests.interop",
     "instance": "d5cf817d-48bd-4f75-8c94-cfa66064adca",
     "parent": "5b6864ad-6157-4b85-85f1-4a0882b4be65",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop.casey",
+    "name": "automojo.tests.interop.casey",
     "instance": "2e4e9c17-692b-4503-bfb5-580c29f655d8",
     "parent": "d5cf817d-48bd-4f75-8c94-cfa66064adca",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop.casey.protocols",
+    "name": "automojo.tests.interop.casey.protocols",
     "instance": "152eb5b1-8492-44a2-aed5-237c38f8049a",
     "parent": "2e4e9c17-692b-4503-bfb5-580c29f655d8",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh",
+    "name": "automojo.tests.interop.casey.protocols.ssh",
     "instance": "c68d4e99-60de-4278-a61e-87f7be8fca22",
     "parent": "152eb5b1-8492-44a2-aed5-237c38f8049a",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
     "monikers": [
         "172.16.1.34"
     ],
@@ -59,7 +59,7 @@
     "stop": ""
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
     "monikers": [
         "172.16.1.34"
     ],
@@ -81,7 +81,7 @@
     }
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
     "monikers": [
         "172.16.1.33"
     ],
@@ -98,7 +98,7 @@
     "stop": ""
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
     "monikers": [
         "172.16.1.33"
     ],
@@ -120,7 +120,7 @@
     }
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
     "monikers": [
         "172.16.1.32"
     ],
@@ -137,7 +137,7 @@
     "stop": ""
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
     "monikers": [
         "172.16.1.32"
     ],
@@ -159,7 +159,7 @@
     }
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
     "monikers": [
         "172.16.1.31"
     ],
@@ -176,7 +176,7 @@
     "stop": ""
 }
 {
-    "name": "mojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
+    "name": "automojo.tests.interop.casey.protocols.ssh#test_ssh_say_hello",
     "monikers": [
         "172.16.1.31"
     ],

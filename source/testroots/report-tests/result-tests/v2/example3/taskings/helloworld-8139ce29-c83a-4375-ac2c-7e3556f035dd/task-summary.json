@@ -1,7 +1,7 @@
 {
-    "name": "mojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+    "name": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
     "type": "HelloWorldTasking",
-    "module": "mojo.interop.protocols.tasker.examples.helloworldtasking",
+    "module": "automojo.interop.protocols.tasker.examples.helloworldtasking",
     "id": "8139ce29-c83a-4375-ac2c-7e3556f035dd",
     "parent": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
     "worker": "172.16.1.41",
@@ -15,7 +15,7 @@
     "progress": {
         "id": "8139ce29-c83a-4375-ac2c-7e3556f035dd",
         "category": "hello",
-        "moniker": "mojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+        "moniker": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
         "ptype": "NumericRange",
         "range_min": 0,
         "range_max": 100,

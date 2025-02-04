@@ -19,7 +19,7 @@ from automojo.testbase.coupling.configurationcoupling import ConfigurationCoupli
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
 from automojo.testbase.origins.validatororigin import ValidatorOrigin
 
-from automojo.testbase.injection.injectableref import InjectableRef
+from automojo.testbase.injection.injectionmoment import InjectionMoment
 
 RESOURCE_KEY_FORMAT = "{}@{}:{}"
 
@@ -61,7 +61,7 @@ class InjectionScope:
     def validator_originations(self) -> Dict[str, ValidatorOrigin]:
         return self._validator_originations
 
-    def add_descendent_parameter_origination(self, assigned_scope: str, parameter_origin: ResourceOrigin):
+    def add_descendent_resource_origination(self, assigned_scope: str, parameter_origin: ResourceOrigin):
         """
             Adds a descendent parameter origin object into the parameter origin table of the
             assigned scope path provided.
@@ -125,7 +125,7 @@ class InjectionScope:
 
         return
 
-    def collect_integrations_and_configurations_for_injectable(self, integration_table: Dict[Callable, IntegrationCoupling],
+    def collect_integrations_and_configurations_for_injection_moment(self, integration_table: Dict[Callable, IntegrationCoupling],
         configuration_table: Dict[Callable, ConfigurationCoupling]):
         """
             Walk the scope tree path for the injectable reference provide and collect all the integration and
@@ -145,7 +145,7 @@ class InjectionScope:
                     for type_arg in typing_get_args(param_resource_type):
                         if issubclass(type_arg, IntegrationCoupling):
                             # There should never be more than one fixture with the same well-known or
-                            # declared name in the same collection of injectables.
+                            # declared name in the same collection of injection moments.
                             integration_table[source_function] = type_arg
                             break
                         elif issubclass(type_arg, ConfigurationCoupling):
@@ -154,7 +154,7 @@ class InjectionScope:
                 else:
                     if issubclass(param_resource_type, IntegrationCoupling):
                         # There should never be more than one fixture with the same well-known or
-                        # declared name in the same collection of injectables.
+                        # declared name in the same collection of injection moments.
                         integration_table[source_function] = param_resource_type
                     elif issubclass(param_resource_type, ConfigurationCoupling):
                         configuration_table[source_function] = param_resource_type
@@ -162,21 +162,21 @@ class InjectionScope:
         for child_scope in self._children.values():
 
             # Call each child and collect descendant integrations and scopes.
-            child_scope.collect_integrations_and_scopes_for_injectable(integration_table, configuration_table)
+            child_scope.collect_integrations_and_scopes_for_injection_moment(integration_table, configuration_table)
 
         return
 
-    def ensure_injection_scopes_for_injectable(self, inj_ref: InjectableRef):
+    def ensure_injection_scopes_for_injection_moment(self, inj_mom: InjectionMoment):
         """
             Walks through the scope tree using the full scope name of a injectable reference
             object and esures there is a scope node for each component of the injectable reference
             path name.
 
-            :param inj_ref: The :class:`InjectableRef` object that ancestrial scope nodes should
+            :param inj_mom: The :class:`InjectionMoment` object that ancestrial scope nodes should
                              be created for.
         """
 
-        inj_scope_name = inj_ref.scope_name
+        inj_scope_name = inj_mom.scope_name
 
         module_name, inj_name = inj_scope_name.split("#")
 
@@ -186,7 +186,7 @@ class InjectionScope:
         path_stack = []
 
         self._is_relevant = True
-        self._ensure_injection_scopes_for_injectable(inj_ref, inj_scope_parts, path_stack)
+        self._ensure_injection_scopes_for_injection_moment(inj_mom, inj_scope_parts, path_stack)
 
         return
 
@@ -289,29 +289,29 @@ class InjectionScope:
 
             self._children[new_origin] = cobj
 
-            # All of the children of cobj will be injectables, go through all of
+            # All of the children of cobj will be injection moments, go through all of
             # the child objects and fix the package name
             for inj_scope in cobj._children.values():
                 inj_scope_origin = "{}#{}".format(new_origin, inj_scope._name)
                 for _, poval in inj_scope.parameter_originations.items():
                     poval._originating_scope = inj_scope_origin
-                    self.add_descendent_parameter_origination(inj_scope_origin, poval)
+                    self.add_descendent_resource_origination(inj_scope_origin, poval)
 
         return
 
-    def resolve_resource_originations_for_injectable(self, inj_ref: InjectableRef, missing_params: List[Any]):
+    def resolve_resource_originations_for_injection_moment(self, inj_mom: InjectionMoment, missing_params: List[Any]):
         """
             Walk through all the descendant nodes of this node utilizing the injectable reference
             full scope name for a path and validate the resolution of all parameters that are
             being utilized by any parameter source functions or any of thier sources.
 
-            :param inj_ref: The :class:`InjectableRef` object whos scope path is used to validate a
+            :param inj_mom: The :class:`InjectionMoment` object whos scope path is used to validate a
                              single scope path from the set of all parameter scope paths.
             :param missing_params: The list of parameters that are found to be missing when
                                    searching the descent of the scope path.
         """
 
-        inj_scope_name = inj_ref.scope_name
+        inj_scope_name = inj_mom.scope_name
 
         module_name, inj_name = inj_scope_name.split("#")
 
@@ -322,7 +322,7 @@ class InjectionScope:
         for pname, pinfo in self._parameter_originations.items():
             param_table[pname] = pinfo
 
-        self._resolve_resource_originations_for_injectable_descend(inj_ref, inj_scope_parts, param_table, missing_params)
+        self._resolve_resource_originations_for_injection_moment_descend(inj_mom, inj_scope_parts, param_table, missing_params)
 
         return
 
@@ -388,7 +388,7 @@ class InjectionScope:
 
         return
 
-    def _ensure_injection_scopes_for_injectable(self, inj_ref: InjectableRef, inj_scope_parts: List[str], path_stack: List[str]):
+    def _ensure_injection_scopes_for_injection_moment(self, inj_mom: InjectionMoment, inj_scope_parts: List[str], path_stack: List[str]):
 
         if len(inj_scope_parts) > 0:
             curr_leaf = inj_scope_parts.pop(0)
@@ -407,13 +407,13 @@ class InjectionScope:
 
                 path_stack.append(curr_leaf)
                 curr_scope = self._children[curr_leaf]
-                curr_scope._ensure_injection_scopes_for_injectable(inj_ref, inj_scope_parts, path_stack)
+                curr_scope._ensure_injection_scopes_for_injection_moment(inj_mom, inj_scope_parts, path_stack)
 
             else:
                 path_stack.append(curr_leaf)
                 curr_scope = self._children[curr_leaf]
                 curr_scope._is_relevant = True
-                curr_scope._ensure_injection_scopes_for_injectable(inj_ref, inj_scope_parts, path_stack)
+                curr_scope._ensure_injection_scopes_for_injection_moment(inj_mom, inj_scope_parts, path_stack)
 
         return
 
@@ -469,7 +469,7 @@ class InjectionScope:
 
         return scope_found
 
-    def _resolve_resource_originations_for_injectable_descend(self, inj_ref: InjectableRef, inj_scope_parts: List[str],
+    def _resolve_resource_originations_for_injection_moment_descend(self, inj_mom: InjectionMoment, inj_scope_parts: List[str],
         param_table: dict, missing_params: List[Any]):
 
         if len(inj_scope_parts) > 0:
@@ -487,7 +487,7 @@ class InjectionScope:
                     if isinstance(scope_param_origin, ResourceOrigin):
                         # Do a lateral check to make sure the originating methods of any declared parameters
                         # already have parameters declared in the current in scope parameters
-                        self._resolve_resource_originations_for_injectable_lateral(inj_ref, scope_param_origin,
+                        self._resolve_resource_originations_for_injection_moment_lateral(inj_mom, scope_param_origin,
                             inj_scope_parts, nxt_param_table, missing_params)
 
                         # Add the new parameter origination to the parameter lookup table for this scope as
@@ -496,12 +496,12 @@ class InjectionScope:
                     else:
                         print("{}:{}".format(nxt_scope.package, scope_param_name))
 
-                nxt_scope._resolve_resource_originations_for_injectable_descend(inj_ref, inj_scope_parts, nxt_param_table, missing_params)
+                nxt_scope._resolve_resource_originations_for_injection_moment_descend(inj_mom, inj_scope_parts, nxt_param_table, missing_params)
             else:
                 print("child not found '{}'".format(nxt_scope_name))
         return
 
-    def _resolve_resource_originations_for_injectable_lateral(self, inj_ref: InjectableRef, lateral_param_origin: ResourceOrigin,
+    def _resolve_resource_originations_for_injection_moment_lateral(self, inj_mom: InjectionMoment, lateral_param_origin: ResourceOrigin,
         inj_scope_parts: List[str], scope_param_table: dict, missing_params: List[Any]):
 
         source_params = lateral_param_origin.source_signature.parameters

@@ -1,7 +1,7 @@
 """
-.. module:: injectableref
+.. module:: InjectiionMoment
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the base :class:`InjectableRef` type used to reference to
+    :synopsis: Module containing the base :class:`InjectiionMoment` type used to reference to
         injectable function that will be included into an a execution graph.
 
 .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
@@ -25,15 +25,14 @@ import inspect
 from automojo.testbase.markers import MetaFilter
 
 
-class InjectableRef:
+class InjectionMoment:
     """
-        The :class:`InjectableRef` objects are used to refer to a reference to a injectable.  We use :class:`InjectableRef` instances
-        to reference the function that are going to be run so we can control the lifespan of an injectable function instances
-        and control our memory consumption during execution runs with large collections of injectables.
+        The :class:`InjectiionMoment` objects are used to record the details around the injection of executable content and resource creation code into an execution scope.
+        :class:`InjectiionMoment` instances provide a reference to factory or test function, the injection location, the lifespan and any other constraints associated with
+        a injection. 
 
-        The :class:`InjectableRef` object allows us to delay the creation of injectable runtime instance data and state until it is
-        necessary to instantiate it and allows us to cleanup the runtime instance and state as soon as it is no longer
-        being used.
+        The :class:`InjectiionMoment` object allows us to delay the creation of injectable runtime instance data and state until it is necessary to instantiate it and allows
+        us to cleanup the runtime instance and state as soon as it is no longer being used.
     """
 
     def __init__(self, injfunc: FunctionType, monikers: Optional[List[str]] = None, pivots: OrderedDict[str, Any]=collections.OrderedDict()):
@@ -111,7 +110,7 @@ class InjectableRef:
 
     def is_member_of_metaset(self, metafilters: Sequence[MetaFilter]):
         """
-            Indicates if a injectable belongs to a set that is associated with a collection of metafilters.
+            Indicates if the associated injection belongs to a set that is associated with a collection of metafilters.
         """
         include = True
 

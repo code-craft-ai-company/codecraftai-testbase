@@ -39,6 +39,7 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
     HELP_EXCLUDE_MARKER_EXP
 )
 
+
 @click.command("run", help="Command used to run collections of tests.")
 @click.option("--root", default=None,  type=str, required=False, help=HELP_ROOT)
 @click.option("--excludes", "-x", multiple=True, required=False, help=HELP_EXCLUDES)

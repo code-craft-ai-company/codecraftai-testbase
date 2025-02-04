@@ -17,11 +17,11 @@ import logging
 
 from automojo.testbase.testref import TestRef
 
-from automojo.testbase.injection.injectablegroup import InjectableGroup
+from automojo.testbase.injection.InjectionGroup import InjectionGroup
 
 logger = logging.getLogger()
 
-class TestGroup(InjectableGroup):
+class TestGroup(InjectionGroup):
     """
               -------------
               |  Group A  |

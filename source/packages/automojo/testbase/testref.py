@@ -18,9 +18,9 @@ from types import FunctionType
 
 import collections
 
-from automojo.testbase.injection.injectableref import InjectableRef
+from automojo.testbase.injection.injectionmoment import InjectionMoment
 
-class TestRef(InjectableRef):
+class TestRef(InjectionMoment):
     """
         The :class:`TestRef` objects are used to refer to a reference to a test.  We use :class:`TestRef` instances
         to reference the tests that are going to be run so we can control the lifespan of test case instances

@@ -15,6 +15,7 @@ def command_testbase_utilities_timestamp():
 
     now = datetime.now()
     timestamp = now.strftime(DATETIME_FORMAT_FILESYSTEM).replace(" ", "T")
+    
     print(timestamp)
 
     return

@@ -1,8 +1,8 @@
 """
-.. module:: injectablegroup
+.. module:: InjectionGroup
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module that contains the :class:`InjectableGroup` class which is utilized as the collection point
-               which associates a set of injectables with their descendant execution scopes.
+    :synopsis: Module that contains the :class:`InjectionGroup` class which is utilized as the collection point
+               which associates a set of injection moments with their descendant execution scopes.
 
 .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
@@ -23,11 +23,11 @@ from automojo.errors.exceptions import SemanticError
 from automojo.testbase.injection.injectionregistry import injection_registry
 from automojo.testbase.injection.injectionscope import InjectionScope
 
-from automojo.testbase.injection.injectableref import InjectableRef
+from automojo.testbase.injection.injectionmoment import InjectionMoment
 
 logger = logging.getLogger()
 
-class InjectableGroup:
+class InjectionGroup:
     """
               -------------
               |  Group A  |
@@ -75,7 +75,7 @@ class InjectableGroup:
             sname = "{}.{}".format(self.package, sname)
         return sname
 
-    def add_descendent(self, child_ref:InjectableRef, group_type: Optional[type] = None):
+    def add_descendent(self, child_ref:InjectionMoment, group_type: Optional[type] = None):
 
         if self._package is not None:
             err_msg = "The 'add_descendent' API can only be called on the root package."
@@ -113,13 +113,13 @@ class InjectableGroup:
         else:
             self._metadata = reference_metadata
 
-        child: Union[InjectableRef, InjectableGroup]
+        child: Union[InjectionMoment, InjectionGroup]
         for child in self._children.values():
             child.resolve_metadata(self._metadata)
 
         return
 
-    def _add_descendent(self, child_ref: InjectableRef, to_walk_list: List[str], path_stack: List[str], group_type: Optional[type] = None):
+    def _add_descendent(self, child_ref: InjectionMoment, to_walk_list: List[str], path_stack: List[str], group_type: Optional[type] = None):
         
         if len(to_walk_list) == 0:
             tbname = child_ref.base_name

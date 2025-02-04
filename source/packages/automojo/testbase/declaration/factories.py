@@ -26,6 +26,7 @@ from automojo.testbase.coupling.configurationcoupling import ConfigurationCoupli
 from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 from automojo.testbase.coupling.validatorcoupling import ValidatorCoupling
 
+from automojo.testbase.sources.configurationsource import ConfigurationSource
 from automojo.testbase.sources.integrationsource import IntegrationSource
 from automojo.testbase.sources.resourcesource import ResourceSource
 from automojo.testbase.sources.validatorsource import ValidatorSource
@@ -155,7 +156,7 @@ def configuration(*, query_function: Optional[Callable]=None, constraints: Optio
                 raise SemanticError("The 'configuration' decorator can only be used on resources that inherit from the 'scopecoupling'.") from None
 
             csource = ConfigurationSource(source_function, query_function, resource_type, constraints)
-            injection_registry.register_scope_source(csource)
+            injection_registry.register_configuration_source(csource)
         else:
             errmsg_lines = [
                 "Unable to determine the resource type of the function which the 'configuration' decorator was applied too.",

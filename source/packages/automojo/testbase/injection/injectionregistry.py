@@ -11,6 +11,7 @@ from automojo.errors.exceptions import SemanticError
 
 from automojo.testbase.resourcelifespan import ResourceLifespan
 
+from automojo.testbase.sources.configurationsource import ConfigurationSource
 from automojo.testbase.sources.integrationsource import IntegrationSource
 from automojo.testbase.sources.resourcesource import ResourceSource
 from automojo.testbase.sources.validatorsource import ValidatorSource
@@ -18,7 +19,7 @@ from automojo.testbase.sources.validatorsource import ValidatorSource
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
 from automojo.testbase.origins.validatororigin import ValidatorOrigin
 
-from automojo.testbase.injection.injectableref import InjectableRef
+from automojo.testbase.injection.injectionmoment import InjectionMoment
 from automojo.testbase.injection.injectionscope import InjectionScope
 
 
@@ -30,12 +31,12 @@ class InjectionRegistry:
 
            The source functions and identifiers being registered are stored in the scope tree in
            order to build data structure that allows for the resolution of scope for the parameters
-           and associated identifiers that will be consumed by injectables during the execution sequence
+           and associated identifiers that will be consumed by injection moments during the execution sequence
            flow. (This is an implicit step)
 
-        2. After all the injectables have been imported and injectable references have been created, we go
+        2. After all the injection moments have been imported and injectable references have been created, we go
            through all of the injectable references and ensure we have a completely filled out scope tree
-           for all of the injectables.  As we go we mark scopes as relavant so we can later go back through
+           for all of the injection moments.  As we go we mark scopes as relavant so we can later go back through
            the tree and prune scope nodes that are not relavant to executing a injectable.
 
         3. Walk through the entire scope tree and prune non-relevant nodes starting at the leaves and
@@ -71,12 +72,12 @@ class InjectionRegistry:
         if not thisType._initialized:
             thisType._initialized = True
 
-            # The source tables are how integration, scope and resource sources are
+            # The source tables are how integration, configuration and resource sources are
             # registered and they help to lookup any factory functions that generate
             # a given type of resource.
             self._integration_source = {}
             self._resource_source = {}
-            self._scope_source = {}
+            self._configuration_source = {}
             self._validator_source = {}
 
             # The unknown parameter table gets populated with the names of subscribe functions
@@ -85,7 +86,7 @@ class InjectionRegistry:
             self._unknown_parameters = {}
 
             # The identifier subscription table contains a list of identifiers that are used by
-            # injectables and the associated contexts in which they were used.
+            # injection moments and the associated contexts in which they were used.
             self._identifier_subscription_table = {}
 
             #TODO: Drop this once we 
@@ -116,10 +117,10 @@ class InjectionRegistry:
             test framework.
         """
         origin = ResourceOrigin("<session>", identifier, ResourceLifespan.Session, source=None, implied=True)
-        self._scope_tree_root.add_descendent_parameter_origination("<session>", origin)
+        self._scope_tree_root.add_descendent_resource_origination("<session>", origin)
         return
 
-    def finalize_startup(self, inj_references: Dict[str, InjectableRef]):
+    def finalize_startup(self, inj_moments: Dict[str, InjectionMoment]):
         """
             ..note: During injectable discovery process, the parameter decorators are executed and the resource
                     identifier names and source functions are registered and available for consumption via
@@ -127,15 +128,15 @@ class InjectionRegistry:
 
                     The source functions and identifiers being registered are stored in the scope tree in
                     order to build data structure that allows for the resolution of scope for the parameters
-                    that and associated identifiers that will be consumed by injectables during the execution of
+                    that and associated identifiers that will be consumed by injection moments during the execution of
                     the execution sequence flow. (This is an implicit step)
         """
-        # 1. After all the injectables have been imported and injectable references have been created, we
+        # 1. After all the injection moments have been imported and injectable references have been created, we
         #    go through all of the injectable references and ensure we have a completely filled out scope
         #    tree.  As we go we mark scopes as relavant so we can later go back through the tree and prune
         #    scope nodes that are not relavant to executing an injectable.
-        for _, inj_ref in inj_references.items():
-            self._scope_tree_root.ensure_injection_scopes_for_injectable(inj_ref)
+        for _, inj_mom in inj_moments.items():
+            self._scope_tree_root.ensure_injection_scopes_for_injection_moment(inj_mom)
 
         # 2. Walk through the entire scope tree and prune non-relevant nodes starting at the leaves and
         #    working backwards until a relavant node is reached or the root of the tree is reached.
@@ -146,19 +147,19 @@ class InjectionRegistry:
         #    ResourceOrigin object as a reference is found.  As we walk, we make sure that any parameters
         #    reference in the current scope are visible in the current parameter dictionary and if not
         #    store information about the missing parameter.
-        for _, inj_ref in inj_references.items():
+        for _, inj_mom in inj_moments.items():
             missing_params = []
 
-            self._scope_tree_root.resolve_resource_originations_for_injectable(inj_ref, missing_params)
+            self._scope_tree_root.resolve_resource_originations_for_injection_moment(inj_mom, missing_params)
 
             if len(missing_params) > 0:
-                self._unknown_parameters[inj_ref.name] = missing_params
+                self._unknown_parameters[inj_mom.name] = missing_params
 
         # 4. Go through all of the injectable references and for each reference, collect integration and
         #    scope couplings that are referenced so we can build a combined picture of everything that
         #    is being coupled into the execution run.
-        for _, inj_ref in inj_references.items():
-            self._scope_tree_root.collect_integrations_and_scopes_for_injectable(self._referenced_integrations, self._referenced_scopes)
+        for _, inj_mom in inj_moments.items():
+            self._scope_tree_root.collect_integrations_and_scopes_for_injection_moment(self._referenced_integrations, self._referenced_scopes)
 
         return
 
@@ -166,20 +167,20 @@ class InjectionRegistry:
         resource_scope = self._scope_tree_root.lookup_scope(scope_name)
         return resource_scope
 
-    def lookup_resource_source(self, source_func):
+    def lookup_resource_source(self, source_func) -> ResourceSource:
 
         source = None
 
         if source_func in self._integration_source:
             source = self._integration_source[source_func]
-        elif source_func in self._scope_source:
-            source = self._scope_source[source_func]
+        elif source_func in self._configuration_source:
+            source = self._configuration_source[source_func]
         elif source_func in self._resource_source:
             source = self._resource_source[source_func]
 
         return source
     
-    def lookup_validator_source(self, source_func):
+    def lookup_validator_source(self, source_func) -> ValidatorSource:
 
         source = None
 
@@ -200,9 +201,9 @@ class InjectionRegistry:
 
         return
 
-    def register_parameter_origin(self, identifier: str, origin: ResourceOrigin):
+    def register_resource_origin(self, identifier: str, origin: ResourceOrigin):
         """
-            The :method:`register_parameter_origin` is used to register an alias as a wellknown parameter
+            The :method:`register_resource_origin` is used to register an alias as a wellknown parameter
             so that subscriber functions can consume the parameter as an input parameter.
         """
 
@@ -214,7 +215,7 @@ class InjectionRegistry:
 
         # Add the parameter origin to the identifiers_for_scope table for this scope so we
         # can lookup identifiers by scope
-        self._scope_tree_root.add_descendent_parameter_origination(originating_scope, origin)
+        self._scope_tree_root.add_descendent_resource_origination(originating_scope, origin)
 
         return
 
@@ -230,15 +231,15 @@ class InjectionRegistry:
 
         return
 
-    def register_scope_source(self, source: ScopeSource):
+    def register_configuration_source(self, source: ConfigurationSource):
         """
             This method is called by the 'scope' decorator in order to register a factory
             function that generates an 'ScopeCoupling' object. 
         """
         source_func = source.source_function
 
-        if source_func not in self._scope_source:
-            self._scope_source[source_func] = source
+        if source_func not in self._configuration_source:
+            self._configuration_source[source_func] = source
 
         return
     

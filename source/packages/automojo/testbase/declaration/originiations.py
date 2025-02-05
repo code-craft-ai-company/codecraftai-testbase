@@ -22,7 +22,6 @@ from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 from automojo.testbase.sources.integrationsource import IntegrationSource
 
 from automojo.testbase.resourcelifespan import ResourceLifespan
-from automojo.testbase.origins.resourceorigin import ResourceOrigin
 
 
 def originate_parameter(source_func, *, identifier: Optional[None], life_span: ResourceLifespan=None, assigned_scope: Optional[str]=None, constraints: Optional[Dict]=None):
@@ -70,8 +69,8 @@ def originate_parameter(source_func, *, identifier: Optional[None], life_span: R
     elif life_span == ResourceLifespan.Session:
         assigned_scope = "<session>"
 
-    param_origin = ParameterOrigin(assigned_scope, identifier, life_span, source_info, constraints)
-    injection_registry.register_parameter_origin(identifier, param_origin)
+    param_origin = ResourceOrigin(assigned_scope, identifier, life_span, source_info, constraints)
+    injection_registry.register_resource_origin(identifier, param_origin)
 
     return
 

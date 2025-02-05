@@ -261,8 +261,8 @@ class ResultRecorder:
             "OUTPUT PATH: {}".format(self._output_dir)
         ])
 
-        if "MJR_SUMMARY_URL" in os.environ:
-            summary_url = os.environ["MJR_SUMMARY_URL"]
+        if "AM_SUMMARY_URL" in os.environ:
+            summary_url = os.environ["AM_SUMMARY_URL"]
             lines.append("SUMMARY URL: {}".format(summary_url))
 
         return lines

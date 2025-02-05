@@ -109,7 +109,7 @@ class TestCollector:
     def test_tree(self) -> TestGroup:
         return self._test_tree
 
-    def collect_integrations_and_scopes(self) -> List[IntegrationCoupling]:
+    def collect_integrations_and_configurations(self) -> List[IntegrationCoupling]:
         """
             Iterates through all of the test references and collects the IntegrationCoupling(s) and
             ScopeCouplings that are found.  The collected IntegrationCoupling(s) and ScopeCoupling(s) can
@@ -145,9 +145,9 @@ class TestCollector:
             raise UnknownParameterError(err_msg) from None
 
         referenced_integrations = injection_registry.referenced_integrations
-        referenced_scopes = injection_registry.referenced_scopes
+        referenced_configurations = injection_registry.referenced_configurations
 
-        return referenced_integrations, referenced_scopes
+        return referenced_integrations, referenced_configurations
 
     def collect_references(self, expression: str):
         """

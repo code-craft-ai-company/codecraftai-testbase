@@ -92,28 +92,28 @@ class TestJob(ContextUser, ITestJob):
 
         self._testpacks = None
 
-        self._apod = AM_RUNTIME_VARIABLES.MJR_AUTOMATION_POD
-        self._release = AM_RUNTIME_VARIABLES.MJR_BUILD_RELEASE
-        self._branch = AM_RUNTIME_VARIABLES.MJR_BUILD_BRANCH
-        self._build = AM_RUNTIME_VARIABLES.MJR_BUILD_NAME
-        self._flavor = AM_RUNTIME_VARIABLES.MJR_BUILD_FLAVOR
-        self._build_url = AM_RUNTIME_VARIABLES.MJR_BUILD_URL
+        self._apod = AM_RUNTIME_VARIABLES.AM_AUTOMATION_POD
+        self._release = AM_RUNTIME_VARIABLES.AM_BUILD_RELEASE
+        self._branch = AM_RUNTIME_VARIABLES.AM_BUILD_BRANCH
+        self._build = AM_RUNTIME_VARIABLES.AM_BUILD_NAME
+        self._flavor = AM_RUNTIME_VARIABLES.AM_BUILD_FLAVOR
+        self._build_url = AM_RUNTIME_VARIABLES.AM_BUILD_URL
 
-        self._run_id = AM_RUNTIME_VARIABLES.MJR_RUN_ID
+        self._run_id = AM_RUNTIME_VARIABLES.AM_RUN_ID
 
-        self._pipeline_id = AM_RUNTIME_VARIABLES.MJR_PIPELINE_ID
-        self._pipeline_name = AM_RUNTIME_VARIABLES.MJR_PIPELINE_NAME
-        self._pipeline_instance = AM_RUNTIME_VARIABLES.MJR_PIPELINE_INSTANCE
+        self._pipeline_id = AM_RUNTIME_VARIABLES.AM_PIPELINE_ID
+        self._pipeline_name = AM_RUNTIME_VARIABLES.AM_PIPELINE_NAME
+        self._pipeline_instance = AM_RUNTIME_VARIABLES.AM_PIPELINE_INSTANCE
 
-        self._job_initiator = AM_RUNTIME_VARIABLES.MJR_JOB_INITIATOR
-        self._job_id = AM_RUNTIME_VARIABLES.MJR_JOB_ID
-        self._job_label = AM_RUNTIME_VARIABLES.MJR_JOB_LABEL
-        self._job_name = AM_RUNTIME_VARIABLES.MJR_JOB_NAME
-        self._job_owner = AM_RUNTIME_VARIABLES.MJR_JOB_OWNER
-        self._job_seed = AM_RUNTIME_VARIABLES.MJR_JOB_SEED
-        self._job_type = AM_RUNTIME_VARIABLES.MJR_JOB_TYPE
-        self._job_venue = AM_RUNTIME_VARIABLES.MJR_JOB_VENUE
-        self._job_tag = AM_RUNTIME_VARIABLES.MJR_JOB_TAG
+        self._job_initiator = AM_RUNTIME_VARIABLES.AM_JOB_INITIATOR
+        self._job_id = AM_RUNTIME_VARIABLES.AM_JOB_ID
+        self._job_label = AM_RUNTIME_VARIABLES.AM_JOB_LABEL
+        self._job_name = AM_RUNTIME_VARIABLES.AM_JOB_NAME
+        self._job_owner = AM_RUNTIME_VARIABLES.AM_JOB_OWNER
+        self._job_seed = AM_RUNTIME_VARIABLES.AM_JOB_SEED
+        self._job_type = AM_RUNTIME_VARIABLES.AM_JOB_TYPE
+        self._job_venue = AM_RUNTIME_VARIABLES.AM_JOB_VENUE
+        self._job_tag = AM_RUNTIME_VARIABLES.AM_JOB_TAG
         
         self._import_errors = []
 

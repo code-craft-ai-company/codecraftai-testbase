@@ -1,6 +1,8 @@
 
-from mojo import testplus
+from automojo import testbase
 
-from mojo.coupling.simplefactories import create_blah
 
-testplus.originate_parameter(create_blah, identifier='blah', constraints={"message": "something"})
+from automojo.testprod.coupling.simplefactories import create_blah
+
+
+testbase.originate.originate_parameter(create_blah, identifier='blah', constraints={"message": "something"})

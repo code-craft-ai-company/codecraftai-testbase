@@ -96,7 +96,7 @@ class InjectionRegistry:
             self._scope_tree_root = InjectionScope()
 
             self._referenced_integrations = {}
-            self._referenced_scopes = {}
+            self._referenced_configurations = {}
         return
 
     @property
@@ -104,8 +104,8 @@ class InjectionRegistry:
         return self._referenced_integrations
 
     @property
-    def referenced_scopes(self):
-        return self._referenced_scopes
+    def referenced_configurations(self):
+        return self._referenced_configurations
 
     @property
     def unknown_parameters(self):
@@ -159,7 +159,7 @@ class InjectionRegistry:
         #    scope couplings that are referenced so we can build a combined picture of everything that
         #    is being coupled into the execution run.
         for _, inj_mom in inj_moments.items():
-            self._scope_tree_root.collect_integrations_and_scopes_for_injection_moment(self._referenced_integrations, self._referenced_scopes)
+            self._scope_tree_root.collect_integrations_and_configurations_for_injection_moment(self._referenced_integrations, self._referenced_configurations)
 
         return
 

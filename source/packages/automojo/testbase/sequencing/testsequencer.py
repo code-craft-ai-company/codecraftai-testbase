@@ -12,7 +12,7 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-from typing import Any, List, OrderedDict, Optional, Sequence, Tuple, Type, Union
+from typing import Any, Dict, List, OrderedDict, Optional, Sequence, Tuple, Type, Union
 
 
 import collections
@@ -36,8 +36,11 @@ from automojo.foundation.xdebugger import WELLKNOWN_BREAKPOINTS, debugger_wellkn
 
 from automojo.testbase.injection.injectionregistry import injection_registry
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
+
+from automojo.testbase.coupling.configurationcoupling import ConfigurationCoupling
 from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 
+from automojo.testbase.diagnostics import DiagnosticLabel
 from automojo.testbase.markers import MetaFilter
 
 
@@ -85,7 +88,7 @@ import logging
 
 logger = logging.getLogger()
 
-from automojo.testbase.cconstraints import ConstraintsCatalog
+from automojo.testbase.constraints import ConstraintsCatalog
 
 constraints_catalog = ConstraintsCatalog()
 
@@ -131,9 +134,9 @@ class TestSequencer(ContextUser):
         self._includes = includes
         self._excludes = excludes
         self._metafilters = metafilters
-        self._integrations = {}
+        self._integrations: Dict[str, IntegrationCoupling] = {}
+        self._configurations: Dict[str, ConfigurationCoupling] = {}
         self._references = []
-        self._scopes = {}
         self._scope_roots = []
         self._import_errors = {}
         self._testtree = None
@@ -215,6 +218,11 @@ class TestSequencer(ContextUser):
 
         for _, integ_type in self._integrations.items():
             integ_type.attach_to_environment(**kwargs)
+
+        config_type: ConfigurationCoupling
+
+        for _, config_type in self._configurations.items():
+            config_type.attach_to_environment(**kwargs)
 
         return
 
@@ -347,7 +355,7 @@ class TestSequencer(ContextUser):
         testcount = len(self._references)
         if testcount > 0:
             if include_integrations:
-                self._integrations, self._scopes = collector.collect_integrations_and_scopes()
+                self._integrations, self._configurations = collector.collect_integrations_and_configurations()
             self._import_errors = collector.import_errors
 
         return testcount

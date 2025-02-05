@@ -168,7 +168,7 @@ def generate_directories():
 
 def generate_python_path():
 
-    python_path = "{}/testroots/testbase:{}/packages:{}/service:{}".format(
+    python_path = "{}/testroots:{}/packages:{}/service:{}".format(
         REPOSITORY_SOURCE_FOLDER,
         REPOSITORY_SOURCE_FOLDER,
         REPOSITORY_SOURCE_FOLDER,

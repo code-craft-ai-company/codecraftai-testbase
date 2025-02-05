@@ -6,13 +6,13 @@ __credits__ = []
 
 from typing import Type
 
-from automojo.testbase.testjob import TestJob
+from automojo.testbase.testjob import TestJob, DefaultTestJob
 
 from automojo.foundation.extension.extensionprotocolbase import ExtensionProtocolBase
 
 class TestBaseExtensionProtocol(ExtensionProtocolBase):
 
-    ext_protocol_name = "automojo-testbase"
+    ext_protocol_name = "automojo-testbase-default-types"
 
     def get_testbase_default_job_type() -> Type[TestJob]:
         """

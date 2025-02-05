@@ -162,7 +162,7 @@ class InjectionScope:
         for child_scope in self._children.values():
 
             # Call each child and collect descendant integrations and scopes.
-            child_scope.collect_integrations_and_scopes_for_injection_moment(integration_table, configuration_table)
+            child_scope.collect_integrations_and_configurations_for_injection_moment(integration_table, configuration_table)
 
         return
 

@@ -18,9 +18,9 @@ TESTPLUS_DIR = os.path.dirname(__file__)
 
 class TestBaseVariables:
     TESTPLUS_TEMPLATES_DIR = os.path.join(TESTPLUS_DIR, "templates")
-    TESTPLUS_RESOURCE_DEST_LEAF = os.path.join("static", "v1")
-    TESTPLUS_RESOURCE_SRC_DIR = os.path.join(TESTPLUS_TEMPLATES_DIR, "v1", "static")
-    TESTPLUS_SUMMARY_TEMPLATE = os.path.join(TESTPLUS_TEMPLATES_DIR, "v1", "testsummary.html")
+    TESTPLUS_RESOURCE_DEST_LEAF = os.path.join("static", "v2")
+    TESTPLUS_RESOURCE_SRC_DIR = os.path.join(TESTPLUS_TEMPLATES_DIR, "v2", "static")
+    TESTPLUS_SUMMARY_TEMPLATE = os.path.join(TESTPLUS_TEMPLATES_DIR, "v2", "testsummary.html")
     
 
 def initialize_testbase_runtime():

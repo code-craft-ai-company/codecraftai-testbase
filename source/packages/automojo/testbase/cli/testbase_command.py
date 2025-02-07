@@ -16,6 +16,7 @@ __credits__ = []
 
 import click
 
+from automojo.testbase.cli.cmdtree.services import group_testbase_services
 from automojo.testbase.cli.cmdtree.testing import group_testbase_testing
 from automojo.testbase.cli.cmdtree.utilities import group_testbase_utilities
 
@@ -43,8 +44,11 @@ def testbase_root_command(verbose):
 
     return
 
+
+testbase_root_command.add_command(group_testbase_services)
 testbase_root_command.add_command(group_testbase_testing)
 testbase_root_command.add_command(group_testbase_utilities)
+
 
 if __name__ == '__main__':
     testbase_root_command()

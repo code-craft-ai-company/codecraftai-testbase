@@ -27,6 +27,19 @@
             ],
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "Python: Test Results",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/source/packages/automojo/testbase/cli/testbase_command.py",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "services",
+                "results"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

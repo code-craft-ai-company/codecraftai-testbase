@@ -75,7 +75,7 @@
 @property --image-logo {
     syntax: "<url>";
     inherits: false;
-    initial-value: url("/static/v2/test-report-banner-background-image.png");
+    initial-value: url("/static/v2/images/test-report-banner-background-image.png");
 }
 
 

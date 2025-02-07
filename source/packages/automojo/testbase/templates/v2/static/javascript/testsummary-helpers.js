@@ -1,7 +1,10 @@
-/* =======================================================================
+
+/*
     Author: "Myron Walker"
-    Copyright: "Copyright 2025, Automation Mojo LLC"
- =======================================================================*/
+    Copyright: "Copyright 2024, Myron W Walker"
+    Version: = "2.0.0"
+    Email: myron.walker@gmail.com
+*/
 
 const DATETIME_FORMAT = "yyyy-MM-ddTHH:mm:ss.ssssss"
 

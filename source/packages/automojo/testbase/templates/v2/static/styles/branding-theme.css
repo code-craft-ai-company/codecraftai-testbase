@@ -1,8 +1,3 @@
-/* =======================================================================
-    Author: "Myron Walker"
-    Copyright: "Copyright 2025, Automation Mojo LLC"
- =======================================================================*/
-
 
 @property --color-error {
     syntax: "<color>";
@@ -80,7 +75,7 @@
 @property --image-logo {
     syntax: "<url>";
     inherits: false;
-    initial-value: url("/static/v2/images/test-report-banner-background-image.png");
+    initial-value: url("/static/v2/test-report-banner-background-image.png");
 }
 
 

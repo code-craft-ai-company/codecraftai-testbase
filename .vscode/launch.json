@@ -23,7 +23,7 @@
                 "testing",
                 "run",
                 "--root=${workspaceFolder}/source/testroots/automojo",
-                "--includes=automojo.tests.testbase"
+                "--includes=automojo.tests"
             ],
             "console": "integratedTerminal",
             "justMyCode": false

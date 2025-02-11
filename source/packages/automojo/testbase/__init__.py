@@ -5,9 +5,9 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-from logging import Logger
+from logging import Logger, getLogger
 
-logger: Logger
+logger: Logger = getLogger()
 
 
 from automojo.testbase.declaration import factories as factory

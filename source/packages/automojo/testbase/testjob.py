@@ -58,8 +58,10 @@ class TestJob(ContextUser, ITestJob):
         * Can be used to customize the sequencing of :class:`TestPack` runs.
     """
 
-    title = "" # Friendly name for the test job
+    name = "" # Friendly name for the test job
+    title = "" # A descriptive title for the test job
     description = "" # Description of the job
+    owner = "" # The owning individual or team
 
     includes = None # The test packs or tests that are included in this TestJob
     excludes = None # The tests that are to be excluded from this TestJob

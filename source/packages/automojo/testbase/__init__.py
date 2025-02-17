@@ -35,6 +35,10 @@ from automojo.testbase.markers import (
     mark_descendent_priority
 )
 
+from automojo.testbase.results.model.taskingresult import (
+    verify_tasking_results
+)
+
 from automojo.testbase.constraints import (
     Constraints,
     ConstraintsCatalog,

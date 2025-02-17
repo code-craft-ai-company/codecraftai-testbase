@@ -26,6 +26,7 @@ from io import TextIOWrapper
 from types import TracebackType
 
 from automojo.foundation.collections.contextuser import ContextUser
+from automojo.foundation.collections.contextpaths import ContextPaths
 
 from automojo.errors.exceptions import SemanticError
 
@@ -309,7 +310,7 @@ class TestSequencer(ContextUser):
             Perform a pre-run diagnostic on the devices in the test landscape.
         """
 
-        prerun_info = self.context.lookup(RuntimeConfigPaths.DIAGNOSTIC_PRERUN)
+        prerun_info = self.context.lookup(ContextPaths.DIAGNOSTICS_PRERUN)
 
         if prerun_info is not None and prerun_info == True:
             label = DiagnosticLabel.PRERUN_DIAGNOSTIC
@@ -324,7 +325,7 @@ class TestSequencer(ContextUser):
         """
             Perform a post-run diagnostic on the devices in the test landscape.
         """
-        postrun_info = self.context.lookup(RuntimeConfigPaths.DIAGNOSTIC_POSTRUN)
+        postrun_info = self.context.lookup(ContextPaths.DIAGNOSTICS_POSTRUN)
 
         if postrun_info is not None and postrun_info == True:
 

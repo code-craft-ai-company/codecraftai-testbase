@@ -167,8 +167,7 @@ class TestJob(ContextUser, ITestJob):
             # order in the automation code and that we provide the ability for configuration
             # issues to be discovered as early as possible.
 
-            debugger = self.context.lookup(ContextPaths.DEBUG_DEBUGGER, None)
-            breakpoints = self.context.lookup(ContextPaths.DEBUG_BREAKPOINTS, None)
+            debugger_wellknown_breakpoint_entry(WELLKNOWN_BREAKPOINTS.TEST_DISCOVERY)
 
             # STEP 1: We discover the tests first so we can build a listing of the
             # Integration and Scope couplings.  We don't want to execute any test code, setup,
@@ -176,8 +175,6 @@ class TestJob(ContextUser, ITestJob):
             # code from the test code and run the integration code first so we can discover
             # integration issues independant of the test code itself.
             self._logger.section("Discovery")
-            debugger_wellknown_breakpoint_entry(WELLKNOWN_BREAKPOINTS.TEST_DISCOVERY)
-
             count = tseq.discover(test_module=self._test_module)
 
             # STEP 2: Tell the sequencer to record any import errors that happened during discovery

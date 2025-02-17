@@ -1,6 +1,11 @@
 {
     "folders": [
         {
+            "name": "automojo",
+            "path": "${TMPLT:HOME}/automojo"
+        },
+        {
+            "name": "testbase"
             "path": "../"
         }
     ],

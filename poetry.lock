@@ -35,7 +35,7 @@ pyyaml = "^6.0.2"
 type = "git"
 url = "git@github.com:automationmojo/automojo-foundation.git"
 reference = "main"
-resolved_reference = "35259c1b87e7ded536eb43d63a603d9fd942b199"
+resolved_reference = "d15e6e741f25e8a633c2b5000e2b4f48c9749cc0"
 
 [[package]]
 name = "automojo-interfaces"

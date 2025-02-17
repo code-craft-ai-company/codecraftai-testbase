@@ -59,7 +59,6 @@ class TestJob(ContextUser, ITestJob):
     """
 
     name = "" # Friendly name for the test job
-    title = "" # A descriptive title for the test job
     description = "" # Description of the job
     owner = "" # The owning individual or team
 
@@ -218,7 +217,7 @@ class TestJob(ContextUser, ITestJob):
                 # STEP 10: Generate the test run sequence document that will be used or the run.
                 tseq.generate_testrun_sequence_document(self._testrun_sequence_filename)
 
-                title = self.title
+                title = self.name
                 runid = self._run_id
                 start = str(self._starttime)
 

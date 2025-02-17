@@ -13,6 +13,7 @@ __copyright__ = "Copyright 2023, Myron W Walker"
 __credits__ = []
 
 
+from typing import Optional, Type
 
 import argparse
 import inspect
@@ -29,10 +30,10 @@ from automojo.foundation.ximport import import_by_name
 from automojo.testbase.injection.injectionregistry import InjectionRegistry
 
 from automojo.testbase.utilities import find_testmodule_root, find_testmodule_fullname
-from automojo.testbase.testjob import DefaultTestJob
+from automojo.testbase.testjob import TestJob, DefaultTestJob
 
 
-def generic_test_entrypoint():
+def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
     """
         This is the generic test entry point for test modules.  It provides a standardized set of
         commanline parameters that can be used to run test files as scripts.
@@ -123,7 +124,7 @@ def generic_test_entrypoint():
         includes.append("*")
 
     result_code = 0
-    with DefaultTestJob(logger, testroot, includes=includes, excludes=excludes, test_module=test_module) as tjob:
+    with job_type(logger, testroot, includes=includes, excludes=excludes, test_module=test_module) as tjob:
         result_code = tjob.execute()
 
     sys.exit(result_code)

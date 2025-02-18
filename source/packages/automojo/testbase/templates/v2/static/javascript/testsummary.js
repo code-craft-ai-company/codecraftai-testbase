@@ -1,6 +1,6 @@
 /*
     Author: "Myron Walker"
-    Copyright: "Copyright 2024, Myron W Walker"
+    Copyright: "Copyright 2025, Automation Mojo LLC"
     Version: = "2.0.0"
     Email: myron.walker@gmail.com
 */
@@ -57,6 +57,59 @@ function split_test_fullname(testname_full) {
 
     return [package_name, test_name];
 }
+
+
+function finalize_test_result_item(ritem, counters, results_table) {
+
+    var moniker_suffix = ""
+    if ((ritem.monikers) && (ritem.monikers.length > 0)) {
+        moniker_start = "["
+        ritem.monikers.forEach(item => {
+            moniker_suffix = moniker_suffix + "[" + item + "]"
+            moniker_start = ",["
+        });
+    }
+
+    var testname_full = ritem.name;
+    if (moniker_suffix != "") {
+        testname_full = testname_full + ":" + moniker_suffix;
+    }
+
+    const [package_name, test_name] = split_test_fullname(testname_full);
+    ritem.name = test_name
+    ritem.package_name = package_name
+
+    var detail = ritem.detail;
+    detail.passed = false;
+    detail.skipped = false;
+
+    if (detail.errors.length > 0) {
+        counters.errors += 1;
+    }
+    else if (detail.failures.length > 0) {
+        counters.failed += 1;
+    }
+    else {
+        if (ritem.result == "SKIPPED") {
+            detail.skipped = true;
+            counters.skipped += 1;
+        } else {
+            detail.passed = true;
+            counters.passed += 1;
+        }
+    }
+    
+    var package_list = null;
+    if (package_name in results_table) {
+        package_list = results_table[package_name];
+    } else {
+        package_list = [];
+        results_table[package_name] = package_list;
+    }
+
+    package_list.push(ritem);
+}
+
 
 /*************************************************************************************
  *************************************************************************************
@@ -126,11 +179,13 @@ async function load_import_errors() {
 async function load_results() {
     var results = await fetch_json_stream("testrun_results.jsos");
 
-    var counter_passed = 0;
-    var counter_errors = 0;
-    var counter_failed = 0;
-    var counter_skipped = 0;
-
+    counters = {
+        passed: 0,
+        errors: 0,
+        failed: 0,
+        skipped: 0
+    }
+    
     if (g_display_mode == "GROUPED") {
         g_results = {};
 
@@ -151,61 +206,18 @@ async function load_results() {
                     if (! parent_lookup.hasOwnProperty(ritem_instance)) {
 
                         ritem.tasking_groups = [];
-                        parent_lookup[ritem_instance] = ritem;
+                        if (ritem.stop.length == 0) {
+                            parent_lookup[ritem_instance] = ritem;
+                        }  else {
+                            finalize_test_result_item(ritem, counters, g_results);
+                        }
 
                     } else {
                         
                         var preview_ritem = parent_lookup[ritem_instance];
                         ritem.tasking_groups = preview_ritem.tasking_groups;
 
-                        var moniker_suffix = ""
-                        if ((ritem.monikers) && (ritem.monikers.length > 0)) {
-                            moniker_start = "["
-                            ritem.monikers.forEach(item => {
-                                moniker_suffix = moniker_suffix + "[" + item + "]"
-                                moniker_start = ",["
-                            });
-                        }
-
-                        var testname_full = ritem.name;
-                        if (moniker_suffix != "") {
-                            testname_full = testname_full + ":" + moniker_suffix;
-                        }
-
-                        const [package_name, test_name] = split_test_fullname(testname_full);
-                        ritem.name = test_name
-                        ritem.package_name = package_name
-
-                        var detail = ritem.detail;
-                        detail.passed = false;
-                        detail.skipped = false;
-
-                        if (detail.errors.length > 0) {
-                            counter_errors += 1;
-                        }
-                        else if (detail.failures.length > 0) {
-                            counter_failed += 1;
-                        }
-                        else {
-                            if (ritem.result == "SKIPPED") {
-                                detail.skipped = true;
-                                counter_skipped += 1;
-                            } else {
-                                detail.passed = true;
-                                counter_passed += 1;
-                            }
-                        }
-
-                        var package_list = null;
-                        if (package_name in g_results) {
-                            package_list = g_results[package_name];
-                        } else {
-                            package_list = [];
-                            g_results[package_name] = package_list;
-                        }
-
-                        package_list.push(ritem);
-
+                        finalize_test_result_item(ritem, counters, g_results);
                     }
 
                 } else if (ritem.rtype == "TASKING_GROUP") {
@@ -267,10 +279,10 @@ async function load_results() {
         //TODO: Add code to create tree based g_results
     }
 
-    g_counter_passed = counter_passed;
-    g_counter_errors = counter_errors;
-    g_counter_failed = counter_failed;
-    g_counter_skipped = counter_skipped;
+    g_counter_passed = counters.passed;
+    g_counter_errors = counters.errors;
+    g_counter_failed = counters.failed;
+    g_counter_skipped = counters.skipped;
 
 }
 

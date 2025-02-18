@@ -56,10 +56,10 @@ class SequencerTestSetupScope(SequencerScopeBase):
         if ex_type is not None:
 
             if issubclass(ex_type, SkipError):
-                self._mark_descendants_skipped(self._test_scope_node, self._scope_id, ex_inst.reason, ex_inst.bug)
+                self._mark_test_as_skip(self._test_scope_node, self._scope_id, ex_inst.reason, ex_inst.bug)
             else:
                 tb_detail = create_traceback_detail(ex_inst)
-                self._mark_descendants_as_error(self._test_scope_node,  self._scope_id, tb_detail)
+                self._mark_test_as_error(self._test_scope_node,  self._scope_id, tb_detail)
 
                 # If an exceptions was thrown in this context, it means
                 # that the exception occured during the setup for this

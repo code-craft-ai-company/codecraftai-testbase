@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 class SequencerTestSetupScope(SequencerScopeBase):
 
     def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, test_name: str, **kwargs):
-        super().__init__()
+        super().__init__(sequencer, recorder)
 
         self._sequencer = sequencer
         self._recorder = recorder

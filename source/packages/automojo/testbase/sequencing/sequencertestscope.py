@@ -38,7 +38,6 @@ if TYPE_CHECKING:
     from automojo.testbase.sequencing.testsequencer import TestSequencer
 
 
-
 class SequencerTestScope:
 
     def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, test_name: str, notables: OrderedDict[str, Any]={}):
@@ -179,39 +178,3 @@ class SequencerTestScope:
     
     def _test_scope_exit(self):
         return
-
-class SequencerTestSetupScope:
-    def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, test_name: str, **kwargs):
-        super().__init__()
-
-        self._sequencer = sequencer
-        self._recorder = recorder
-        self._test_name = test_name
-        self._scope_name = "setup:{}".format(test_name)
-        self._scope_args = kwargs
-        self._scope_id = None
-        self._parent_scope_id = None
-        self._test_scope_node = self._sequencer.find_treenode_for_scope(test_name)
-        return
-
-    def __enter__(self):
-        self._parent_scope_id, self._scope_id = self._sequencer.scope_id_create(self._scope_name)
-        logger.info("TEST SETUP ENTER: {}, {}".format(self._scope_name, self._scope_id))
-        return self
-
-    def __exit__(self, ex_type, ex_inst, ex_tb):
-        handled = False
-
-        if ex_type is not None:
-            # If an exceptions was thrown in this context, it means
-            # that the exception occured during the setup for this
-            # module, this means we need to mark all descendant tests
-            # as error'd due to a setup failure.
-            errmsg = "Exception raises setting up scope='{}'".format(self._scope_name)
-            logger.exception(errmsg)
-            handled = True
-
-        self._test_scope_node.finalize()
-        self._sequencer.scope_id_pop(self._scope_name)
-        logger.info("TEST SETUP EXIT: {}, {}".format(self._scope_name, self._scope_id))
-        return handled

@@ -62,7 +62,8 @@ from automojo.testbase.testref import TestRef
 
 from automojo.testbase.sequencing.sequencersessionscope import SequencerSessionScope
 from automojo.testbase.sequencing.sequencermodulescope import SequencerModuleScope
-from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope, SequencerTestSetupScope
+from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope
+from automojo.testbase.sequencing.sequencertestsetupscope import SequencerTestSetupScope
 
 from automojo.testbase.constraints import ConstraintsCatalog
 

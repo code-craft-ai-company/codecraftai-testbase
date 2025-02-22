@@ -52,6 +52,7 @@ class JsonResultRecorder(ResultRecorder):
     """
         The :class:`JsonResultRecorder` object records test results in JSON format.
     """
+
     def __init__(self, *, runid: str, start: datetime, render_info: RenderInfo,
                  apod: Optional[str] = None, build_info: Optional[BuildInfo] = None,
                  pipeline_info: Optional[PipelineInfo] = None, job_info: Optional[JobInfo] = None):
@@ -71,6 +72,7 @@ class JsonResultRecorder(ResultRecorder):
                                                  build_info=build_info, pipeline_info=pipeline_info, job_info=job_info)
         return
 
+
     def preview(self, result: ResultNode):
         """
             Provides a way to write a preview of a result to a result stream.  When a preview
@@ -89,6 +91,7 @@ class JsonResultRecorder(ResultRecorder):
         self.catalog_output_directory()
 
         return
+
 
     def record(self, result: ResultNode):
         """
@@ -126,6 +129,7 @@ class JsonResultRecorder(ResultRecorder):
 
         return
 
+
     def update_summary(self):
         """
             Writes out an update to the test run summary file.
@@ -137,4 +141,13 @@ class JsonResultRecorder(ResultRecorder):
         self.catalog_output_directory()
 
         return
-    
+
+
+    def write_consolidated_results(self, root_node: dict):
+
+        with open(self._render_info.consolidated_results_filename, 'w+') as rout:
+            json.dump(root_node, rout, indent=4, cls=JsonResultEncoder)
+
+        self.catalog_output_directory()
+
+        return

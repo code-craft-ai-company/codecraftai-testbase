@@ -176,17 +176,12 @@ async function load_import_errors() {
     g_import_errors = await fetch_json_stream("import_errors.jsos")
 }
 
-async function load_results() {
-    var results = await fetch_json_stream("testrun_results.jsos");
+async function load_results_from_stream(counters) {
 
-    counters = {
-        passed: 0,
-        errors: 0,
-        failed: 0,
-        skipped: 0
-    }
-    
+    var results = await fetch_json_stream("testrun_results_stream.jsos");
+
     if (g_display_mode == "GROUPED") {
+
         g_results = {};
 
         var parent_lookup = {};
@@ -278,6 +273,21 @@ async function load_results() {
     } else {
         //TODO: Add code to create tree based g_results
     }
+
+}
+
+async function load_results() {
+
+    counters = {
+        passed: 0,
+        errors: 0,
+        failed: 0,
+        skipped: 0
+    }
+    
+    // Because we dont necessarily display the results in a maching result tree, for now we probably should just
+    // load the results from the results stream
+    load_results_from_stream(counters)
 
     g_counter_passed = counters.passed;
     g_counter_errors = counters.errors;

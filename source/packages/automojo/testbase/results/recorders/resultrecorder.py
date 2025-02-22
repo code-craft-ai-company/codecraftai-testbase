@@ -31,6 +31,7 @@ from automojo.testbase.results.model.pipelineinfo import PipelineInfo
 from automojo.testbase.results.model.renderinfo import RenderInfo
 
 from automojo.testbase.results.model.resultnode import ResultNode
+from automojo.testbase.results.model.resulttype import ResultType
 
 from automojo.testbase.results.utilities import (
     catalog_tree,
@@ -137,6 +138,7 @@ class ResultRecorder:
 
         return
 
+
     def __enter__(self):
         """
             Starts up the recording process of test results.
@@ -145,8 +147,9 @@ class ResultRecorder:
 
         self.update_summary()
         
-        self._rout = open(self._render_info.result_filename, 'w')
+        self._rout = open(self._render_info.stream_results_filename, 'w')
         return self
+
 
     def __exit__(self, ex_type: type, ex_inst: Exception, ex_tb: TracebackType) -> bool:
         """
@@ -161,6 +164,7 @@ class ResultRecorder:
         if not self._finalized:
             self.finalize()
         return
+
 
     @property
     def summary(self):
@@ -177,6 +181,7 @@ class ResultRecorder:
 
         return rtnval
 
+
     def catalog_output_directory(self):
         """
             A method that can be called in order to trigger catalog generation for the
@@ -185,6 +190,106 @@ class ResultRecorder:
         catalog_tree(self._output_dir, dont_catalog_dirs=DEFAULT_DO_NOT_CATALOG_DIRS,
                      dont_descend_dirs=DEFAULT_DO_NOT_DESCEND_DIRS)
         return
+
+
+    def clear_task_progress(self, task_ids: List[str]):
+
+        self._lock.acquire()
+        try:
+            for tid in task_ids:
+                if tid in self._running_tasks:
+                    del self._running_tasks[tid]
+        finally:
+            self._lock.release()
+
+        return
+
+
+    def consolidate_results(self):
+        """
+            Process the results stream and roll-it-up into a consolidated tests results document.
+        """
+
+        node_lookup = {}
+        root_node = None
+
+        result_stream = self.load_result_stream()
+
+        for ritem in result_stream:
+
+            ritem_inst = ritem["instance"]
+            ritem_type = ritem["type"]
+
+            if ritem_type == ResultType.JOB.name:
+                if root_node is not None:
+                    raise Exception("More than one job node found in results file.")
+                root_node = ritem
+
+                root_node["items"] = []
+            else:
+
+                ritem_parent_id = ritem["parent"]
+                if ritem_parent_id not in node_lookup:
+                    errmsg = f"We should never encounter a non-job node that does not have a parent.  Id={ritem_inst} Parent={ritem_parent_id}"
+                    raise Exception(errmsg)
+                
+                parent_node = node_lookup[ritem_parent_id]
+            
+                if ritem_type == ResultType.TEST_CONTAINER.name:
+                    
+                    parent_node_items: list = parent_node["items"]
+                    parent_node_items.append(ritem)
+                    ritem["items"] = []
+
+                    node_lookup[ritem_inst] = ritem
+
+                elif ritem_type == ResultType.TEST.name:
+
+                    parent_node_items: list = parent_node["items"]
+                    parent_node_items.append(ritem)
+                    
+                    if "tasking_groups" not in ritem:
+                        ritem["tasking_groups"] = []
+
+                    if ritem_inst in node_lookup:
+                        preview_info: dict = node_lookup[ritem_inst]
+                        preview_info.update(ritem)
+
+                    else:
+                        # This must be a injected failure that does not have a preview
+                        node_lookup[ritem_inst] = ritem
+
+                elif ritem_type == ResultType.TASKING_GROUP.name:
+                    parent_node_taskinggroups: list = parent_node["tasking_groups"]
+                    parent_node_taskinggroups.append(ritem)
+
+                    if "taskings" not in ritem:
+                        ritem["taskings"] = []
+
+                    if ritem_inst in node_lookup:
+                        preview_info: dict = node_lookup[ritem_inst]
+                        preview_info.update(ritem)
+
+                    else:
+                        # This must be a injected failure that does not have a preview
+                        node_lookup[ritem_inst] = ritem
+
+                elif ritem_type == ResultType.TASKING.name:
+                    parent_node_taskings: list = parent_node["taskings"]
+                    parent_node_taskings.append(ritem)
+
+                    if ritem_inst in node_lookup:
+                        preview_info: dict = node_lookup[ritem_inst]
+                        preview_info.update(ritem)
+
+                    else:
+                        # This must be a injected failure that does not have a preview
+                        node_lookup[ritem_inst] = ritem
+
+        self.write_consolidated_results(root_node)
+
+        return
+
 
     def finalize(self):
         """
@@ -222,6 +327,7 @@ class ResultRecorder:
 
         return
     
+
     def format_lines(self):
         lines = [
             " ============== Test Summary ============== ",
@@ -267,11 +373,14 @@ class ResultRecorder:
 
         return lines
 
+
     def forward_summary_update(self, summary):
         return
 
+
     def get_summary_render_file_basename(self):
         return "testsummary.html"
+
 
     def initialize_report(self):
 
@@ -286,6 +395,11 @@ class ResultRecorder:
 
         return
 
+
+    def load_result_stream(self) -> List[dict]:
+        return
+
+
     def preview(self, result: ResultNode):
         """
             Provides a way to write a preview of a result to a result stream.  When a preview
@@ -296,26 +410,6 @@ class ResultRecorder:
         """
         raise NotOverloadedError("The 'preview' method must be overridden by derived 'ResultRecorder' objects.") from None
 
-    def record(self, result: ResultNode):
-        """
-            Records an entry for the result object that is passed.
-
-            :param result: A result object to be recorded.
-        """
-        raise NotOverloadedError("The 'record' method must be overridden by derived 'ResultRecorder' objects.") from None
-
-    
-    def clear_task_progress(self, task_ids: List[str]):
-
-        self._lock.acquire()
-        try:
-            for tid in task_ids:
-                if tid in self._running_tasks:
-                    del self._running_tasks[tid]
-        finally:
-            self._lock.release()
-
-        return
 
     def post_task_progress(self, progress_list: List[ProgressInfo]):
 
@@ -346,6 +440,15 @@ class ResultRecorder:
         return
 
 
+    def record(self, result: ResultNode):
+        """
+            Records an entry for the result object that is passed.
+
+            :param result: A result object to be recorded.
+        """
+        raise NotOverloadedError("The 'record' method must be overridden by derived 'ResultRecorder' objects.") from None
+
+
     def update_render_environment(self):
         """
             Called in order to publish resources required by the HTML presentation to
@@ -372,10 +475,14 @@ class ResultRecorder:
 
         return
 
+
     def update_summary(self): # pylint: disable=no-self-use
         """
             Writes out an update to the test run summary file.
         """
         raise NotOverloadedError("The 'update_summary' method must be overridden by derived 'ResultRecorder' objects.") from None
 
-    
+
+    def write_consolidated_results(self, root_node: dict):
+        raise NotOverloadedError("The 'write_consolidated_results' method must be overridden by derived 'ResultRecorder' objects.") from None
+

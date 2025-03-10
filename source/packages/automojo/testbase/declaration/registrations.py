@@ -37,7 +37,7 @@ from automojo.testbase.injection.injectionregistry import injection_registry
 _IntegrationSubscriberType = TypeVar("_IntegrationSubscriberType", bound=Callable[..., object])
 
 
-def integration(*, constraints: Optional[Dict]=None):
+def integration_factory(*, constraints: Optional[Dict]=None):
     """
         The `integration` decorator is used to declare a function as the source
         of an integration resource.
@@ -84,7 +84,7 @@ def integration(*, constraints: Optional[Dict]=None):
     return decorator
 
 
-def resource(*, query_function: Optional[Callable]=None, constraints: Optional[Dict]=None):
+def resource_factory(*, query_function: Optional[Callable]=None, constraints: Optional[Dict]=None):
     def decorator(source_function: Callable) -> Callable:
         nonlocal constraints
 
@@ -123,7 +123,7 @@ def resource(*, query_function: Optional[Callable]=None, constraints: Optional[D
     return decorator
 
 
-def configuration(*, query_function: Optional[Callable]=None, constraints: Optional[Dict]=None):
+def configuration_factory(*, query_function: Optional[Callable]=None, constraints: Optional[Dict]=None):
     """
         The `configuration` decorator is used to declare a function as the source of a configuration
         resource.
@@ -169,7 +169,7 @@ def configuration(*, query_function: Optional[Callable]=None, constraints: Optio
     return decorator
 
 
-def validator(*, constraints: Optional[Dict]=None):
+def validator_factory(*, constraints: Optional[Dict]=None):
     def decorator(source_function: Callable) -> Callable:
         nonlocal constraints
 

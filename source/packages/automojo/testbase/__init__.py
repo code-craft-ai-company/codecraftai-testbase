@@ -10,8 +10,10 @@ from logging import Logger, getLogger
 logger: Logger = getLogger()
 
 
-from automojo.testbase.declaration import factories as factory
+from automojo.testbase.declaration import attachments as attach
+from automojo.testbase.declaration import registrations as register
 from automojo.testbase.declaration import originiations as originate
+
 
 from automojo.testbase.verification import (
     assert_dict_response_has_keys,

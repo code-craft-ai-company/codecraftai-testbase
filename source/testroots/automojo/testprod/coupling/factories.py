@@ -72,13 +72,13 @@ class TestIntegrationCoupling(IntegrationCoupling):
         return
 
 
-@testbase.factory.resource()
+@testbase.register.resource_factory()
 def create_landscape(constraints={}) -> Generator[Landscape, None, None]:
     lscape = Landscape()
     yield lscape
 
 
-@testbase.factory.integration()
+@testbase.register.integration_factory()
 def create_testintegration_coupling() -> Generator[TestIntegrationCoupling, None, None]:
     test_coupling = TestIntegrationCoupling()
     yield test_coupling

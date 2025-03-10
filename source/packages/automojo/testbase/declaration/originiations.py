@@ -3,7 +3,7 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 import inspect
 
@@ -13,17 +13,17 @@ from automojo.foundation.xinspect import is_typed_from_type
 
 
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
-
 from automojo.testbase.injection.injectionregistry import injection_registry
-
-
 from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 from automojo.testbase.sources.integrationsource import IntegrationSource
-
 from automojo.testbase.resourcelifespan import ResourceLifespan
 
 
-def parameter(source_func, *, identifier: Optional[None], life_span: ResourceLifespan=None, assigned_scope: Optional[str]=None, constraints: Optional[Dict]=None):
+def parameter(source_func, *, identifier: str, life_span: ResourceLifespan=None, assigned_scope: Optional[str]=None, constraints: Optional[Dict]=None):
+
+    def decorator(subscriber: Callable) -> Callable:
+        errmsg = "The '@testbase.originate.parameter()' function is not a decorator.  Use '@testbase.attach.parameter()' to localize a parameter to a specific test."
+        raise SemanticError(errmsg)
 
     if source_func is None:
         errmsg = "The 'source_func' parameter cannot be 'None'."
@@ -71,5 +71,5 @@ def parameter(source_func, *, identifier: Optional[None], life_span: ResourceLif
     param_origin = ResourceOrigin(assigned_scope, identifier, life_span, source_info, constraints)
     injection_registry.register_resource_origin(identifier, param_origin)
 
-    return
+    return decorator
 

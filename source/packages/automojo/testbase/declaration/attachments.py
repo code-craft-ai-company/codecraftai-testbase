@@ -13,7 +13,6 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-
 from typing import Any, Callable, Dict, Optional
 
 NoneType = type(None)
@@ -25,7 +24,7 @@ from automojo.testbase.injection.injectionregistry import injection_registry
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
 from automojo.testbase.resourcelifespan import ResourceLifespan
 
-def attach_parameter(source, *, identifier: Optional[None], constraints: Optional[Dict[str, Any]]=None):
+def parameter(source, *, identifier: str, constraints: Optional[Dict[str, Any]]=None):
 
     def decorator(subscriber: Callable) -> Callable:
         nonlocal source

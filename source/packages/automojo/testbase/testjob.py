@@ -25,7 +25,7 @@ from automojo.foundation.xformatting import CommandOutputFormat
 from automojo.foundation.xdebugger import WELLKNOWN_BREAKPOINTS, debugger_wellknown_breakpoint_entry
 from automojo.foundation.xlogging.foundations import EnhancedLogger
 
-from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES, DefaultValue
 from automojo.foundation.runtime.paths import (
     get_summary_html_template_source,
     get_summary_static_resource_dest_dir,
@@ -117,6 +117,10 @@ class TestJob(ContextUser, ITestJob):
         self._job_tag = AM_RUNTIME_VARIABLES.AM_JOB_TAG
         
         self._import_errors = []
+
+        self._title = "Test Run"
+        if self._job_name != DefaultValue.NotSet:
+            self._title = self._job_name
 
         return
 
@@ -416,7 +420,7 @@ class TestJob(ContextUser, ITestJob):
             Simple hook function to make it possible to overload the type of the TestSequencer that is created
             for jobs.
         """
-        inst = TestSequencer(self.title, self._testroot, includes=self.includes, excludes=self.excludes, metafilters=self.metafilters)
+        inst = TestSequencer(self._title, self._testroot, includes=self.includes, excludes=self.excludes, metafilters=self.metafilters)
         return inst
 
 

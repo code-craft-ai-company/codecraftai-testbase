@@ -72,7 +72,11 @@ def create_time_interval_validator() -> TimeIntervalValidator:
 @originate.validate(create_validator, suffix="vcheck", identifier="nvalidator")
 @originate.validate(create_looping_validator, suffix="vlcheck", identifier="lvalidator")
 @originate.validate(create_time_interval_validator, suffix="vticheck", identifier="tivalidator")
-def test_no_parameters():
+def test_with_validators(nvalidator: TestValidator, lvalidator: TestLoopingValidator, tivalidator: TimeIntervalValidator):
+
+    # The test function can ask for the validators as parameters so it has a way to handle synchronization
+    # of parallel checks.
+
     testbase.logger.info("test_no_parameters: was run.")
     time.sleep(10)
     return

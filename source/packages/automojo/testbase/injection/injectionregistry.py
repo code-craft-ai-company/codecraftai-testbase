@@ -25,9 +25,10 @@ from automojo.testbase.injection.injectionscope import InjectionScope
 
 class InjectionRegistry:
     """
-        1. During the injectable discovery process, the parameter decorators are executed and the resource
-           identifier names and source functions are registered and available for consumption via a query
-           interface or by a execution sequencer when generating the injectable execution flow code.
+        1. During the injectable discovery process, the origination functions and parameter decorators are
+           executed and the resource identifier names and source functions are registered and available for
+           consumption via a query interface or by a execution sequencer when generating the injectable
+           execution flow code.
 
            The source functions and identifiers being registered are stored in the scope tree in
            order to build data structure that allows for the resolution of scope for the parameters

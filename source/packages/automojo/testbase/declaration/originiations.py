@@ -21,6 +21,7 @@ from automojo.testbase.resourcelifespan import ResourceLifespan
 
 def parameter(source_func, *, identifier: str, life_span: ResourceLifespan=None, assigned_scope: Optional[str]=None, constraints: Optional[Dict]=None):
 
+    # Trap for the use of this version of 'parameter' as a decorator and provide a more explicit error message if it gets misused.
     def decorator(subscriber: Callable) -> Callable:
         errmsg = "The '@testbase.originate.parameter()' function is not a decorator.  Use '@testbase.attach.parameter()' to localize a parameter to a specific test."
         raise SemanticError(errmsg)

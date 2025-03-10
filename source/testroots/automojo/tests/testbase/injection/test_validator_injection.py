@@ -41,7 +41,7 @@ class TestTimeIntervalValidator(TimeIntervalValidator):
         return
 
 
-@testbase.register.validator()
+@testbase.register.validator_factory()
 def create_validator() -> TestValidator:
 
     validator = TestValidator()
@@ -49,7 +49,7 @@ def create_validator() -> TestValidator:
 
     return validator
 
-@testbase.register.validator()
+@testbase.register.validator_factory()
 def create_looping_validator() -> TestLoopingValidator:
 
     validator = TestLoopingValidator()
@@ -57,7 +57,7 @@ def create_looping_validator() -> TestLoopingValidator:
 
     return validator
 
-@testbase.register.validator()
+@testbase.register.validator_factory()
 def create_time_interval_validator() -> TimeIntervalValidator:
 
     validator = TestTimeIntervalValidator(interval=1)

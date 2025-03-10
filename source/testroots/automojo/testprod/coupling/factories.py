@@ -84,7 +84,7 @@ def create_testintegration_coupling() -> Generator[TestIntegrationCoupling, None
     yield test_coupling
 
 
-@testbase.factory.resource()
+@testbase.register.resource_factory()
 def create_blah(constraints={}):
     yield "blah"
 

@@ -23,7 +23,7 @@ import threading
 
 from datetime import datetime
 
-from automojo.errors.exceptions import NotOverloadedError
+from automojo.errors.exceptions import AbstractMethodError
 
 from automojo.testbase.results.model.buildinfo import BuildInfo
 from automojo.testbase.results.model.jobinfo import JobInfo
@@ -408,7 +408,7 @@ class ResultRecorder:
 
             :param result: A result object to be recorded.
         """
-        raise NotOverloadedError("The 'preview' method must be overridden by derived 'ResultRecorder' objects.") from None
+        raise AbstractMethodError("The 'preview' method must be overridden by derived 'ResultRecorder' objects.") from None
 
 
     def post_task_progress(self, progress_list: List[ProgressInfo]):
@@ -446,7 +446,7 @@ class ResultRecorder:
 
             :param result: A result object to be recorded.
         """
-        raise NotOverloadedError("The 'record' method must be overridden by derived 'ResultRecorder' objects.") from None
+        raise AbstractMethodError("The 'record' method must be overridden by derived 'ResultRecorder' objects.") from None
 
 
     def update_render_environment(self):
@@ -480,9 +480,9 @@ class ResultRecorder:
         """
             Writes out an update to the test run summary file.
         """
-        raise NotOverloadedError("The 'update_summary' method must be overridden by derived 'ResultRecorder' objects.") from None
+        raise AbstractMethodError("The 'update_summary' method must be overridden by derived 'ResultRecorder' objects.") from None
 
 
     def write_consolidated_results(self, root_node: dict):
-        raise NotOverloadedError("The 'write_consolidated_results' method must be overridden by derived 'ResultRecorder' objects.") from None
+        raise AbstractMethodError("The 'write_consolidated_results' method must be overridden by derived 'ResultRecorder' objects.") from None
 

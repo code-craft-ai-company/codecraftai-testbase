@@ -10,7 +10,7 @@ import threading
 import time
 import uuid
 
-from automojo.errors.exceptions import NotOverloadedError, SemanticError
+from automojo.errors.exceptions import AbstractMethodError, SemanticError
 from automojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
 from automojo.testbase.results.model.testresult import TestResult
 from automojo.testbase.coupling.validatorcoupling import ValidatorCoupling
@@ -74,7 +74,7 @@ class Validator(ValidatorCoupling):
             The 'validate' method is a self contained testcase.  It checks the state of the validator object and then
             raises the appropriate exception for an 'Error' or 'Failure' condition based on the results found.
         """
-        raise NotOverloadedError("Validator derived types must implement the 'validate' method.")
+        raise AbstractMethodError("Validator derived types must implement the 'validate' method.")
 
     def finalize(self):
         """

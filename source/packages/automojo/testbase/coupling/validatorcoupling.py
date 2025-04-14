@@ -15,7 +15,7 @@ __credits__ = []
 
 from typing import Any
 
-from automojo.errors.exceptions import NotOverloadedError
+from automojo.errors.exceptions import AbstractMethodError
 
 class ValidatorCoupling:
     """
@@ -27,5 +27,5 @@ class ValidatorCoupling:
             The 'attach_to_test' method is called by the sequencer in order to attach the validator to its partner
             test scope.
         """
-        raise NotOverloadedError("'ValidatorCoupling' derived objects must overload the 'attach_to_test' method.")
+        raise AbstractMethodError("'ValidatorCoupling' derived objects must overload the 'attach_to_test' method.")
 

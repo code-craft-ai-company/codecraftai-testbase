@@ -18,7 +18,7 @@ from typing import Any, Dict, List, Tuple, TypeVar, TYPE_CHECKING
 import inspect
 
 from automojo.testbase.coupling.basecoupling import BaseCoupling
-from automojo.errors.exceptions import NotOverloadedError
+from automojo.errors.exceptions import AbstractMethodError
 
 
 class IntegrationCoupling(BaseCoupling):
@@ -72,7 +72,7 @@ class IntegrationCoupling(BaseCoupling):
             :raises :class:`automojo.errors.exceptions.AKitMissingConfigError`, :class:`automojo.errors.exceptions.ConfigurationError`:
         """
         errmsg = "The 'attach_to_environment' method must be overloaded by derived integration coupling types."
-        raise NotOverloadedError(errmsg)
+        raise AbstractMethodError(errmsg)
 
     @classmethod
     def collect_resources(cls):
@@ -83,7 +83,7 @@ class IntegrationCoupling(BaseCoupling):
             :raises :class:`automojo.errors.exceptions.AKitResourceError`:
         """
         errmsg = "The 'collect_resources' method must be overloaded by derived integration coupling types."
-        raise NotOverloadedError(errmsg)
+        raise AbstractMethodError(errmsg)
 
     @classmethod
     def declare_precedence(cls) -> int:
@@ -124,7 +124,7 @@ class IntegrationCoupling(BaseCoupling):
                       reports for devices devices based on the coordinator.
         """
         errmsg = "The 'diagnostic' method must be overloaded by derived integration coupling types."
-        raise NotOverloadedError(errmsg)
+        raise AbstractMethodError(errmsg)
 
     @classmethod
     def establish_presence(cls) -> Tuple[List[str], Dict]:
@@ -136,7 +136,7 @@ class IntegrationCoupling(BaseCoupling):
                       reports for devices devices based on the coordinator.
         """
         errmsg = "The 'diagnostic' method must be overloaded by derived integration coupling types."
-        raise NotOverloadedError(errmsg)
+        raise AbstractMethodError(errmsg)
 
     @classmethod
     def get_integration_key(cls):
@@ -151,7 +151,7 @@ class IntegrationCoupling(BaseCoupling):
     @classmethod
     def validate_item_configuration(cls, item_info: Dict[str, Any]) -> Tuple[List[str], List[str]]:
         errmsg = "The 'validate_item_configuration' method must be overloaded by derived integration coupling types."
-        raise NotOverloadedError(errmsg)
+        raise AbstractMethodError(errmsg)
 
 
 IntegrationCouplingType = TypeVar('IntegrationCouplingType', bound=IntegrationCoupling)

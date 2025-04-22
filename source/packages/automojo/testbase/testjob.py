@@ -143,7 +143,7 @@ class TestJob(ContextUser, ITestJob):
 
         env = self.context.lookup("/environment")
 
-        self._starttime = env["starttime"]
+        self._starttime = AM_RUNTIME_VARIABLES.AM_STARTTIME
 
         self._test_results_dir = get_path_for_testresults()
         

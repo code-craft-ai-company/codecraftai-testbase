@@ -287,7 +287,7 @@ async function load_results() {
     
     // Because we dont necessarily display the results in a maching result tree, for now we probably should just
     // load the results from the results stream
-    load_results_from_stream(counters)
+    await load_results_from_stream(counters)
 
     g_counter_passed = counters.passed;
     g_counter_errors = counters.errors;

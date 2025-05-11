@@ -34,6 +34,9 @@ var g_import_errors = null;
 // File Catalog State
 var g_catalog = null;
 
+// Bug Server State
+var g_bug_server_available = false;
+
 
 /*************************************************************************************
  *************************************************************************************
@@ -297,7 +300,13 @@ async function load_results() {
 }
 
 async function load_summary() {
-    g_summary = await fetch_json("testrun_summary.json");
+    respHeaders = {}
+
+    g_summary = await fetch_json("testrun_summary.json", respHeaders);
+
+    if (respHeaders.hasOwnProperty("AM-BUG-SERVER-TYPE")) {
+        g_bug_server_available = true;
+    }
 }
 
 /*************************************************************************************
@@ -437,7 +446,7 @@ function refresh_summary() {
  *************************************************************************************/
 
 async function refresh_page() {
-    
+
     load_summary().then(() => {
         refresh_summary();
     });

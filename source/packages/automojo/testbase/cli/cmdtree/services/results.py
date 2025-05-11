@@ -9,7 +9,7 @@ import os
 import click
 
 
-from automojo.testbase.server.resultserver import TestResultServer, TestResultRequestHandler
+from automojo.testbase.server.resultserver import TestResultServer, TestResultRequestHandler, try_construction_from_environment
 from automojo.foundation.runtime.activation import activate_profile_service
 from automojo.foundation.runtime.paths import get_presence_directory
 from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
@@ -37,7 +37,9 @@ def command_testbase_services_results(directory, bind, port):
         presence_dir = get_presence_directory()
         svc_directory = os.path.join(presence_dir, "results")
 
-    server = TestResultServer(svc_directory, svc_endpoint, TestResultRequestHandler)
+    bug_svc = try_construction_from_environment()
+
+    server = TestResultServer(svc_directory, svc_endpoint, TestResultRequestHandler, bug_svc)
     server.serve_forever()
 
     return

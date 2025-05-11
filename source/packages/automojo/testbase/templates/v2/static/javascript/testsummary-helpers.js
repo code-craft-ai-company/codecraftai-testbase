@@ -34,7 +34,7 @@ const DATETIME_FORMAT = "yyyy-MM-ddTHH:mm:ss.ssssss"
     return promise;
 }
 
-async function fetch_json(url) {
+async function fetch_json(url, headers=null) {
     var promise = new Promise((resolve, reject) => {
 
         var xmlhttp = new XMLHttpRequest();
@@ -42,8 +42,28 @@ async function fetch_json(url) {
         xmlhttp.onreadystatechange = function () {
             if (this.readyState == 4) {
                 if (this.status == 200) {
+                    // If headers are provided, parse the response headers
+                    if (headers != null) {
+
+                        var respHeaderContent = this.getAllResponseHeaders();
+                        const headerLines = respHeaderContent.split('\r\n');
+
+                        // Iterate over the lines
+                        headerLines.forEach(line => {
+                            // Split each line into key and value
+                            const parts = line.split(': ');
+                            if (parts.length === 2) {
+                            const key = parts[0];
+                            const value = parts[1];
+                            headers[key.toUpperCase()] = value.toUpperCase();
+                            }
+                        });
+
+                    }
+
                     var robj = JSON.parse(this.responseText);
                     resolve(robj);
+
                 } else {
                     reject(this.statusText);
                 }

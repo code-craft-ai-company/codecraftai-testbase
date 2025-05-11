@@ -1,19 +1,144 @@
 
 
-from typing import Tuple, Type
+from typing import Optional, Tuple, Type, Union
 
 import contextlib
 import datetime
 import email.utils
+import html
+import io
+import json
+import logging
 import os
 import posixpath
 import shutil
 import socket
+import sys
 import urllib
+
 
 from http import HTTPStatus
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+
+from automojo.foundation.runtime.variablenames import AM_RUNTIME_VARNAMES
+
+logger = logging.getLogger()
+
+
+SUPPORTED_BUG_SERVERS = ["JIRA"]
+
+class BugServerInterface:
+    """
+        An interface for a bug server.
+    """
+
+    def __init__(self, server_type: str, server_endpoint: str, team: str, username: str, token: str):
+        self._server_type = server_type
+        self._server_endpoint = server_endpoint
+        self._team = team
+        self._username = username
+        self._token = token
+        return
+
+    @property
+    def server_type(self) -> str:
+        return self._server_type
+
+    @property
+    def server_endpoint(self) -> str:
+        return self._server_endpoint
+
+    @property
+    def team(self) -> str:
+        return self._team
+
+    @property
+    def username(self) -> str:
+        return self._username
+
+    @property
+    def token(self) -> str:
+        return self._token
+    
+
+class BugServerInterfaceForJira(BugServerInterface):
+    """
+        A bug server interface for JIRA.
+    """
+
+    def __init__(self, server_type: str, server_endpoint: str, team: str, username: str, token: str):
+        super().__init__(server_type, server_endpoint, team, username, token)
+        return
+
+
+def try_construction_from_environment() -> Union[None, 'BugServerInterface']:
+    """
+        Construct a BugServerInterface from the environment.
+    """
+    server_iface = None
+
+    environ = os.environ
+
+    server_type: str = None
+    server_endpoint: str = None
+    team: str = None
+    username: str = None
+    token: str = None
+
+    if AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE in environ:
+        server_type = environ[AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE].upper()
+
+        while True:
+            if server_type not in SUPPORTED_BUG_SERVERS:
+                warn_msg = f"Unknown bug server type: {server_type}"
+                logger.warning(warn_msg)
+                break
+            
+            if AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT not in environ:
+                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT} variable must be set."
+                logger.warning(warn_msg)
+                break
+
+            server_endpoint = environ[AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT]
+            
+            if AM_RUNTIME_VARNAMES.AM_BUG_TEAM not in environ:
+                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_TEAM} variable must be set."
+                logger.warning(warn_msg)
+                break
+            
+            team = environ[AM_RUNTIME_VARNAMES.AM_BUG_TEAM]
+
+            if AM_RUNTIME_VARNAMES.AM_BUG_USERNAME not in environ:
+                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_USERNAME} variable must be set."
+                logger.warning(warn_msg)
+                break
+            
+            username = environ[AM_RUNTIME_VARNAMES.AM_BUG_USERNAME]
+            
+            if AM_RUNTIME_VARNAMES.AM_BUG_TOKEN not in environ:
+                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_TOKEN} variable must be set."
+                logger.warning(warn_msg)
+                break
+            
+            token = environ[AM_RUNTIME_VARNAMES.AM_BUG_TOKEN]
+
+            # If we have all the required information to construct the server interface, create it and
+            # assign it to the 'server_iface' in order to return it.
+            if server_type == "JIRA":
+                server_iface = BugServerInterfaceForJira(
+                    server_type=server_type,
+                    server_endpoint=server_endpoint,
+                    team=team,
+                    username=username,
+                    token=token
+                )
+
+
+            break # Always exit the 'while True' pipeline
+
+    return server_iface
+
 
 class TestResultRequestHandler(SimpleHTTPRequestHandler):
     """
@@ -21,20 +146,42 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
         properly display them.
     """
 
-    def __init__(self, *args, directory=None, **kwargs):
+    def __init__(self, *args, directory=None, bug_server: BugServerInterface=None,**kwargs):
         self._no_sniff_header = False
-        
+        self._bug_server = bug_server
+
         super().__init__(*args, directory=directory, **kwargs)
         return
 
     def do_GET(self):
         """Serve a GET request."""
-        f = self.send_head()
-        if f:
-            try:
-                self.copyfile(f, self.wfile)
-            finally:
-                f.close()
+        if self.path.startswith('/api'):
+            self.handle_api_get(self.path)
+        else:
+            f = self.send_head()
+            if f:
+                try:
+                    self.copyfile(f, self.wfile)
+                finally:
+                    f.close()
+
+    def do_POST(self):
+        """Serve a POST request."""
+        
+        if self.path.startswith('/api'):
+            self.handle_api_post(self.path)
+        else:
+            self.send_error(HTTPStatus.BAD_REQUEST, "INVALID REQUEST")
+
+        return
+    
+    def do_PUT(self):
+        """Serve a PUT request."""
+        
+        if self.path.startswith('/api'):
+            self.handle_api_put(self.path)
+
+        return
 
     def copyfile(self, source, outputfile):
         """Copy all data between two file objects.
@@ -51,6 +198,129 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
 
         """
         shutil.copyfileobj(source, outputfile)
+
+    def handle_api_get(self, path: str):
+        """Handle GET requests to the /api endpoint."""
+
+        
+        if path == "/api/v1/environment":
+            response = {
+                AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE: self._bug_server.server_type,
+                AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT: self._bug_server.server_endpoint,
+                AM_RUNTIME_VARNAMES.AM_BUG_TEAM: self._bug_server.team,
+                AM_RUNTIME_VARNAMES.AM_BUG_USERNAME: self._bug_server.username,
+                AM_RUNTIME_VARNAMES.AM_BUG_TOKEN: self._bug_server.token
+            }
+            rcontent = json.dumps(response).encode('utf-8')
+
+            self.send_response(HTTPStatus.OK)
+            self.send_header("Content-type", "application/json")
+            self.send_header("Content-Length", str(len(rcontent)))
+            self.try_send_bug_server_header()
+            self.end_headers()
+
+            self.wfile.write(rcontent.encode('utf-8'))
+            
+        else:
+            # Handle other API paths
+            self.send_response(HTTPStatus.NOT_FOUND)
+            self.send_header("Content-type", "text/html")
+            self.try_send_bug_server_header()
+            self.end_headers()
+            
+            # Example response for unsupported path
+
+        
+
+        return
+    
+    def handle_api_post(self, path: str):
+        """Handle POST requests to the /api endpoint."""
+        
+        # Implement your API logic here
+        self.send_response(HTTPStatus.NOT_IMPLEMENTED)
+        self.send_header("Content-type", "text/html")
+        self.try_send_bug_server_header()
+        self.end_headers()
+        
+        rcontent = f"POST not supported for path: {path}"
+
+        self.wfile.write(rcontent.encode('utf-8'))
+
+        return
+    
+    def handle_api_put(self, path: str):
+        """Handle PUT requests to the /api endpoint."""
+        
+        # Implement your API logic here
+        self.send_response(HTTPStatus.NOT_IMPLEMENTED)
+        self.send_header("Content-type", "text/html")
+        self.try_send_bug_server_header()
+        self.end_headers()
+        
+        rcontent = f"PUT not supported for path: {path}"
+
+        self.wfile.write(rcontent.encode('utf-8'))
+        
+        return
+
+    def list_directory(self, path):
+        """Helper to produce a directory listing (absent index.html).
+
+        Return value is either a file object, or None (indicating an
+        error).  In either case, the headers are sent, making the
+        interface the same as for send_head().
+
+        """
+        try:
+            list = os.listdir(path)
+        except OSError:
+            self.send_error(
+                HTTPStatus.NOT_FOUND,
+                "No permission to list directory")
+            return None
+        list.sort(key=lambda a: a.lower())
+        r = []
+        try:
+            displaypath = urllib.parse.unquote(self.path,
+                                               errors='surrogatepass')
+        except UnicodeDecodeError:
+            displaypath = urllib.parse.unquote(self.path)
+        displaypath = html.escape(displaypath, quote=False)
+        enc = sys.getfilesystemencoding()
+        title = f'Directory listing for {displaypath}'
+        r.append('<!DOCTYPE HTML>')
+        r.append('<html lang="en">')
+        r.append('<head>')
+        r.append(f'<meta charset="{enc}">')
+        r.append(f'<title>{title}</title>\n</head>')
+        r.append(f'<body>\n<h1>{title}</h1>')
+        r.append('<hr>\n<ul>')
+        for name in list:
+            fullname = os.path.join(path, name)
+            displayname = linkname = name
+            # Append / for directories or @ for symbolic links
+            if os.path.isdir(fullname):
+                displayname = name + "/"
+                linkname = name + "/"
+            if os.path.islink(fullname):
+                displayname = name + "@"
+                # Note: a link to a directory displays with @ and links with /
+            r.append('<li><a href="%s">%s</a></li>'
+                    % (urllib.parse.quote(linkname,
+                                          errors='surrogatepass'),
+                       html.escape(displayname, quote=False)))
+        r.append('</ul>\n<hr>\n</body>\n</html>\n')
+        encoded = '\n'.join(r).encode(enc, 'surrogateescape')
+        f = io.BytesIO()
+        f.write(encoded)
+        f.seek(0)
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-type", "text/html; charset=%s" % enc)
+        self.send_header("Content-Length", str(len(encoded)))
+        self.try_send_bug_server_header()
+        self.end_headers()
+        return f
 
     def send_head(self):
         """Common code for GET and HEAD commands.
@@ -75,6 +345,7 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
                 new_url = urllib.parse.urlunsplit(new_parts)
                 self.send_header("Location", new_url)
                 self.send_header("Content-Length", "0")
+                self.try_send_bug_server_header()
                 self.end_headers()
                 return None
             for index in self.index_pages:
@@ -84,6 +355,7 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
                     break
             else:
                 return self.list_directory(path)
+
         ctype = self.guess_type(path)
         # check for trailing "/" which should return 404. See Issue17324
         # The test for this was added in test_httpserver.py
@@ -125,6 +397,7 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
 
                         if last_modif <= ims:
                             self.send_response(HTTPStatus.NOT_MODIFIED)
+                            self.try_send_bug_server_header()
                             self.end_headers()
                             f.close()
                             return None
@@ -136,11 +409,18 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
                 self.date_time_string(fs.st_mtime))
             if self._no_sniff_header:
                 self.send_header("X-Content-Type-Options", "nosniff")
+            self.try_send_bug_server_header()
             self.end_headers()
             return f
         except:
             f.close()
             raise
+
+    def try_send_bug_server_header(self):
+        """Try to send the bug server header."""
+        if self._bug_server is not None:
+            self.send_header("AM-BUG-SERVER-TYPE", self._bug_server.server_type)
+        return
 
     def translate_path(self, path):
         """Translate a /-separated PATH to the local filename syntax.
@@ -193,9 +473,10 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
 
 class TestResultServer(ThreadingHTTPServer):
 
-    def __init__(self, root_directory: str, server_endpoint: Tuple[str, int], handler_class: Type[SimpleHTTPRequestHandler]):
+    def __init__(self, root_directory: str, server_endpoint: Tuple[str, int], handler_class: Type[SimpleHTTPRequestHandler], bug_server: Optional[BugServerInterface]=None,):
         super().__init__(server_endpoint, handler_class)
         self._root_directory = root_directory
+        self._bug_server = bug_server
         return
 
     def server_bind(self):
@@ -206,7 +487,7 @@ class TestResultServer(ThreadingHTTPServer):
         return super().server_bind()
 
     def finish_request(self, request, client_address):
-        self.RequestHandlerClass(request, client_address, self, directory=self._root_directory)
+        self.RequestHandlerClass(request, client_address, self, directory=self._root_directory, bug_server=self._bug_server)
         return
 
 
@@ -227,6 +508,8 @@ if __name__ == '__main__':
     svc_endpoint = (args.bind, args.port)
     svc_directory = os.path.abspath(os.path.expandvars(os.path.expanduser(args.directory)))
 
-    server = TestResultServer(svc_directory, svc_endpoint, TestResultRequestHandler)
+    bug_svc = try_construction_from_environment()
+
+    server = TestResultServer(svc_directory, svc_endpoint, TestResultRequestHandler, bug_svc)
 
     server.serve_forever()

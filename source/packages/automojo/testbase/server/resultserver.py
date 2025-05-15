@@ -1,7 +1,8 @@
 
 
-from typing import Optional, Tuple, Type, Union
+from typing import Dict, Optional, Tuple, Type, Union
 
+import abc
 import contextlib
 import datetime
 import email.utils
@@ -28,19 +29,24 @@ logger = logging.getLogger()
 
 SUPPORTED_BUG_SERVERS = ["JIRA"]
 
-class BugServerInterface:
+class BugServerInterface(abc.ABC):
     """
         An interface for a bug server.
     """
 
-    def __init__(self, server_type: str, server_endpoint: str, team: str, username: str, token: str):
+    def __init__(self, server_type: str, server_endpoint: str, projects: str, team: str, username: str, token: str):
         self._server_type = server_type
         self._server_endpoint = server_endpoint
+        self._proejcts = projects
         self._team = team
         self._username = username
         self._token = token
         return
 
+    @property
+    def projects(self) -> str:
+        return self._proejcts
+    
     @property
     def server_type(self) -> str:
         return self._server_type
@@ -61,18 +67,64 @@ class BugServerInterface:
     def token(self) -> str:
         return self._token
     
+    @abc.abstractmethod
+    def create_issue(self, title: str, runid: str, automation_pod: str,
+                     pipeline_info: Optional[Dict[str, str]]=None, job_info: Optional[Dict[str, str]]=None,
+                     build_info: Optional[Dict[str, str]]=None, failure_info: Optional[Dict[str, str]]=None) -> str:
+        """
+            Create an issue in the bug server.
+        """
+        pass
+
+    @abc.abstractmethod
+    def search_issues(self, query: str) -> str:
+        """
+            Search for issues in the bug server.
+        """
+        pass
+    
+    @abc.abstractmethod
+    def update_issue(self, issue_id: str, issue_data: dict):
+        """
+            Update an issue in the bug server.
+        """
+        pass
+
 
 class BugServerInterfaceForJira(BugServerInterface):
     """
         A bug server interface for JIRA.
     """
 
-    def __init__(self, server_type: str, server_endpoint: str, team: str, username: str, token: str):
-        super().__init__(server_type, server_endpoint, team, username, token)
+    def __init__(self, server_type: str, server_endpoint: str, projects: str, team: str, username: str, token: str):
+        super().__init__(server_type, server_endpoint, projects, team, username, token)
+        return
+
+    def create_issue(self, title: str, runid: str, automation_pod: str,
+                     pipeline_info: Optional[Dict[str, str]]=None, job_info: Optional[Dict[str, str]]=None,
+                     build_info: Optional[Dict[str, str]]=None, failure_info: Optional[Dict[str, str]]=None) -> str:
+        """
+            Create an issue in the bug server.
+        """
+        # Implement the create issue logic here
+        return
+
+    def search_issues(self, query: str) -> str:
+        """
+            Search for issues in the bug server.
+        """
+        # Implement the search logic here
+        return
+    
+    def update_issue(self, issue_id: str, issue_data: dict):
+        """
+            Update an issue in the bug server.
+        """
+        # Implement the update issue logic here
         return
 
 
-def try_construction_from_environment() -> Union[None, 'BugServerInterface']:
+def try_create_bug_server_interface_from_environment() -> Union[None, 'BugServerInterface']:
     """
         Construct a BugServerInterface from the environment.
     """
@@ -82,6 +134,7 @@ def try_construction_from_environment() -> Union[None, 'BugServerInterface']:
 
     server_type: str = None
     server_endpoint: str = None
+    projects: str = None
     team: str = None
     username: str = None
     token: str = None
@@ -89,38 +142,46 @@ def try_construction_from_environment() -> Union[None, 'BugServerInterface']:
     if AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE in environ:
         server_type = environ[AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE].upper()
 
-        while True:
+        while True: # Setup a breakout pipeline
+
             if server_type not in SUPPORTED_BUG_SERVERS:
                 warn_msg = f"Unknown bug server type: {server_type}"
                 logger.warning(warn_msg)
                 break
-            
+
             if AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT not in environ:
                 warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT} variable must be set."
                 logger.warning(warn_msg)
                 break
 
             server_endpoint = environ[AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT]
+
+            if AM_RUNTIME_VARNAMES.AM_BUG_PROJECTS not in environ:
+                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_PROJECTS} variable must be set."
+                logger.warning(warn_msg)
+                break
+
+            projects = environ[AM_RUNTIME_VARNAMES.AM_BUG_PROJECTS]
             
             if AM_RUNTIME_VARNAMES.AM_BUG_TEAM not in environ:
                 warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_TEAM} variable must be set."
                 logger.warning(warn_msg)
                 break
-            
+
             team = environ[AM_RUNTIME_VARNAMES.AM_BUG_TEAM]
 
             if AM_RUNTIME_VARNAMES.AM_BUG_USERNAME not in environ:
                 warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_USERNAME} variable must be set."
                 logger.warning(warn_msg)
                 break
-            
+
             username = environ[AM_RUNTIME_VARNAMES.AM_BUG_USERNAME]
-            
+
             if AM_RUNTIME_VARNAMES.AM_BUG_TOKEN not in environ:
                 warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_TOKEN} variable must be set."
                 logger.warning(warn_msg)
                 break
-            
+
             token = environ[AM_RUNTIME_VARNAMES.AM_BUG_TOKEN]
 
             # If we have all the required information to construct the server interface, create it and
@@ -129,13 +190,13 @@ def try_construction_from_environment() -> Union[None, 'BugServerInterface']:
                 server_iface = BugServerInterfaceForJira(
                     server_type=server_type,
                     server_endpoint=server_endpoint,
+                    projects=projects,
                     team=team,
                     username=username,
                     token=token
                 )
 
-
-            break # Always exit the 'while True' pipeline
+            break # Always exit this 'while True' pipeline after one time through
 
     return server_iface
 
@@ -207,10 +268,12 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
             response = {
                 AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE: self._bug_server.server_type,
                 AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT: self._bug_server.server_endpoint,
+                AM_RUNTIME_VARNAMES.AM_BUG_PROJECTS: self._bug_server.projects,
                 AM_RUNTIME_VARNAMES.AM_BUG_TEAM: self._bug_server.team,
                 AM_RUNTIME_VARNAMES.AM_BUG_USERNAME: self._bug_server.username,
                 AM_RUNTIME_VARNAMES.AM_BUG_TOKEN: self._bug_server.token
             }
+
             rcontent = json.dumps(response).encode('utf-8')
 
             self.send_response(HTTPStatus.OK)
@@ -230,10 +293,8 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
             
             # Example response for unsupported path
 
-        
-
         return
-    
+
     def handle_api_post(self, path: str):
         """Handle POST requests to the /api endpoint."""
         
@@ -248,7 +309,7 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
         self.wfile.write(rcontent.encode('utf-8'))
 
         return
-    
+
     def handle_api_put(self, path: str):
         """Handle PUT requests to the /api endpoint."""
         
@@ -508,7 +569,7 @@ if __name__ == '__main__':
     svc_endpoint = (args.bind, args.port)
     svc_directory = os.path.abspath(os.path.expandvars(os.path.expanduser(args.directory)))
 
-    bug_svc = try_construction_from_environment()
+    bug_svc = try_create_bug_server_interface_from_environment()
 
     server = TestResultServer(svc_directory, svc_endpoint, TestResultRequestHandler, bug_svc)
 

@@ -17,6 +17,7 @@ from automojo.errors.xtraceback import TracebackFormatPolicy
 
 __traceback_format_policy__ = TracebackFormatPolicy.Hide
 
+
 PREFIX_STD = "Result"
 PREFIX_API = "'{}' API result"
 

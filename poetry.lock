@@ -13,7 +13,7 @@ develop = false
 type = "git"
 url = "git@github.com:automationmojo/automojo-errors.git"
 reference = "main"
-resolved_reference = "5b883ec8ea74509a9d8a0f2bef1ccee92653836d"
+resolved_reference = "279ac701867318b1a1873cdccc57f17db04e6d7d"
 
 [[package]]
 name = "automojo-foundation"
@@ -35,7 +35,7 @@ pyyaml = "^6.0.2"
 type = "git"
 url = "git@github.com:automationmojo/automojo-foundation.git"
 reference = "main"
-resolved_reference = "346805f98a759a6d9266d547081b9ab9724535d6"
+resolved_reference = "e95c8226cc9a38fd21ab94719e061a6391e5f442"
 
 [[package]]
 name = "automojo-interfaces"
@@ -50,7 +50,7 @@ develop = false
 type = "git"
 url = "git@github.com:automationmojo/automojo-interfaces.git"
 reference = "main"
-resolved_reference = "f3b1f49e3235deaa809dd0d029ee1d1a2cb34503"
+resolved_reference = "b2c5d02f6ac788a5678ce13655ca6a41b8a2e8aa"
 
 [[package]]
 name = "automojo-waiting"

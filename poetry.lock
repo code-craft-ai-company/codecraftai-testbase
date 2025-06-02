@@ -13,7 +13,7 @@ develop = false
 type = "git"
 url = "git@github.com:automationmojo/automojo-errors.git"
 reference = "main"
-resolved_reference = "279ac701867318b1a1873cdccc57f17db04e6d7d"
+resolved_reference = "91af243efdb6bcb4daf93dd1c78218c86b8d7632"
 
 [[package]]
 name = "automojo-foundation"
@@ -35,7 +35,7 @@ pyyaml = "^6.0.2"
 type = "git"
 url = "git@github.com:automationmojo/automojo-foundation.git"
 reference = "main"
-resolved_reference = "e95c8226cc9a38fd21ab94719e061a6391e5f442"
+resolved_reference = "2572c45a340bc77f37d2c25c4fa6077ff0e187df"
 
 [[package]]
 name = "automojo-interfaces"
@@ -50,7 +50,7 @@ develop = false
 type = "git"
 url = "git@github.com:automationmojo/automojo-interfaces.git"
 reference = "main"
-resolved_reference = "b2c5d02f6ac788a5678ce13655ca6a41b8a2e8aa"
+resolved_reference = "11a62948373f48448b0e1a971fd39fd6a241c712"
 
 [[package]]
 name = "automojo-waiting"
@@ -65,7 +65,7 @@ develop = false
 type = "git"
 url = "git@github.com:automationmojo/automojo-waiting.git"
 reference = "main"
-resolved_reference = "fef72bf8eb16712dac6a7892eb88d8580c2a537c"
+resolved_reference = "ba76d268a0973f52ecb0dc5865183aa55f886684"
 
 [[package]]
 name = "cffi"
@@ -148,13 +148,13 @@ pycparser = "*"
 
 [[package]]
 name = "click"
-version = "8.2.0"
+version = "8.2.1"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "click-8.2.0-py3-none-any.whl", hash = "sha256:6b303f0b2aa85f1cb4e5303078fadcbcd4e476f114fab9b5007005711839325c"},
-    {file = "click-8.2.0.tar.gz", hash = "sha256:f5452aeddd9988eefa20f90f05ab66f17fce1ee2a36907fd30b05bbb5953814d"},
+    {file = "click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"},
+    {file = "click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202"},
 ]
 
 [package.dependencies]

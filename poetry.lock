@@ -11,9 +11,9 @@ develop = false
 
 [package.source]
 type = "git"
-url = "git@github.com:automationmojo/automojo-errors.git"
+url = "https://github.com/automationmojo/automojo-errors.git"
 reference = "main"
-resolved_reference = "91af243efdb6bcb4daf93dd1c78218c86b8d7632"
+resolved_reference = "0f4778d19bea6cf0a9d45c15c13259570e61efb6"
 
 [[package]]
 name = "automojo-foundation"
@@ -25,17 +25,17 @@ files = []
 develop = false
 
 [package.dependencies]
-automojo-errors = {git = "git@github.com:automationmojo/automojo-errors.git", branch = "main"}
-automojo-waiting = {git = "git@github.com:automationmojo/automojo-waiting.git", branch = "main"}
+automojo-errors = {git = "https://github.com/automationmojo/automojo-errors.git", branch = "main"}
+automojo-waiting = {git = "https://github.com/automationmojo/automojo-waiting.git", branch = "main"}
 cryptography = "^44.0.0"
 debugpy = "^1.8.12"
 pyyaml = "^6.0.2"
 
 [package.source]
 type = "git"
-url = "git@github.com:automationmojo/automojo-foundation.git"
+url = "https://github.com/automationmojo/automojo-foundation.git"
 reference = "main"
-resolved_reference = "2572c45a340bc77f37d2c25c4fa6077ff0e187df"
+resolved_reference = "366115f03db70505f40dcc8fb8ab7f94aedf5ae4"
 
 [[package]]
 name = "automojo-interfaces"
@@ -48,9 +48,9 @@ develop = false
 
 [package.source]
 type = "git"
-url = "git@github.com:automationmojo/automojo-interfaces.git"
+url = "https://github.com/automationmojo/automojo-interfaces.git"
 reference = "main"
-resolved_reference = "11a62948373f48448b0e1a971fd39fd6a241c712"
+resolved_reference = "b4dfb39a110823f5d989656ba45b18fbaac3c14e"
 
 [[package]]
 name = "automojo-waiting"
@@ -63,9 +63,9 @@ develop = false
 
 [package.source]
 type = "git"
-url = "git@github.com:automationmojo/automojo-waiting.git"
+url = "https://github.com/automationmojo/automojo-waiting.git"
 reference = "main"
-resolved_reference = "ba76d268a0973f52ecb0dc5865183aa55f886684"
+resolved_reference = "68d666411e48d99ce183fe11e64e143b1d6472b4"
 
 [[package]]
 name = "cffi"
@@ -341,4 +341,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "3e29680af514ea43c5eea96326284519bfc13e1a6fbe0f20b4aafd8cf74ed0e7"
+content-hash = "1b675249a0f37f80ad416731cdb7fc46fa78323b1dc55c1e7718bfdc574d5e49"

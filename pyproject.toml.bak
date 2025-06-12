@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "automojo-testbase"
+description = "Automation Mojo - TestBase"
+version = "0.0.1"
+authors = []
+readme = "README.rst"
+license = "LICENSE.txt"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX"
+]
+keywords = [
+    "python"
+]
+packages = [{include="automojo", from="source/packages"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+click = "^8.1.8"
+automojo-errors = { git = "git@github.com:automationmojo/automojo-errors.git", branch = "main" }
+automojo-foundation = { git = "git@github.com:automationmojo/automojo-foundation.git", branch = "main" }
+automojo-interfaces = { git = "git@github.com:automationmojo/automojo-interfaces.git", branch = "main" }
+automojo-waiting = { git = "git@github.com:automationmojo/automojo-waiting.git", branch = "main" }
+
+
+[tool.poetry.group.dev.dependencies]
+
+[tool.poetry.group.dbio.dependencies]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -34,9 +34,21 @@ class TestGroup(InjectionGroup):
     """
 
     def __init__(self, name, package=None):
+        """
+            Initializes the :class:`TestGroup` with the specified name and
+            optional package.
+
+            :param name: The name of the group being created.
+            :param package: Optional package name associated with the group.
+        """
         super().__init__(name, package=package)
         return
 
     def add_descendent(self, test_ref: TestRef):
+        """
+            Adds a :class:`TestRef` instance as a descendent of this group.
+
+            :param test_ref: The :class:`TestRef` to add.
+        """
         super().add_descendent(test_ref)
         return

@@ -79,7 +79,18 @@ class ConstraintsCatalog:
 
 
     def add_constraints(self, origin: ConstraintsOrigin, originating_scope: str, identifier: str, constraints: Union[Constraints, "FeatureConstraints", Dict[str, Any]]) -> str:
+        """
+            Adds a set of constraints to the catalog and returns the key that
+            can be used to reference them.
 
+            :param origin: The origin for the constraints such as a site or
+                override parameter.
+            :param originating_scope: The scope the constraints apply to.
+            :param identifier: An identifier for the constraints.
+            :param constraints: The constraint set being stored.
+
+            :returns: The key assigned to the stored constraints.
+        """
         ckey = create_constraint_key(originating_scope, identifier)
 
         cref = ConstraintsRef(origin, originating_scope, identifier, constraints)
@@ -149,18 +160,38 @@ class ConstraintsRef:
 
     @property
     def constraints(self) ->  Union[Constraints, "FeatureConstraints", Dict[str, Any]]:
+        """
+            The constraint object referenced by this instance.
+
+            :returns: A :class:`Constraints` or :class:`FeatureConstraints` object.
+        """
         return self._constraints
     
     @property
     def identifier(self) -> str:
+        """
+            The identifier for the constraint set.
+
+            :returns: A unique identifier string.
+        """
         return self._identifier
 
     @property
     def origin(self) -> ConstraintsOrigin:
+        """
+            The origin that supplied the constraints.
+
+            :returns: A :class:`ConstraintsOrigin` enumeration value.
+        """
         return self._origin
 
     @property
     def originating_scope(self) -> str:
+        """
+            The scope to which the constraints apply.
+
+            :returns: The scope name associated with the constraints.
+        """
         return self._originating_scope
 
 

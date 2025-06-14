@@ -25,14 +25,34 @@ from automojo.errors.exceptions import SemanticError
 class FeatureTagNodeMeta(type):
 
     def __new__(metacls, name, bases, namespace, **kwargs):
+        """
+            Creates a new :class:`FeatureTag` derived type.
+
+            :param name: Name of the class being created.
+            :param bases: Base classes of the new type.
+            :param namespace: Attribute dictionary for the type.
+            :param kwargs: Additional keyword arguments.
+
+            :returns: The newly created class.
+        """
         cls = super().__new__(metacls, name, bases, namespace, **kwargs)
         cls.ID = cls.__qualname__.lower().replace(".", "/")
         return cls
-    
+
     def __repr__(self):
+        """
+            Returns a representation for the tag class.
+
+            :returns: The tag identifier string.
+        """
         return "'{}'".format(self.ID)
-    
+
     def __str__(self):
+        """
+            Returns the string form of the tag class.
+
+            :returns: The tag identifier string.
+        """
         return "{}".format(self.ID)
 
 
@@ -45,13 +65,23 @@ class FeatureAttachedObject:
     FEATURE_TAGS = []
 
     def __init__(self):
+        """
+            Initializes a new :class:`FeatureAttachedObject`.
 
+            The constructor seeds the object with any default feature tags
+            defined by ``FEATURE_TAGS`` on the derived class.
+        """
         self._feature_tags = []
         self.extend_features(self.FEATURE_TAGS)
         return
 
     @property
     def feature_tags(self) -> FrozenSet[str]:
+        """
+            The set of feature tag identifiers assigned to this object.
+
+            :returns: Frozen set of feature tag strings.
+        """
         return frozenset(self._feature_tags)
 
     def extend_features(self, features_to_add: Union[List[FeatureTag], List[str]]):
@@ -81,6 +111,14 @@ class FeatureAttachedObject:
         return
     
     def has_all_features(self, feature_list: Union[List[FeatureTag], List[str]]):
+        """
+            Determines if all specified features are present on this object.
+
+            :param feature_list: List of feature tag identifiers or
+                :class:`FeatureTag` types to validate.
+
+            :returns: ``True`` if the object has all of the given features.
+        """
 
         has_all = True
 
@@ -112,6 +150,14 @@ class FeatureAttachedObject:
         return has_all
 
     def has_any_feature(self, feature_list: List[FeatureTag]):
+        """
+            Determines if any feature from the list is present on this object.
+
+            :param feature_list: List of feature identifiers or
+                :class:`FeatureTag` types.
+
+            :returns: ``True`` if any feature is present.
+        """
 
         has_any = False
 
@@ -145,6 +191,13 @@ class FeatureAttachedObject:
         return has_any
 
     def has_feature(self, feature: Union[FeatureTag, str]):
+        """
+            Checks for a specific feature on this object.
+
+            :param feature: The feature identifier or :class:`FeatureTag` type.
+
+            :returns: ``True`` if the feature is present.
+        """
         fid = None
 
         if isinstance(feature, str):
@@ -165,6 +218,12 @@ class FeatureAttachedObject:
 class FeatureMask(dict):
 
     def __init__(self, *, required_features: Optional[List[FeatureTag]]=None, excluded_features: Optional[List[FeatureTag]]=None, **kwargs):
+        """
+            Dictionary wrapper used to describe feature requirements.
+
+            :param required_features: Features that must be present.
+            :param excluded_features: Features that must not be present.
+        """
         super().__init__(required_features=required_features, excluded_features=excluded_features, **kwargs)
         return
 
@@ -172,11 +231,25 @@ class FeatureMask(dict):
 class FeatureFilter:
 
     def __init__(self, *, required_features: Optional[List[FeatureTag]]=None, excluded_features: Optional[List[FeatureTag]]=None, **kwargs):
+        """
+            Utility for filtering objects that have feature tags.
+
+            :param required_features: Features that must be present on an object.
+            :param excluded_features: Features that disqualify an object.
+        """
         self._required_features = required_features
         self._excluded_features = excluded_features
         return
 
     def filter(self, device_list: List[FeatureAttachedObject]) -> List[FeatureAttachedObject]:
+        """
+            Filters a list of feature attached objects based on the configured
+            required and excluded features.
+
+            :param device_list: The devices to be filtered.
+
+            :returns: List of devices that match the feature criteria.
+        """
 
         matching_devices = []
 

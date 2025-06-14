@@ -40,6 +40,12 @@ class InjectionGroup:
     """
 
     def __init__(self, name, package=None):
+        """
+            Initializes an :class:`InjectionGroup` instance.
+
+            :param name: Name of the group.
+            :param package: Optional package where the group resides.
+        """
         self._name = name
         self._package = package
         self._children = {}
@@ -48,35 +54,80 @@ class InjectionGroup:
         return
 
     def __enter__(self):
+        """
+            Enter the context manager.
+
+            :returns: The current :class:`InjectionGroup` instance.
+        """
         return self
 
     def __exit__(self, ex_type, ex_inst, ex_tb):
+        """
+            Exit the context manager.
+
+            :param ex_type: Exception type if raised.
+            :param ex_inst: Exception instance if raised.
+            :param ex_tb: Traceback object if raised.
+
+            :returns: ``False`` to propagate exceptions.
+        """
         return False
 
     @property
     def children(self):
+        """
+            Mapping of child injection groups and moments.
+
+            :returns: Dictionary of child objects.
+        """
         return self._children
 
     @property
     def finalized(self):
+        """
+            Indicates whether the group has been finalized.
+
+            :returns: ``True`` if finalized.
+        """
         return self._finalized
 
     @property
     def name(self):
+        """
+            The name of the injection group.
+
+            :returns: Group name string.
+        """
         return self._name
 
     @property
     def package(self):
+        """
+            Package path for the injection group.
+
+            :returns: Package name or ``None``.
+        """
         return self._package
 
     @property
     def scope_name(self):
+        """
+            Fully qualified scope name for the group.
+
+            :returns: The dotted scope name.
+        """
         sname = self._name
         if self._package is not None and len(self._package) > 0:
             sname = "{}.{}".format(self.package, sname)
         return sname
 
     def add_descendent(self, child_ref:InjectionMoment, group_type: Optional[type] = None):
+        """
+            Adds a descendent injection moment under this group.
+
+            :param child_ref: The injection moment to add.
+            :param group_type: Optional group class for intermediate nodes.
+        """
 
         if self._package is not None:
             err_msg = "The 'add_descendent' API can only be called on the root package."
@@ -92,15 +143,28 @@ class InjectionGroup:
         return
 
     def finalize(self):
+        """
+            Marks the group as finalized.
+        """
         self._finalized = True
         return
 
     def get_resource_scope(self) -> InjectionScope:
+        """
+            Retrieves the resource scope associated with this group.
+
+            :returns: The :class:`InjectionScope` for this group.
+        """
         scope_name = self.scope_name
         rscope = injection_registry.lookup_resource_scope(scope_name)
         return rscope
 
     def resolve_metadata(self, parent_metadata: Optional[Dict[str, str]]=None):
+        """
+            Resolves metadata for the group and its descendents.
+
+            :param parent_metadata: Metadata inherited from the parent group.
+        """
 
         reference_metadata = self._reference_metadata()
 
@@ -121,7 +185,15 @@ class InjectionGroup:
         return
 
     def _add_descendent(self, child_ref: InjectionMoment, to_walk_list: List[str], path_stack: List[str], group_type: Optional[type] = None):
-        
+        """
+            Internal helper that walks the group tree and inserts a child.
+
+            :param child_ref: Injection moment being inserted.
+            :param to_walk_list: Remaining path segments to walk.
+            :param path_stack: Stack of traversed path segments.
+            :param group_type: Optional group class for new nodes.
+        """
+
         if len(to_walk_list) == 0:
             tbname = child_ref.base_name
             self._children[tbname] = child_ref
@@ -171,13 +243,33 @@ class InjectionGroup:
         return refmd
 
     def __contains__(self, key):
+        """
+            Checks whether a child with *key* exists.
+
+            :param key: Name of the child to check.
+
+            :returns: ``True`` if the child exists.
+        """
         has_item = key in self._children
         return has_item
 
     def __getitem__(self, key):
+        """
+            Retrieves a child by *key*.
+
+            :param key: Name of the child to retrieve.
+
+            :returns: The requested child object.
+        """
         item = self._children[key]
         return item
 
     def __setitem__(self, key, value):
+        """
+            Inserts or replaces a child in the group.
+
+            :param key: Name of the child.
+            :param value: The child object to store.
+        """
         self._children[key] = value
         return

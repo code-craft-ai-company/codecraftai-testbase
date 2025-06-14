@@ -1,11 +1,12 @@
 """
-.. module:: utilities
+    .. module:: automojo.testbase.utilities
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing utility functions utilized by the objects in the testing module.
+    :synopsis: Module for utilities.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
-
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

@@ -1,11 +1,12 @@
 """
-.. module:: renderinfo
+    .. module:: automojo.testbase.results.model.renderinfo
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`RenderInfo` dataclass used to contain and pass
-               result rendering information
+    :synopsis: Module for renderinfo.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

@@ -1,11 +1,12 @@
 """
-.. module:: features
+    .. module:: automojo.testbase.features
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module which contains classes used for tagging device with feature tags and
-               for enabling the filtering of devices based on filter tags.
+    :synopsis: Module for features.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

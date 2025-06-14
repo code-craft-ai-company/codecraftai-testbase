@@ -1,11 +1,12 @@
 """
-.. module:: resultnode
+    .. module:: automojo.testbase.results.model.testresult
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`ResultNode` object used to serve as a
-               tree leaf result node.
+    :synopsis: Module for testresult.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

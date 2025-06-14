@@ -1,12 +1,12 @@
-
 """
-.. module:: sequencerscopebase
+    .. module:: automojo.testbase.sequencing.sequencerscopebase
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`SequencerScopeBase` which servces as a base
-               scope object for other sequencer scope objects.
+    :synopsis: Module for sequencerscopebase.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

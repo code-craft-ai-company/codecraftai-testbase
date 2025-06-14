@@ -1,10 +1,12 @@
 """
-.. module:: resultrecorder
+    .. module:: automojo.testbase.results.recorders.resultrecorder
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`ResultRecorder` object.
+    :synopsis: Module for resultrecorder.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

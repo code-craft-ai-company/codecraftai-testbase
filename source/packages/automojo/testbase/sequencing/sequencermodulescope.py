@@ -1,12 +1,12 @@
-
 """
-.. module:: sequencermodulescope
+    .. module:: automojo.testbase.sequencing.sequencermodulescope
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the base :class:`SequencerModuleScope` type which is used to
-               provide module scope error handling in the control flow for automation tests.
+    :synopsis: Module for sequencermodulescope.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

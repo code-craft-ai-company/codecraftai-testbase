@@ -1,11 +1,12 @@
 """
-.. module:: testcontainer
+    .. module:: automojo.testbase.results.model.testcontainer
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`TestContainer` object used to serve as a
-               tree node container for children of type TEST.
+    :synopsis: Module for testcontainer.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

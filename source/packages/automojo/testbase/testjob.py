@@ -1,11 +1,12 @@
 """
-.. module:: testjob
+    .. module:: automojo.testbase.testjob
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module that is contains the :class:`TestJob` class which is utilized for each test
-        run as the parent container for all test results.
+    :synopsis: Module for testjob.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

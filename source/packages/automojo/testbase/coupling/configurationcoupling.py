@@ -1,12 +1,12 @@
 """
-.. module:: configurationcoupling
+    .. module:: automojo.testbase.coupling.configurationcoupling
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`ConfigurationCoupling` class and associated reflection
-        methods.  The :class:`ConfigurationCoupling` derived classes can be used to provide early validation
-        of automation configuration support for a given test run.
+    :synopsis: Module for configurationcoupling.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

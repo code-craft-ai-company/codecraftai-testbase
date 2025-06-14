@@ -1,12 +1,12 @@
 """
-.. module:: validatorcoupling
+    .. module:: automojo.testbase.coupling.validatorcoupling
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`ValidatorCoupling` class and associated reflection methods.
-        The :class:`ValidatorCoupling` derived classes can be used to integraton validator resources 
-        into the test environment.
+    :synopsis: Module for validatorcoupling.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

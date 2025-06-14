@@ -1,11 +1,12 @@
 """
-.. module:: jobinfo
+    .. module:: automojo.testbase.results.model.jobinfo
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`JobInfo` dataclass used to contain and pass
-               job information
+    :synopsis: Module for jobinfo.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

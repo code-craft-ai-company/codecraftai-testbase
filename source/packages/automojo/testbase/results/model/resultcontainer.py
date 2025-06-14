@@ -1,11 +1,12 @@
 """
-.. module:: resultcontainer
+    .. module:: automojo.testbase.results.model.resultcontainer
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`ResultContainer` object used to serve as a
-               tree node container for child results.
+    :synopsis: Module for resultcontainer.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

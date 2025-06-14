@@ -1,12 +1,12 @@
-
 """
-.. module:: resources
+    .. module:: automojo.testbase.declaration.attachments
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: A set of standardized decorations that are utilized to declare integrations
-               scope and resource factory functions.
+    :synopsis: Module for attachments.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

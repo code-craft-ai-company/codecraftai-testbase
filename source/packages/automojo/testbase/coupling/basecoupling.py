@@ -1,10 +1,12 @@
 """
-.. module:: basecoupling
+    .. module:: automojo.testbase.coupling.basecoupling
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`BaseCoupling` class and associated reflection methods.
+    :synopsis: Module for basecoupling.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

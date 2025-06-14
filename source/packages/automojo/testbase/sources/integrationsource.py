@@ -1,3 +1,12 @@
+"""
+    .. module:: automojo.testbase.sources.integrationsource
+    :platform: Darwin, Linux, Unix, Windows
+    :synopsis: Module for integrationsource.
+
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+"""
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

@@ -1,11 +1,12 @@
 """
-.. module:: taskgroup
+    .. module:: automojo.testbase.results.model.taskinggroup
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`TaskingGroup` object used to serve as a
-               tree node group for a group of tasks.
+    :synopsis: Module for taskinggroup.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

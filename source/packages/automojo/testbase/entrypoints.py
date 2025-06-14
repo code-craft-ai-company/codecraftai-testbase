@@ -1,12 +1,12 @@
 """
-.. module:: entrypoints
+    .. module:: automojo.testbase.entrypoints
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: A set of standaridized entry point functions that provide standardized test environment
-               startup and test run commencement utilizing the :class:`automojo.testbase.testsequencer.TestSequencer`
-               object.
+    :synopsis: Module for entrypoints.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2023, Myron W Walker"

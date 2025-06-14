@@ -1,11 +1,12 @@
 """
-.. module:: buildinfo
+    .. module:: automojo.testbase.results.model.buildinfo
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`BuildInfo` dataclass used to contain and pass
-               build information
+    :synopsis: Module for buildinfo.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

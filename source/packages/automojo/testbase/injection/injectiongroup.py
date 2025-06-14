@@ -1,11 +1,12 @@
 """
-.. module:: InjectionGroup
+    .. module:: automojo.testbase.injection.injectiongroup
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module that contains the :class:`InjectionGroup` class which is utilized as the collection point
-               which associates a set of injection moments with their descendant execution scopes.
+    :synopsis: Module for injectiongroup.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

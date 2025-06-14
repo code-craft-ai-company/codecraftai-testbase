@@ -1,12 +1,12 @@
 """
-.. module:: testcollector
+    .. module:: automojo.testbase.testcollector
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module that contains the `TestCollector` object which is utilized to collection the
-               information about the tests, scopes and integration that will be included in an
-               automation run.
+    :synopsis: Module for testcollector.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

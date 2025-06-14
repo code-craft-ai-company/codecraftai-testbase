@@ -1,11 +1,12 @@
 """
-.. module:: resulttype
+    .. module:: automojo.testbase.results.model.resulttype
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`ResultType` enumeration used to mark the type of
-               a result node.
+    :synopsis: Module for resulttype.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

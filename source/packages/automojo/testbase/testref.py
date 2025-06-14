@@ -1,11 +1,12 @@
 """
-.. module:: testref
+    .. module:: automojo.testbase.testref
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the base :class:`TestRef` type used to reference to
-        tests that will be included into an a test execution graph.
+    :synopsis: Module for testref.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

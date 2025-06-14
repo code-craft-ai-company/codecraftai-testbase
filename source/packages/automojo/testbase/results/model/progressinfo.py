@@ -1,10 +1,12 @@
 """
-.. module:: progressinfo
+    .. module:: automojo.testbase.results.model.progressinfo
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`ProgressInfo` class which is used to report task progress.
+    :synopsis: Module for progressinfo.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

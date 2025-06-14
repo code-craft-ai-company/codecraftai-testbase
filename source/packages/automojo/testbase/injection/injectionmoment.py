@@ -1,11 +1,12 @@
 """
-.. module:: InjectiionMoment
+    .. module:: automojo.testbase.injection.injectionmoment
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the base :class:`InjectiionMoment` type used to reference to
-        injectable function that will be included into an a execution graph.
+    :synopsis: Module for injectionmoment.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

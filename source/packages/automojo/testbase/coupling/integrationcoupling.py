@@ -1,12 +1,12 @@
 """
-.. module:: integration
+    .. module:: automojo.testbase.coupling.integrationcoupling
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`IntegrationCoupling` class and associated reflection methods.
-        The :class:`IntegrationCoupling` derived classes can be used to integraton automation resources and roles
-        into the test environment.
+    :synopsis: Module for integrationcoupling.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

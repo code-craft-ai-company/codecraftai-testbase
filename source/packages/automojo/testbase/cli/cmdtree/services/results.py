@@ -1,3 +1,12 @@
+"""
+    .. module:: automojo.testbase.cli.cmdtree.services.results
+    :platform: Darwin, Linux, Unix, Windows
+    :synopsis: Module for results.
+
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+"""
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

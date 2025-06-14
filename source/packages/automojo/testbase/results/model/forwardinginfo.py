@@ -1,11 +1,12 @@
 """
-.. module:: forwardinginfo
+    .. module:: automojo.testbase.results.model.forwardinginfo
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module containing the :class:`ForwardingInfo` dataclass used to contain and pass
-               summary forwarding parameter information
+    :synopsis: Module for forwardinginfo.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
+
+
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"

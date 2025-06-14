@@ -1,3 +1,12 @@
+"""
+    .. module:: automojo.testbase.server.resultserver
+    :platform: Darwin, Linux, Unix, Windows
+    :synopsis: Module for resultserver.
+
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+"""
+
+
 
 
 from typing import Dict, Optional, Tuple, Type, Union

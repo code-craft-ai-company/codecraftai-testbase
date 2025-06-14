@@ -229,12 +229,15 @@ def create_constraint_key(source: str, identifier: str):
 
 def merge_constraints(*args: Union[Constraints, dict]) -> Constraints:
     """
-        Takes a sequence of :class:`Contraints` objects and merges them into a single
+        Takes a sequence of :class:`Constraints` objects and merges them into a single
         :class:`Constraints` object.
 
-        ..note: In cases where this method is provided with constraints with overlapping
-                values, the last constraint with a give value will overwrite any previous
-                values.
+        .. note::
+            In cases where this method is provided with constraints with overlapping
+            values, the last constraint with a given key overwrites earlier values.
+
+        :returns: The merged constraints.
+        :rtype: Constraints
     """
 
     combined: Constraints = Constraints()

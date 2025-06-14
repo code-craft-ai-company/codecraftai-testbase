@@ -72,7 +72,7 @@ class TestCollector:
             :param root: The root directory to scan for included tests
             :param excludes: A list or sequence of exclude expressions to apply during test collection operations.
             :param metafilters: A list of metadata filters to apply during test collection operations.
-            :param module_prefix: The prefix or word that test methods will start with.  The default is 'test'.
+            :param method_prefix: The prefix or word that test methods will start with.  The default is 'test'.
             :param test_module: A test module which is passed for the debug workflow where a test module is run directly
                                 as a script using the generic_test_entrypoint or in the debugger by Right-Click
 

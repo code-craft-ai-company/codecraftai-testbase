@@ -28,11 +28,17 @@ logger = logging.getLogger()
 
 def collect_test_references(root, included_files, filter_package, filter_module, filter_testname, test_prefix):
     """
-        Finds the test references based on the expression provided and the excludes
-        for this class.  The `find_test_references` method is intended to be called
-        multiple times, once with each include expression provided by the users.
+        Collects references to test functions based on the filters provided.
 
-        :param expression: An include expression to process and collect references for.
+        :param str root: Path to the root package containing tests.
+        :param list included_files: Paths to files that may contain test functions.
+        :param str filter_package: Optional filter expression for packages.
+        :param str filter_module: Optional filter expression for modules.
+        :param str filter_testname: Optional glob expression for test function names.
+        :param str test_prefix: Prefix indicating test functions.
+
+        :returns: A tuple ``(test_references, import_errors)`` describing collected tests and import errors.
+        :rtype: Tuple[dict, dict]
     """
 
     test_references = {}

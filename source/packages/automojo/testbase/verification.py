@@ -186,7 +186,7 @@ def assert_greater(found: Any, boundary: Any, api: Optional[str] = None):
         the returned error.
 
         :param found: The value being compared
-        :param boundry: The boundary value being compared against
+        :param boundary: The boundary value being compared against
         :param api: The name of the API that returned the result being inspected.
         
         :returns: None
@@ -231,7 +231,7 @@ def assert_lessthan(found: Any, boundary: Any, api: Optional[str] = None):
         the returned error.
 
         :param found: The value being compared
-        :param boundry: The boundary value being compared against
+        :param boundary: The boundary value being compared against
         :param api: The name of the API that returned the result being inspected.
         
         :returns: None
@@ -454,8 +454,7 @@ def verify_dict_has_keys(to_inspect: dict, expected_keys: List[str], template: O
 
         :param to_inspect: The dictionary being inspected
         :param expected_keys: The list of expected keys
-        :param template: Optional template to combine with the missing key names to
-                         product error messages for missing keys.
+        :param template: Optional template used with missing key names to produce error messages.
 
         :returns: None
         :raises: :class:`AssertionError` if the verification fails.
@@ -481,8 +480,7 @@ def verify_dict_has_paths(to_inspect: dict, expected_paths: List[str], template:
 
         :param to_inspect: The dictionary being inspected
         :param expected_paths: The list of expected paths to leafs in a dictionary
-        :param template: Optional template to combine with the missing key names to
-                         product error messages for missing keys.
+        :param template: Optional template used with missing key names to produce error messages.
 
         :returns: None
         :raises: :class:`AssertionError` if the verification fails.

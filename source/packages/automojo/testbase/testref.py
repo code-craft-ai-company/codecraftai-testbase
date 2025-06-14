@@ -36,8 +36,12 @@ class TestRef(InjectionMoment):
         """
             Initializes the test reference object.
 
-            :param testcontainer: The class of the test object that is being created.
-            :param testmeth: The method on the test container
+            :param FunctionType testfunc: The test function being referenced.
+            :param List[str] monikers: Optional list of monikers associated with the test.
+            :param OrderedDict[str, Any] pivots: Optional mapping describing pivot variations.
+
+            :returns: ``None``
+            :rtype: None
         """
         if monikers is None:
             monikers = []

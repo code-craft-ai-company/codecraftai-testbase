@@ -150,6 +150,9 @@ class TaskingResult(ResultNode):
 
 
 class TaskingResultFormatter(Protocol):
+    """
+        Callable protocol for formatting :class:`TaskingResult` objects.
+    """
     
     def __call__(self, result: TaskingResult) -> List[str]: ...
 

@@ -14,10 +14,18 @@ __credits__ = []
 
 
 class DiagnosticLabel:
+    """
+        Constants that identify well-known diagnostic stages.
+    """
+
     PRERUN_DIAGNOSTIC = "prerun-diagnostic"
     POSTRUN_DIAGNOSTIC = "postrun-diagnostic"
 
 
 class RuntimeConfigPaths:
+    """
+        Configuration paths for diagnostic runtime information.
+    """
+
     DIAGNOSTIC_PRERUN = "/configuration/runtime/diagnostics/prerun-diagnostic"
     DIAGNOSTIC_POSTRUN = "/configuration/runtime/diagnostics/postrun-diagnostic"

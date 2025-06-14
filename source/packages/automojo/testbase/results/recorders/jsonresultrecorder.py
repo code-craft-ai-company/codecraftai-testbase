@@ -36,6 +36,9 @@ from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 
 
 class JsonResultEncoder(json.JSONEncoder):
+    """
+        JSON encoder that serializes datetime objects as ISO formatted strings.
+    """
 
     def default(self, obj) -> Any:
 

@@ -26,6 +26,10 @@ from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
 TESTPLUS_DIR = os.path.dirname(__file__)
 
 class TestBaseVariables:
+    """
+        Container for commonly referenced paths used by testbase.
+    """
+
     TESTPLUS_TEMPLATES_DIR = os.path.join(TESTPLUS_DIR, "templates")
     TESTPLUS_RESOURCE_DEST_LEAF = os.path.join("static", "v2")
     TESTPLUS_RESOURCE_SRC_DIR = os.path.join(TESTPLUS_TEMPLATES_DIR, "v2", "static")

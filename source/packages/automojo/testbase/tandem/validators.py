@@ -28,6 +28,9 @@ from automojo.waiting import wait_for_it, TimeoutContext
 
 
 class Validator(ValidatorCoupling):
+    """
+        Base class for validator implementations used with tandem tests.
+    """
 
     def __init__(self):
         super().__init__()
@@ -132,6 +135,9 @@ DEFAULT_SHUTDOWN_INTERVAL = 1
 
 
 class LoopingValidatorState:
+    """
+        Enumerates the operational states of a :class:`LoopingValidator`.
+    """
     Initial = "Initial"
     Running = "Running"
     Shutdown = "Shutdown"

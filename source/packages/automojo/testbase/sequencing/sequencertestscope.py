@@ -39,6 +39,9 @@ if TYPE_CHECKING:
 
 
 class SequencerTestScope:
+    """
+        Context manager for executing a single test function.
+    """
 
     def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, test_name: str, notables: OrderedDict[str, Any]={}):
         super().__init__()

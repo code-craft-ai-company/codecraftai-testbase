@@ -20,11 +20,18 @@ from automojo.testbase.features import FeatureMask, FeatureTag
 
 
 class ConstraintsOrigin(str, Enum):
+    """
+        Enumeration of the origins from which constraints may be provided.
+    """
+
     SITE_PARAMETER = "site-parameter"
     OVERRIDE_PARAMETER = "override-parameter"
 
 
 class Constraints(dict):
+    """
+        Dictionary wrapper representing a set of constraints.
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -129,6 +136,9 @@ class ConstraintsCatalog:
 
 
 class ConstraintsRef:
+    """
+        Reference object used to associate constraints with their origin.
+    """
 
     def __init__(self, origin: ConstraintsOrigin, originating_scope: str, identifier: str, constraints: Constraints):
         self._origin = origin
@@ -155,11 +165,18 @@ class ConstraintsRef:
 
 
 class FeatureConstraintKeys(str, Enum):
+    """
+        Standard keys used when defining feature constraints.
+    """
+
     REQUIRED_FEATURES = "required_features"
     EXCLUDED_FEATURES = "excluded_features"
 
 
 class FeatureConstraints(FeatureMask):
+    """
+        Specialized :class:`FeatureMask` representing feature constraints.
+    """
 
     def __init__(self, *, required_features: List[FeatureTag]=None,
                        excluded_features: List[FeatureTag]=None,

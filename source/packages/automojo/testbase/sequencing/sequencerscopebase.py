@@ -33,6 +33,9 @@ logger = logging.getLogger()
 
 
 class SequencerScopeBase:
+    """
+        Base context manager for all sequencer scope implementations.
+    """
 
     def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder):
         super().__init__()

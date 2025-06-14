@@ -37,6 +37,9 @@ if TYPE_CHECKING:
 
 
 class SequencerSessionScope(SequencerScopeBase):
+    """
+        Context manager for the root session scope of a test run.
+    """
     def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, root_result: JobContainer):
         super().__init__(sequencer, recorder)
         

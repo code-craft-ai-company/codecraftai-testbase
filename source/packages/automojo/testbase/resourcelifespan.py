@@ -14,6 +14,10 @@ __credits__ = []
 import enum
 
 class ResourceLifespan(str, enum.Enum):
+    """
+        Enumeration of lifespans for injectable resources.
+    """
+
     Session = "session"
     Package = "package"
     Test = "test"

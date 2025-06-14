@@ -25,6 +25,9 @@ from automojo.testbase.resourcelifespan import ResourceLifespan
 constraints_catalog = ConstraintsCatalog()
 
 class ValidatorOrigin:
+    """
+        Describes the origin of a validator used during testing.
+    """
 
     def __init__(self, originating_scope: str, identifier: str, suffix: str, source: Optional[SourceBase] = None,
                  implied: bool = False, constraints: Optional[Dict] = None):

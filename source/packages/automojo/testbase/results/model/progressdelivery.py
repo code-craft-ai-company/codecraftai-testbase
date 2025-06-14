@@ -21,17 +21,26 @@ from automojo.testbase.results.model.progressinfo import ProgressInfo
 
 
 class ProgressDeliveryMethod:
+    """
+        Well-known progress delivery methods.
+    """
     SUMMARY_PULL_PROGRESS = "summary-pull-progress"
 
 
 
 class TaskingProgressCallback(Protocol):
+    """
+        Callable protocol for receiving task progress updates.
+    """
 
     def __call__(self, progress: List[ProgressInfo]) -> None: ...
 
 
 @dataclass
 class SummaryProgressDelivery:
+    """
+        Configuration for periodic progress callbacks.
+    """
     progress_interval: float
     progress_callback: TaskingProgressCallback
 

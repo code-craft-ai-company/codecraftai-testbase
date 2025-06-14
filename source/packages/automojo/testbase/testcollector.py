@@ -107,6 +107,11 @@ class TestCollector:
 
     @property
     def test_tree(self) -> TestGroup:
+        """
+            Returns the :class:`TestGroup` created from the collected references.
+
+            :returns: The root of the test reference tree.
+        """
         return self._test_tree
 
     def collect_integrations_and_configurations(self) -> List[IntegrationCoupling]:
@@ -114,6 +119,8 @@ class TestCollector:
             Iterates through all of the test references and collects the IntegrationCoupling(s) and
             ScopeCouplings that are found.  The collected IntegrationCoupling(s) and ScopeCoupling(s) can
             be used by integrations and scopes to participate in test framework startup.
+
+            :returns: A tuple containing lists of referenced integrations and configurations.
         """
 
         referenced_integrations = {}
@@ -189,6 +196,8 @@ class TestCollector:
     def finalize_collection(self):
         """
             Applies the metadata filters and then creates the test tree.
+
+            :returns: ``None``
         """
         
         testref_key_list = [k for k in self._test_references.keys()]

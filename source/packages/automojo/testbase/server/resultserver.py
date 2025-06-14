@@ -258,18 +258,12 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
         return
 
     def copyfile(self, source, outputfile):
-        """Copy all data between two file objects.
+        """
+            Copy all data between two file objects.
 
-        The SOURCE argument is a file object open for reading
-        (or anything with a read() method) and the DESTINATION
-        argument is a file object open for writing (or
-        anything with a write() method).
-
-        The only reason for overriding this would be to change
-        the block size or perhaps to replace newlines by CRLF
-        -- note however that this the default server uses this
-        to copy binary data as well.
-
+            The ``source`` argument must be a file object open for reading and
+            ``outputfile`` must be a file object open for writing.  The default
+            implementation simply delegates to :func:`shutil.copyfileobj`.
         """
         shutil.copyfileobj(source, outputfile)
 

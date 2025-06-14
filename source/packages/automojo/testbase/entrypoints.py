@@ -38,9 +38,9 @@ def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
         This is the generic test entry point for test modules.  It provides a standardized set of
         commanline parameters that can be used to run test files as scripts.
 
-    .. note::
-       The `generic_test_entrypoint` is a useful tool to place at the bottom of test files to allow
-       them to easily be run for debugging purposes.
+        .. note::
+            The ``generic_test_entrypoint`` is a useful tool to place at the bottom of test files to
+            allow them to easily be run for debugging purposes.
     """
     from automojo.testbase.initialize import initialize_testbase_runtime, initialize_testbase_results
     initialize_testbase_runtime()

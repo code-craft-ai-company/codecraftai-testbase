@@ -126,6 +126,9 @@ def mark_descendent_priority(*, priority: int):
 
 
 class MetaFilter:
+    """
+        Base class for metadata based include or exclude filters.
+    """
 
     def __init__(self, include: bool, group: str):
         self._include = include
@@ -146,6 +149,9 @@ class MetaFilter:
 
 
 class MetaFilterContains(MetaFilter):
+    """
+        Filter that checks if a metadata value contains a substring.
+    """
 
     def __init__(self, include: bool, group: str, value:str):
         super().__init__(include, group)
@@ -174,6 +180,9 @@ class MetaFilterContains(MetaFilter):
         return include
 
 class MetaFilterEquals(MetaFilter):
+    """
+        Filter that checks if a metadata value equals a target value.
+    """
 
     def __init__(self, include: bool, group: str, value:str):
         super().__init__(include, group)
@@ -198,6 +207,9 @@ class MetaFilterEquals(MetaFilter):
         return include
 
 class MetaFilterNotEquals(MetaFilterEquals):
+    """
+        Filter that matches when a metadata value does not equal the target value.
+    """
 
     def __init__(self, include: bool, group: str, value:str):
         super().__init__(include, group, value)

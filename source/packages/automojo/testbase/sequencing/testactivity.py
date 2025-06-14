@@ -25,6 +25,9 @@ from automojo.foundation.jsos import CHAR_RECORD_SEPERATOR
 from types import TracebackType
 
 class TestActivity:
+    """
+        Records the timing information for a test activity.
+    """
 
     def __init__(self, activity_filename: str, activity_name: str, target: str, detail: Optional[dict]):
         self._activity_filename = activity_filename

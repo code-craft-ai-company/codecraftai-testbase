@@ -37,6 +37,9 @@ if TYPE_CHECKING:
 
 
 class SequencerModuleScope(SequencerScopeBase):
+    """
+        Context manager that manages the lifetime of a module level scope.
+    """
     def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, scope_name: str, **kwargs):
         super().__init__(sequencer, recorder)
 

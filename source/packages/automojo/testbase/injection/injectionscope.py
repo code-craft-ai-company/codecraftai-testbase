@@ -35,6 +35,9 @@ RESOURCE_KEY_FORMAT = "{}@{}:{}"
 RESERVED_PARAMETER_NAMES = ["constraints"]
 
 class InjectionScope:
+    """
+        Node in the injection scope tree used to resolve resources and validators.
+    """
 
     def __init__(self, name=None, package=None, is_inj_scope=False):
         self._name = name

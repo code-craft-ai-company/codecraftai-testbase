@@ -15,6 +15,9 @@ __credits__ = []
 from enum import Enum
 
 class ProgressType(str, Enum):
+    """
+        Enumeration of progress tracking modes.
+    """
 
     NumericRange = "NumericRange"
     Sequential = "Sequential"

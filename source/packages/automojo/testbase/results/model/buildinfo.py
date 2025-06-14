@@ -19,6 +19,9 @@ from dataclasses import dataclass
 
 @dataclass
 class BuildInfo:
+    """
+        Information describing a build under test.
+    """
 
     branch: str # name of a code 'branch' to associate with the results.
     build: str # name of a product 'build' to associate with the results

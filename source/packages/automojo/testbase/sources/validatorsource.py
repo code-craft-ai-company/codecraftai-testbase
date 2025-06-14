@@ -19,6 +19,9 @@ from typing import Callable, Type
 from automojo.testbase.sources.sourcebase import SourceBase
 
 class ValidatorSource(SourceBase):
+    """
+        Source wrapper for validator implementations.
+    """
 
     def __init__(self, source_func: Callable, resource_type: Type, constraints: dict):
         SourceBase.__init__(self, source_func, None, resource_type, constraints)

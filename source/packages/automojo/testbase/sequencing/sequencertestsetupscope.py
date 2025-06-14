@@ -32,6 +32,9 @@ if TYPE_CHECKING:
 
 
 class SequencerTestSetupScope(SequencerScopeBase):
+    """
+        Context manager that manages setup operations for a test scope.
+    """
 
     def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, test_name: str, **kwargs):
         super().__init__(sequencer, recorder)

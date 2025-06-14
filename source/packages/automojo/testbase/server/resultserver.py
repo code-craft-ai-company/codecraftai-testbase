@@ -540,6 +540,9 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
         return rtnval
 
 class TestResultServer(ThreadingHTTPServer):
+    """
+        Simple HTTP server for browsing and interacting with test results.
+    """
 
     def __init__(self, root_directory: str, server_endpoint: Tuple[str, int], handler_class: Type[SimpleHTTPRequestHandler], bug_server: Optional[BugServerInterface]=None,):
         super().__init__(server_endpoint, handler_class)

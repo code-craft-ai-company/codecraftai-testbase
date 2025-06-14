@@ -23,6 +23,9 @@ from automojo.errors.exceptions import SemanticError
 
 
 class FeatureTagNodeMeta(type):
+    """
+        Metaclass for creating :class:`FeatureTag` derived types.
+    """
 
     def __new__(metacls, name, bases, namespace, **kwargs):
         """
@@ -57,10 +60,17 @@ class FeatureTagNodeMeta(type):
 
 
 class FeatureTag(metaclass=FeatureTagNodeMeta):
+    """
+        Base type used to declare feature tag identifiers.
+    """
+
     ID = None
 
 
 class FeatureAttachedObject:
+    """
+        Mixin class providing feature tag support to derived objects.
+    """
 
     FEATURE_TAGS = []
 
@@ -216,11 +226,12 @@ class FeatureAttachedObject:
 
 
 class FeatureMask(dict):
+    """
+        Dictionary wrapper used to describe feature requirements.
+    """
 
     def __init__(self, *, required_features: Optional[List[FeatureTag]]=None, excluded_features: Optional[List[FeatureTag]]=None, **kwargs):
         """
-            Dictionary wrapper used to describe feature requirements.
-
             :param required_features: Features that must be present.
             :param excluded_features: Features that must not be present.
         """
@@ -229,6 +240,9 @@ class FeatureMask(dict):
 
 
 class FeatureFilter:
+    """
+        Utility for filtering :class:`FeatureAttachedObject` instances by feature tags.
+    """
 
     def __init__(self, *, required_features: Optional[List[FeatureTag]]=None, excluded_features: Optional[List[FeatureTag]]=None, **kwargs):
         """

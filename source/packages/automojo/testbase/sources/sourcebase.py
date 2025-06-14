@@ -19,6 +19,9 @@ from typing import Callable, Type
 import inspect
 
 class SourceBase:
+    """
+        Base class representing a provider of injectable objects.
+    """
 
     def __init__(self, source_func: Callable, query_func: Callable, resource_type: Type, constaints: dict):
         self._source_func = source_func

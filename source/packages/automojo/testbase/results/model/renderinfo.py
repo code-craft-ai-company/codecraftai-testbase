@@ -17,6 +17,9 @@ from dataclasses import dataclass
 
 @dataclass
 class RenderInfo:
+    """
+        Parameters that control how result rendering is performed.
+    """
 
     title: str # A title to associated with the summary for the test results.
     summary_filename: str # The full path to the summary file where the test run summary should be written to.

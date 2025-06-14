@@ -26,6 +26,9 @@ from automojo.testbase.results.model.progresstype import ProgressType
 
 @dataclass
 class ProgressInfo:
+    """
+        Representation of a single progress update event.
+    """
 
     id: str
     category: str

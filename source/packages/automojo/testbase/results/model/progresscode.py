@@ -17,6 +17,9 @@ from enum import Enum
 
 
 class ProgressCode(str, Enum):
+    """
+        Enumeration of task progress states.
+    """
 
     Completed = "Completed"
     Errored = "Errored"

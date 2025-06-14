@@ -20,6 +20,9 @@ from automojo.testbase.testjob import TestJob, DefaultTestJob
 from automojo.foundation.extension.extensionprotocolbase import ExtensionProtocolBase
 
 class TestBaseExtensionProtocol(ExtensionProtocolBase):
+    """
+        Extension protocol used by Automation Mojo testbase tooling.
+    """
 
     ext_protocol_name = "automojo-testbase-default-types"
 

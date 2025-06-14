@@ -25,6 +25,9 @@ from automojo.testbase.resourcelifespan import ResourceLifespan
 constraints_catalog = ConstraintsCatalog()
 
 class ResourceOrigin:
+    """
+        Describes the origin of a resource provider in the injection tree.
+    """
 
     def __init__(self, originating_scope: str, identifier: str, life_span: ResourceLifespan,
                  source: Optional[SourceBase] = None, implied: bool = False,

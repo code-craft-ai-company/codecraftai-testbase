@@ -18,6 +18,9 @@ from dataclasses import dataclass
 
 @dataclass
 class PipelineInfo:
+    """
+        Metadata describing the pipeline associated with a run.
+    """
 
     id: str # identifier such as a uuid which identifies a particular venue associated with the pipeline.
     name: str # name for the venue associated pipeline.

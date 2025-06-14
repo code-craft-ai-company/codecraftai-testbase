@@ -22,6 +22,9 @@ from automojo.testbase.coupling.configurationcoupling import ConfigurationCoupli
 from automojo.testbase.sources.sourcebase import SourceBase
 
 class ConfigurationSource(SourceBase):
+    """
+        Source wrapper for configuration resources.
+    """
 
     def __init__(self, source_func: Callable, query_func: Union[Callable, None], config_type: ConfigurationCoupling, constraints: dict):
         SourceBase.__init__(self, source_func, query_func, config_type, constraints)

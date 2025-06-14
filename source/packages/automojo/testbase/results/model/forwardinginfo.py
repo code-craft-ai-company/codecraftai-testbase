@@ -21,6 +21,9 @@ from dataclasses import dataclass
 
 @dataclass
 class ForwardingInfo:
+    """
+        Information controlling progress forwarding operations.
+    """
 
     forwarding_interval: float # The interval in seconds to use when forwarding job summary information
     forwarding_url: str # identifier such as a uuid which identifies a particular pipeline.

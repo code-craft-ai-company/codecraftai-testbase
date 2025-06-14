@@ -20,6 +20,9 @@ from dataclasses import dataclass
 
 @dataclass
 class JobInfo:
+    """
+        Descriptor for job execution metadata.
+    """
 
     id: str # identifier for a job from the runner perspective
     name: str # name of the job.

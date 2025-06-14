@@ -18,6 +18,9 @@ from typing import Callable, Union, Type
 from automojo.testbase.sources.sourcebase import SourceBase
 
 class ResourceSource(SourceBase):
+    """
+        Source wrapper for general resource providers.
+    """
 
     def __init__(self, source_func: Callable, query_func: Union[Callable, None], resource_type: Type, constraints: dict):
         SourceBase.__init__(self, source_func, query_func, resource_type, constraints)

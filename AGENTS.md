@@ -30,6 +30,24 @@ When checking out the code for this repository in order to test changes, agents 
 * run the 'repository-setup/rehome-repository' script.  It creates a needed '.env' file.
 * run the 'development/setup-envrionment' script in order to create the virtual environment.
 
+# Running Tests
+In order to run the unittest tests, you must first enter the virtual environment by running the command:
+
+```
+    source <repository-root>/.venv/bin/activate
+```
+
+When you setup the environment, the '.venv/bin/activate' script is modified so that it will pull in the appropriate environment
+variables from the '.env' file.
+
+For running the 'unittest' tests located under the folder '<repository-root>/source/tests', use the command:
+
+```
+    cd <repository-root>
+
+    python -m unittest discover -s source/tests -p "test_*.py"
+```
+
 # Project Specific Rules
 
 

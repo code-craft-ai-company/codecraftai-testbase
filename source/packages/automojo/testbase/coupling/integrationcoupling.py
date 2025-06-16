@@ -61,7 +61,8 @@ class IntegrationCoupling(BaseCoupling):
             registration processes.  This allows the framework to ignore the bringing-up of couplings that are not being
             included by a test.
         """
-        return
+        errmsg = "The 'attach_to_framework' method must be overloaded by derived integration coupling types."
+        raise AbstractMethodError(errmsg)
 
     @classmethod
     def attach_to_environment(cls, **kwargs):
@@ -91,7 +92,8 @@ class IntegrationCoupling(BaseCoupling):
             This API is called so that the IntegrationCoupling can declare an ordinal precedence that should be
             utilized for bringing up its integration state.
         """
-        return
+        errmsg = "The 'declare_precedence' method must be overloaded by derived integration coupling types."
+        raise AbstractMethodError(errmsg)
 
     @classmethod
     def diagnostic(cls, label: str, level: int, diag_folder: str): # pylint: disable=unused-argument

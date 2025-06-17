@@ -13,7 +13,7 @@ develop = false
 type = "git"
 url = "https://github.com/automationmojo/automojo-errors.git"
 reference = "main"
-resolved_reference = "0f4778d19bea6cf0a9d45c15c13259570e61efb6"
+resolved_reference = "cb27af7ef34f7f570c98c471732737dc4fe1587e"
 
 [[package]]
 name = "automojo-foundation"
@@ -35,7 +35,7 @@ pyyaml = "^6.0.2"
 type = "git"
 url = "https://github.com/automationmojo/automojo-foundation.git"
 reference = "main"
-resolved_reference = "366115f03db70505f40dcc8fb8ab7f94aedf5ae4"
+resolved_reference = "c1d694869c375cb7ce3d47353ffe6582d1b38230"
 
 [[package]]
 name = "automojo-interfaces"
@@ -50,7 +50,7 @@ develop = false
 type = "git"
 url = "https://github.com/automationmojo/automojo-interfaces.git"
 reference = "main"
-resolved_reference = "b4dfb39a110823f5d989656ba45b18fbaac3c14e"
+resolved_reference = "cad3a7b8fca90bc231def97488849c6486df9ba1"
 
 [[package]]
 name = "automojo-waiting"
@@ -65,7 +65,7 @@ develop = false
 type = "git"
 url = "https://github.com/automationmojo/automojo-waiting.git"
 reference = "main"
-resolved_reference = "68d666411e48d99ce183fe11e64e143b1d6472b4"
+resolved_reference = "986eb37bdf67551968bfa48c1eeb37ac58f05039"
 
 [[package]]
 name = "cffi"

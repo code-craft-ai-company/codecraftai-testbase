@@ -85,6 +85,6 @@ def create_testintegration_coupling() -> Generator[TestIntegrationCoupling, None
 
 
 @testbase.register.resource_factory()
-def create_blah(constraints={}):
+def create_blah(constraints={}) -> Generator[str, None, None]:
     yield "blah"
 

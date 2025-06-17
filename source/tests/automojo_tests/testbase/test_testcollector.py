@@ -1,0 +1,116 @@
+import unittest
+from unittest import mock
+
+from automojo.testbase.testcollector import (
+    catagorize_exclusions,
+    TestCollector,
+)
+from automojo.testbase.testref import TestRef
+from automojo.testbase.testgroup import TestGroup
+
+
+class CategorizeExclusionsTests(unittest.TestCase):
+    def test_returns_specific_exclusions_when_no_at_symbol(self):
+        files, specific = catagorize_exclusions(["pkg.module"])
+        self.assertEqual(files, [])
+        self.assertEqual(specific, ["pkg.module"])
+
+    def test_with_at_symbol_also_specific(self):
+        files, specific = catagorize_exclusions(["pkg.module@Test"])
+        self.assertEqual(files, [])
+        self.assertEqual(specific, ["pkg.module@Test"])
+
+
+class CollectReferencesTests(unittest.TestCase):
+    def test_collect_references_uses_helpers_and_updates_state(self):
+        col = TestCollector(root="/root", excludes=[], metafilters=[])
+
+        def dummy():
+            pass
+        tref = TestRef(dummy)
+
+        with mock.patch(
+            "automojo.testbase.testcollector.parse_test_include_expression"
+        ) as pexp, \
+             mock.patch(
+                 "automojo.testbase.testcollector.find_included_modules_under_root"
+             ) as finc, \
+             mock.patch(
+                 "automojo.testbase.testcollector.collect_test_references"
+             ) as crefs:
+
+            pexp.return_value = ("pkg", "mod", None, None)
+            finc.return_value = (["f1.py"], ["x.py"])
+            crefs.return_value = ({tref.name: tref}, {"err": ("m", "f", "msg")})
+
+            col.collect_references("expr")
+
+            pexp.assert_called_once_with("expr", col._test_module, col._method_prefix)
+            finc.assert_called_once_with("/root", "pkg", "mod", excluded_path_prefixes=col._excluded_path_prefixes)
+            crefs.assert_called_once()
+
+        self.assertIn(tref.name, col.references)
+        self.assertIn("err", col.import_errors)
+        self.assertIn("x.py", col._excluded_files)
+
+
+class FinalizeCollectionTests(unittest.TestCase):
+    def test_filters_and_builds_tree(self):
+        col = TestCollector(root="/root", excludes=[], metafilters=[object()])
+
+        def f1():
+            pass
+        def f2():
+            pass
+
+        t1 = TestRef(f1)
+        t2 = TestRef(f2)
+        t1.is_member_of_metaset = mock.Mock(return_value=True)
+        t2.is_member_of_metaset = mock.Mock(return_value=False)
+
+        col._test_references = {t1.name: t1, t2.name: t2}
+
+        col.finalize_collection()
+
+        self.assertEqual(list(col.references.keys()), [t1.name])
+        self.assertIsInstance(col.test_tree, TestGroup)
+        self.assertIn("f1", col.test_tree.children)
+
+
+class CollectIntegrationsAndConfigurationsTests(unittest.TestCase):
+    class FakeRegistry:
+        def __init__(self, unknown=None):
+            self.added = []
+            self.finalized_with = None
+            self.unknown_parameters = unknown or {}
+            self.referenced_integrations = {"i": 1}
+            self.referenced_configurations = {"c": 2}
+
+        def add_implied_session_resource(self, ident):
+            self.added.append(ident)
+
+        def finalize_startup(self, refs):
+            self.finalized_with = refs
+
+    def test_returns_registry_values(self):
+        col = TestCollector(root="/root", excludes=[], metafilters=[])
+        col._test_references = {"a": object()}
+        fake = self.FakeRegistry()
+        with mock.patch("automojo.testbase.testcollector.injection_registry", fake):
+            integrations, configs = col.collect_integrations_and_configurations()
+        self.assertEqual(fake.added, ["sequencer"])
+        self.assertIs(fake.finalized_with, col._test_references)
+        self.assertEqual(integrations, fake.referenced_integrations)
+        self.assertEqual(configs, fake.referenced_configurations)
+
+    def test_raises_on_unknown_parameters(self):
+        col = TestCollector(root="/root", excludes=[], metafilters=[])
+        col._test_references = {"a": object()}
+        fake = self.FakeRegistry({"x": ["p"]})
+        with mock.patch("automojo.testbase.testcollector.injection_registry", fake):
+            with self.assertRaises(Exception):
+                col.collect_integrations_and_configurations()
+
+
+if __name__ == "__main__":
+    unittest.main()

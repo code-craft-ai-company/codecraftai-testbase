@@ -39,39 +39,42 @@ class IntegrationCouplingTests(unittest.TestCase):
         self.assertFalse(ic.connectivity_establish)
         self.assertFalse(ic.presence_establish)
 
-    def test_integration_key_helpers(self):
+    def test_get_integration_key(self):
         expected_key = "iroot:isect:ileaf:iclass"
         self.assertEqual(SampleIntegration.get_integration_key(), expected_key)
 
+    def test_get_integration_key_parts(self):
         expected_parts = ("iroot", "isect", "ileaf", "iclass")
-        self.assertEqual(SampleIntegration.get_integration_key_parts(), expected_parts)
+        self.assertEqual(
+            SampleIntegration.get_integration_key_parts(),
+            expected_parts,
+        )
 
     def test_abstract_methods_raise(self):
-        with self.assertRaises(AbstractMethodError):
-            IntegrationCoupling.attach_to_framework()
+        """Ensure each abstract method raises ``AbstractMethodError``."""
 
-        with self.assertRaises(AbstractMethodError):
-            IntegrationCoupling.attach_to_environment()
+        methods = [
+            IntegrationCoupling.attach_to_framework,
+            IntegrationCoupling.attach_to_environment,
+            IntegrationCoupling.collect_resources,
+            IntegrationCoupling.declare_precedence,
+            lambda: IntegrationCoupling.diagnostic("label", 1, "folder"),
+            IntegrationCoupling.establish_presence,
+            lambda: IntegrationCoupling.validate_item_configuration({}),
+        ]
 
-        with self.assertRaises(AbstractMethodError):
-            IntegrationCoupling.collect_resources()
+        for method in methods:
+            with self.subTest(method=method):
+                with self.assertRaises(AbstractMethodError):
+                    method()
 
-        with self.assertRaises(AbstractMethodError):
-            IntegrationCoupling.declare_precedence()
-
-        with self.assertRaises(AbstractMethodError):
-            IntegrationCoupling.diagnostic("label", 1, "folder")
-
-        with self.assertRaises(AbstractMethodError):
-            IntegrationCoupling.establish_presence()
-
-        with self.assertRaises(AbstractMethodError):
-            IntegrationCoupling.validate_item_configuration({})
-
-    def test_is_integration_coupling(self):
+    def test_is_integration_coupling_true(self):
         self.assertTrue(is_integration_coupling(SampleIntegration))
-        self.assertFalse(is_integration_coupling(IntegrationCoupling))
-        self.assertFalse(is_integration_coupling(str))
+
+    def test_is_integration_coupling_false(self):
+        for obj in (IntegrationCoupling, str):
+            with self.subTest(obj=obj):
+                self.assertFalse(is_integration_coupling(obj))
 
     def test_sort_integration_couplings_by_precedence(self):
         unordered = [SampleIntegrationB, SampleIntegration]

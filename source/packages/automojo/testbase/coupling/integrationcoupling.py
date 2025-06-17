@@ -188,8 +188,7 @@ def sort_integration_couplings_by_precedence(self, coupling_list: List[Integrati
             precedence_table[precedence] = precedence_level_list
         precedence_level_list.append(coupling)
 
-    precedence_keys_sorted = precedence_table.keys()
-    precedence_keys_sorted.sort()
+    precedence_keys_sorted = sorted(precedence_table.keys())
 
     ordered_couplings = []
     for precedence in precedence_keys_sorted:

@@ -31,21 +31,40 @@ When checking out the code for this repository in order to test changes, agents 
 * run the 'development/setup-envrionment' script in order to create the virtual environment.
 
 # Running Tests
+This repository uses `unittest` tests in order to test the `testbase` test framework code.  There are also 'testbase' tests included in this repository that are used to test the functionality of the `testbase` framework.
+
+When you setup the environment, the '.venv/bin/activate' script is modified so that it will pull in the appropriate environment
+variables from the '.env' file.  The environment setup script also creates an alias that makes it easy to run the 'testbase' command from the virtual environment command line.
+
+## UnitTest
 In order to run the unittest tests, you must first enter the virtual environment by running the command:
 
 ```
     source <repository-root>/.venv/bin/activate
 ```
 
-When you setup the environment, the '.venv/bin/activate' script is modified so that it will pull in the appropriate environment
-variables from the '.env' file.
 
-For running the 'unittest' tests located under the folder '<repository-root>/source/tests', use the command:
+For running the 'unittest' tests located under the folder '<repository-root>/source/tests', use the commands:
 
 ```
     cd <repository-root>
 
     python -m unittest discover -s source/tests -p "test_*.py"
+```
+
+## TestBase
+In order to run the `testbase` tests, you must first enter the virtual environment by running the command:
+
+```
+    source <repository-root>/.venv/bin/activate
+```
+
+For running the `testbase` tests located under the folder '<repository-root>/source/testbase', use the commands:
+
+``` 
+    cd <repository-root>
+
+    testbase testing run --root "<repository-root>/source/testbase" --include  automojo
 ```
 
 # Project Specific Rules

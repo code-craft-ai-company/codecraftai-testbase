@@ -1,12 +1,12 @@
 """
-    .. module:: automojo.testbase.coupling.integrationcoupling
+.. module:: integration
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module for integrationcoupling.
+    :synopsis: Module containing the :class:`IntegrationCoupling` class and associated reflection methods.
+        The :class:`IntegrationCoupling` derived classes can be used to integraton automation resources and roles
+        into the test environment.
 
-    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
-
-
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
@@ -112,7 +112,8 @@ class IntegrationCoupling(BaseCoupling):
             :param level: The maximum diagnostic level to run dianostics for.
             :param diag_folder: The output folder path where the diagnostic information should be written.
         """
-        return
+        errmsg = "The 'diagnostic' method must be overloaded by derived integration coupling types."
+        raise AbstractMethodError(errmsg)
 
     @classmethod
     def establish_connectivity(cls, allow_missing_devices: bool=False) -> Tuple[List[str], Dict]:
@@ -125,7 +126,7 @@ class IntegrationCoupling(BaseCoupling):
             :returns: A tuple with a list of error messages for failed connections and dict of connectivity
                       reports for devices devices based on the coordinator.
         """
-        errmsg = "The 'diagnostic' method must be overloaded by derived integration coupling types."
+        errmsg = "The 'establish_connectivity' method must be overloaded by derived integration coupling types."
         raise AbstractMethodError(errmsg)
 
     @classmethod

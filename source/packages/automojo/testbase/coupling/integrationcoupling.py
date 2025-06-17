@@ -112,7 +112,8 @@ class IntegrationCoupling(BaseCoupling):
             :param level: The maximum diagnostic level to run dianostics for.
             :param diag_folder: The output folder path where the diagnostic information should be written.
         """
-        return
+        errmsg = "The 'diagnostic' method must be overloaded by derived integration coupling types."
+        raise AbstractMethodError(errmsg)
 
     @classmethod
     def establish_connectivity(cls, allow_missing_devices: bool=False) -> Tuple[List[str], Dict]:
@@ -187,8 +188,7 @@ def sort_integration_couplings_by_precedence(self, coupling_list: List[Integrati
             precedence_table[precedence] = precedence_level_list
         precedence_level_list.append(coupling)
 
-    precedence_keys_sorted = precedence_table.keys()
-    precedence_keys_sorted.sort()
+    precedence_keys_sorted = sorted(precedence_table.keys())
 
     ordered_couplings = []
     for precedence in precedence_keys_sorted:

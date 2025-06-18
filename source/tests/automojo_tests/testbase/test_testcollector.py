@@ -74,7 +74,14 @@ class FinalizeCollectionTests(unittest.TestCase):
 
         self.assertEqual(list(col.references.keys()), [t1.name])
         self.assertIsInstance(col.test_tree, TestGroup)
-        self.assertIn("f1", col.test_tree.children)
+
+        node = col.test_tree
+        for part in t1.function.__module__.split("."):
+            self.assertIn(part, node.children)
+            node = node[part]
+
+        self.assertIn(t1.base_name, node.children)
+        self.assertIs(node[t1.base_name], t1)
 
 
 class CollectIntegrationsAndConfigurationsTests(unittest.TestCase):

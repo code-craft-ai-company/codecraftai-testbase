@@ -225,6 +225,6 @@ class TestCollector:
 
         self._test_tree = TestGroup("<session>")
         for _, trval in self._test_references.items():
-            self._test_tree[trval.base_name] = trval
+            self._test_tree.add_descendent(trval)
 
         return

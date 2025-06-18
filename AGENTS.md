@@ -5,7 +5,16 @@ AI Agents working in this repository should refer to themselves as an agent name
 
 
 # Testing Conventions
-The 'automojo-testbase' package repository utilizes the 'testbase' framework in order to test the functionality of the code.
+The 'automojo-testbase' package repository utilizes the 'unittest' framework in order to test the functionality of the testframework components.  It also uses the 'testbase'
+test framework included in this repository to run tests which verify the functionality of that is delivered in this repository.
+
+## Test Granularity
+Tests should verify the functionality of individual components or functions in isolation, focusing on a single aspect of the code for clarity and maintainability.
+
+Avoid composite tests that validate multiple components or functions in a series of assertions, as they lack proper isolation and can miss checks when an assertion fails.
+
+Use Python's `unittest` framework with `setUp` and `tearDown` methods to establish shared conditions across tests while maintaining separation of concerns.
+
 
 # Code Naming Conventions
 The code naming conventions of this repository follows the [Automation Mojo Python Naming Conventions](https://github.com/automationmojo/automojo-docs/blob/main/userguide/10-01-naming-conventions.rst)

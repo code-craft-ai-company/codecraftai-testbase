@@ -158,6 +158,16 @@ class MockContext:
         return
 
     @property
+    def call_args(self) -> Optional[Tuple[Tuple[Any, ...], Dict[str, Any]]]:
+        """Returns the arguments of the last call to the mock as a tuple (args, kwargs)."""
+        return self._call_args
+
+    @property
+    def call_args_list(self) -> List[Tuple[Tuple[Any, ...], Dict[str, Any]]]:
+        """Returns a list of all calls made to the mock. Each call is a tuple (args, kwargs)."""
+        return self._call_args_list
+
+    @property
     def reference(self) -> Any:
         """
             Returns the reference object of this mock context.
@@ -165,18 +175,30 @@ class MockContext:
         return self._reference
 
     @property
+    def call_count(self) -> int:
+        """Returns the number of times the mock was called."""
+        return self._call_count
+
+    @property
+    def mock_type(self) -> MockType:
+        """
+            Returns the type of this mock context.
+        """
+        return self._mock_type
+    
+    @property
+    def mock_attributes(self) -> Dict[str, Any]:
+        """
+            Returns the attributes of this mock context.
+        """
+        return self._mock_attributes
+
+    @property
     def return_value(self) -> Any:
         """
             Returns the return value of this mock context.
         """
         return self._return_value
-    
-    @property
-    def side_effect(self) -> SideEffect:
-        """
-            Returns the side effect of this mock context.
-        """
-        return self._side_effect
 
     @property
     def recursive(self) -> bool:
@@ -195,30 +217,100 @@ class MockContext:
         self._recursive = value
 
     @property
-    def call_count(self) -> int:
-        """Returns the number of times the mock was called."""
-        return self._call_count
+    def side_effect(self) -> SideEffect:
+        """
+            Returns the side effect of this mock context.
+        """
+        return self._side_effect
 
-    @property
-    def call_args(self) -> Optional[Tuple[Tuple[Any, ...], Dict[str, Any]]]:
-        """Returns the arguments of the last call to the mock as a tuple (args, kwargs)."""
-        return self._call_args
-
-    @property
-    def call_args_list(self) -> List[Tuple[Tuple[Any, ...], Dict[str, Any]]]:
-        """Returns a list of all calls made to the mock. Each call is a tuple (args, kwargs)."""
-        return self._call_args_list
-    
     @property
     def mock_calls(self) -> List[Tuple[str, Tuple[Any, ...], Dict[str, Any]]]:
         """
-        Returns a list of all calls made to this mock and its children (attributes that are also mocks).
-        Each call is a tuple (name, args, kwargs), where name is '' for the mock itself.
+            Returns a list of all calls made to this mock and its children (attributes that are also mocks).
+            Each call is a tuple (name, args, kwargs), where name is '' for the mock itself.
         """
         # For simplicity, this currently only tracks direct calls to this mock.
         # A more complete implementation would involve children reporting calls to their parent.
         # For now, it mirrors call_args_list but with an empty name for direct calls.
-        return [('', args, kwargs) for args, kwargs in self._call_args_list]
+        calls = [('', args, kwargs) for args, kwargs in self._call_args_list]
+        return calls
+
+
+    def assert_any_call(self, *args, **kwargs):
+        """Assert that the mock was called at least once with the specified arguments."""
+        if not any(c_args == args and c_kwargs == kwargs for c_args, c_kwargs in self._call_args_list):
+            expected_call_str = self._format_call_args(args, kwargs)
+            actual_calls_str = "\n".join([self._format_call_args(ca, ck) for ca, ck in self._call_args_list])
+            if not actual_calls_str:
+                actual_calls_str = " (no calls made)"
+            raise AssertionError(f"Expected at least one call with {expected_call_str}. Actual calls:\n{actual_calls_str}")
+
+
+    def assert_called(self):
+        """Assert that the mock was called at least once."""
+        if self._call_count == 0:
+            raise AssertionError("Expected mock to have been called.")
+
+
+    def assert_called_once(self):
+        """Assert that the mock was called exactly once."""
+        if self._call_count != 1:
+            raise AssertionError(f"Expected mock to have been called once. Called {self._call_count} times.")
+
+
+    def assert_called_once_with(self, *args, **kwargs):
+        """Assert that the mock was called exactly once and with the specified arguments."""
+        self.assert_called_once()
+        self.assert_called_with(*args, **kwargs)
+
+
+    def assert_called_with(self, *args, **kwargs):
+        """Assert that the last call to the mock was with the specified arguments."""
+        if self._call_args is None:
+            raise AssertionError("Expected mock to have been called with specific arguments, but it was not called.")
+        
+        last_args, last_kwargs = self._call_args
+        if last_args != args or last_kwargs != kwargs:
+            # Helper for formatting expected vs actual calls
+            expected_call_str = self._format_call_args(args, kwargs)
+            actual_call_str = self._format_call_args(last_args, last_kwargs)
+            raise AssertionError(f"Expected last call with {expected_call_str}, but was called with {actual_call_str}.")
+
+    
+    def assert_has_calls(self, calls: List[Tuple[Tuple[Any, ...], Dict[str, Any]]], any_order: bool = False):
+        """
+            Assert that the mock was called with a specific sequence of calls.
+            Each call in `calls` should be a tuple (args, kwargs).
+        """
+        if not isinstance(calls, list):
+            raise TypeError("Expected 'calls' to be a list of call arguments.")
+        if not all(isinstance(c, tuple) and len(c) == 2 and isinstance(c[0], tuple) and isinstance(c[1], dict) for c in calls):
+            raise ValueError("Each item in 'calls' must be a tuple of (args_tuple, kwargs_dict).")
+
+        actual_calls = self._call_args_list
+
+        if any_order:
+            # Check if all expected calls are present in actual_calls, regardless of order and count
+            # This is a simplified check; unittest.mock's version is more sophisticated
+            for expected_call in calls:
+                if expected_call not in actual_calls:
+                    expected_call_str = self._format_call_args(*expected_call)
+                    raise AssertionError(f"Expected call {expected_call_str} not found in actual calls.")
+        else:
+            # Check for an exact sub-sequence
+            if len(calls) > len(actual_calls):
+                raise AssertionError(f"Expected {len(calls)} calls, but only {len(actual_calls)} were made.")
+            
+            # Naive subsequence check
+            found_subsequence = False
+            for i in range(len(actual_calls) - len(calls) + 1):
+                if actual_calls[i:i+len(calls)] == calls:
+                    found_subsequence = True
+                    break
+            if not found_subsequence:
+                expected_calls_str = "\n".join([self._format_call_args(*c) for c in calls])
+                actual_calls_str = "\n".join([self._format_call_args(*c) for c in actual_calls])
+                raise AssertionError(f"Expected call sequence not found.\nExpected:\n{expected_calls_str}\nActual:\n{actual_calls_str}")
 
 
     def get_attribute(self, name: str) -> Any:
@@ -348,8 +440,30 @@ class MockContext:
 
         return
 
+    def _format_call_args(self, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> str:
+        """
+            Helper to format call arguments for assertion messages.
+        """
+        rtnval = ""
+
+        call_parts = []
+        if args:
+            call_parts.extend(map(repr, args))
+        
+        if kwargs:
+            # Sort keyword arguments for consistent output order
+            sorted_kwargs = sorted(kwargs.items())
+            call_parts.extend(f"{k}={v!r}" for k, v in sorted_kwargs)
+        
+        rtnval = f"({', '.join(call_parts)})"
+
+        return rtnval
+
+
     def _record_call(self, *args, **kwargs):
-        """Internal method to record a call to the mock."""
+        """
+            Internal method to record a call to the mock.
+        """
         self._call_count += 1
         self._call_args = (args, kwargs)
         self._call_args_list.append((args, kwargs))
@@ -357,89 +471,6 @@ class MockContext:
         # For direct calls to this mock, the name is empty.
         # self._mock_calls.append(('', args, kwargs))
 
-    # --- Assertion Helpers ---
-    def assert_called(self):
-        """Assert that the mock was called at least once."""
-        if self._call_count == 0:
-            raise AssertionError("Expected mock to have been called.")
-
-    def assert_called_once(self):
-        """Assert that the mock was called exactly once."""
-        if self._call_count != 1:
-            raise AssertionError(f"Expected mock to have been called once. Called {self._call_count} times.")
-
-    def assert_called_with(self, *args, **kwargs):
-        """Assert that the last call to the mock was with the specified arguments."""
-        if self._call_args is None:
-            raise AssertionError("Expected mock to have been called with specific arguments, but it was not called.")
-        
-        last_args, last_kwargs = self._call_args
-        if last_args != args or last_kwargs != kwargs:
-            # Helper for formatting expected vs actual calls
-            expected_call_str = self._format_call_args(args, kwargs)
-            actual_call_str = self._format_call_args(last_args, last_kwargs)
-            raise AssertionError(f"Expected last call with {expected_call_str}, but was called with {actual_call_str}.")
-
-    def assert_called_once_with(self, *args, **kwargs):
-        """Assert that the mock was called exactly once and with the specified arguments."""
-        self.assert_called_once()
-        self.assert_called_with(*args, **kwargs)
-
-    def assert_any_call(self, *args, **kwargs):
-        """Assert that the mock was called at least once with the specified arguments."""
-        if not any(c_args == args and c_kwargs == kwargs for c_args, c_kwargs in self._call_args_list):
-            expected_call_str = self._format_call_args(args, kwargs)
-            actual_calls_str = "\n".join([self._format_call_args(ca, ck) for ca, ck in self._call_args_list])
-            if not actual_calls_str:
-                actual_calls_str = " (no calls made)"
-            raise AssertionError(f"Expected at least one call with {expected_call_str}. Actual calls:\n{actual_calls_str}")
-
-    def assert_has_calls(self, calls: List[Tuple[Tuple[Any, ...], Dict[str, Any]]], any_order: bool = False):
-        """
-        Assert that the mock was called with a specific sequence of calls.
-        Each call in `calls` should be a tuple (args, kwargs).
-        """
-        if not isinstance(calls, list):
-            raise TypeError("Expected 'calls' to be a list of call arguments.")
-        if not all(isinstance(c, tuple) and len(c) == 2 and isinstance(c[0], tuple) and isinstance(c[1], dict) for c in calls):
-            raise ValueError("Each item in 'calls' must be a tuple of (args_tuple, kwargs_dict).")
-
-        actual_calls = self._call_args_list
-
-        if any_order:
-            # Check if all expected calls are present in actual_calls, regardless of order and count
-            # This is a simplified check; unittest.mock's version is more sophisticated
-            for expected_call in calls:
-                if expected_call not in actual_calls:
-                    expected_call_str = self._format_call_args(*expected_call)
-                    raise AssertionError(f"Expected call {expected_call_str} not found in actual calls.")
-        else:
-            # Check for an exact sub-sequence
-            if len(calls) > len(actual_calls):
-                raise AssertionError(f"Expected {len(calls)} calls, but only {len(actual_calls)} were made.")
-            
-            # Naive subsequence check
-            found_subsequence = False
-            for i in range(len(actual_calls) - len(calls) + 1):
-                if actual_calls[i:i+len(calls)] == calls:
-                    found_subsequence = True
-                    break
-            if not found_subsequence:
-                expected_calls_str = "\n".join([self._format_call_args(*c) for c in calls])
-                actual_calls_str = "\n".join([self._format_call_args(*c) for c in actual_calls])
-                raise AssertionError(f"Expected call sequence not found.\nExpected:\n{expected_calls_str}\nActual:\n{actual_calls_str}")
-
-    def _format_call_args(self, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> str:
-        """Helper to format call arguments for assertion messages."""
-        arg_str = ", ".join(map(repr, args))
-        kwarg_str = ", ".join(f"{k}={v!r}" for k, v in sorted(kwargs.items()))
-        if arg_str and kwarg_str:
-            return f"({arg_str}, {kwarg_str})"
-        elif kwarg_str:
-            return f"({kwarg_str})"
-        return f"({arg_str})"
-
-        return
 
 
 class Mock:
@@ -575,7 +606,6 @@ class Mock:
             raise
 
 
-
     def __setattr__(self, name: str, value: Any):
         """
             Sets the attribute of the mock object with the given name to the given value. If the attribute starts with
@@ -681,6 +711,24 @@ class Mock:
         else:
             rtnval = True # Default truthiness for a Mock object itself
         return rtnval
+
+
+    def __dir__(self) -> List[str]:
+        """
+            Returns a list of attributes for the mock object and any mock attributes that have been defined on the Mock object.
+            
+            :return: A list of attributes for the mock object.
+        """
+        attributes = set(super().__dir__()) # Get attributes from Mock class and its bases
+
+        # Add attributes from the mock context
+        if self._mock_context and hasattr(self._mock_context, '_mock_attributes'):
+            attributes.update(self._mock_context._mock_attributes.keys())
+    
+        attributes = list(attributes)
+        attributes.sort()
+
+        return attributes
 
 
     def __len__(self):

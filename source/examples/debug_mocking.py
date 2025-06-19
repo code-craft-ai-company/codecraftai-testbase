@@ -230,6 +230,27 @@ def debug_mock_configure_method():
     mock_obj.alpha.gamma.assert_called_once_with(10, 20)
     assert mock_obj.alpha.gamma.mock_context().recursive is False
 
+    # Test configuring only one aspect
+    mock_d = mock_obj.delta
+    mock_d.configure(return_value="Only Return Value Set")
+    assert mock_d() == "Only Return Value Set"
+    # Check that other properties were not unintentionally reset (if they had defaults or were set before)
+    # For a fresh mock, side_effect would be None, recursive would be True (from parent)
+    assert mock_d.mock_context().side_effect is None 
+    assert mock_d.mock_context().recursive is True 
+
+    # Fluent configuration of the same mock
+    mock_obj.epsilon.zeta.configure(return_value=100).configure(recursive=False)
+    assert mock_obj.epsilon.zeta() == 100
+    assert mock_obj.epsilon.zeta.mock_context().recursive is False
+    print("Fluent configuration successful for the same mock (zeta).")
+
+    # Fluent configuration of parent then child
+    mock_obj.theta.iota.configure(return_value="Theta Configured").kappa.configure(return_value="Kappa Configured")
+    assert mock_obj.theta.iota() == "Theta Configured"
+    assert mock_obj.theta.iota.kappa() == "Kappa Configured"
+    print("Fluent configuration of parent (iota) and then its child (kappa) successful.")
+
 def main_debug_mocking():
     debug_mock_simple_function_return_value()
     debug_mock_simple_function_side_effect()

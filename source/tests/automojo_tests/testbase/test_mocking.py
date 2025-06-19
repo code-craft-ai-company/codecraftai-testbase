@@ -71,6 +71,15 @@ class RecursiveMockTests(unittest.TestCase):
         child.configure(return_value="val")
         self.assertEqual(m.foo.bar(), "val")
 
+    def test_fluent_configure_parent_then_child(self):
+        m = Mock(recursive=True)
+        # Configure 'parent', then access 'child' on it, then configure 'child'
+        m.parent.configure(return_value="parent_val").child.configure(return_value="child_val")
+
+        self.assertEqual(m.parent(), "parent_val")
+        m.parent.assert_called_once()
+        self.assertEqual(m.parent.child(), "child_val")
+        m.parent.child.assert_called_once()
 
 class StrictAttributeTests(unittest.TestCase):
     def test_setting_unknown_attr_raises(self):

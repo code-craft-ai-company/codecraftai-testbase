@@ -67,8 +67,8 @@ class RecursiveMockTests(unittest.TestCase):
         m = Mock(recursive=True)
         child = m.foo.bar
         self.assertIsInstance(child, Mock)
-        self.assertTrue(child.mock_context().recursive)
-        child.mock_context().set_return_value("val")
+        self.assertTrue(child.mock_context().recursive) # recursive is a property on context
+        child.configure(return_value="val")
         self.assertEqual(m.foo.bar(), "val")
 
 
@@ -78,7 +78,7 @@ class StrictAttributeTests(unittest.TestCase):
         with self.assertRaises(AttributeError):
             m.new_attr = 1
         # setting return_value is allowed
-        m.return_value = 5
+        m.configure(return_value=5)
         self.assertEqual(m(), 5)
 
 
@@ -86,14 +86,14 @@ class PatchTests(unittest.TestCase):
     def test_module_patch(self):
         original = os.path.exists
         with create_module_patch(os.path, "exists") as mock_exists:
-            mock_exists.mock_context().set_return_value(True)
+            mock_exists.configure(return_value=True)
             self.assertTrue(os.path.exists("/tmp"))
         self.assertIs(os.path.exists, original)
 
     def test_class_patch(self):
         orig = SampleClass.cmethod("x")
         with create_class_patch(SampleClass, "cmethod") as mock_cm:
-            mock_cm.mock_context().set_return_value("patched")
+            mock_cm.configure(return_value="patched")
             self.assertEqual(SampleClass.cmethod("y"), "patched")
         self.assertEqual(SampleClass.cmethod("z"), "orig:z")
 
@@ -101,7 +101,7 @@ class PatchTests(unittest.TestCase):
         obj = SampleClass()
         orig = obj.method(1)
         with create_instance_patch(obj, "method") as mock_m:
-            mock_m.mock_context().set_return_value(99)
+            mock_m.configure(return_value=99)
             self.assertEqual(obj.method(2), 99)
         self.assertEqual(obj.method(3), obj.value + 3)
 

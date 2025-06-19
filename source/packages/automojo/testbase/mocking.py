@@ -41,9 +41,9 @@ class SideEffect:
         This class is used to store the side effect of a mock object, which is a callable that is executed when the
         mock object is called.
     """
-
-    def __init__(self, callable: Callable, default_args: Optional[Union[List[Any], Tuple[Any]]] = None,
-                 default_kwargs: Dict[str, Any] = None):
+    # Changed default from None to ... for default_args and default_kwargs
+    def __init__(self, callable: Callable, default_args: Optional[Union[List[Any], Tuple[Any]]] = ...,
+                 default_kwargs: Dict[str, Any] = ...):
         """
             Initializes the SideEffect with the given callable function.
             
@@ -51,7 +51,11 @@ class SideEffect:
         """
         self._callable = callable
         self._default_args = default_args
-        self._default_kwargs = default_kwargs
+        # Ensure default_kwargs is a dict if provided, or None if not (or explicitly None)
+        if default_kwargs is ...:
+            self._default_kwargs = None
+        else:
+            self._default_kwargs = default_kwargs
         return
     
     def __call__(self, *args, **kwargs) -> Any:
@@ -67,12 +71,12 @@ class SideEffect:
 
         if len(args) > 0:
             pass_args = args
-        elif self._default_args is not None:
+        elif self._default_args is not ... and self._default_args is not None: # Check against ... and None
             pass_args = self._default_args
 
         if len(kwargs) > 0:
             pass_kwargs = kwargs
-        elif self._default_kwargs is not None:
+        elif self._default_kwargs is not ... and self._default_kwargs is not None: # Check against ... and None
             pass_kwargs = self._default_kwargs
 
         rtnval = self._callable(*pass_args, **pass_kwargs)
@@ -112,7 +116,7 @@ class MockContext:
 
 
     def __init__(self, mock: "Mock", mock_type: MockType, mock_attributes: Dict[str, Any], *, reference: Optional[Any] = None,
-                 return_value: Optional[Any] = None, side_effect: Optional[Union[Callable, SideEffect]] = None, mock_owner: Optional["Mock"] = None,
+                 return_value: Optional[Any] = ..., side_effect: Optional[Union[Callable, SideEffect]] = ..., mock_owner: Optional["Mock"] = ...,
                  recursive: bool = False, strict_attrs: bool = False):
         """
             Creates an instance of a :class:`MockClassContext` object.
@@ -131,22 +135,26 @@ class MockContext:
         self._mock_ref = weakref.ref(mock)
         self._mock_type = mock_type if mock_type is not None else MockType.Generic
         self._mock_attributes = mock_attributes
-
-        self._reference = reference
-        self._return_value = return_value
         
-        if side_effect is not None and not isinstance(side_effect, SideEffect):
-            if callable(side_effect):
-                self._side_effect = SideEffect(side_effect)
-            else:
-                raise TypeError(f"side_effect must be a SideEffect instance or a callable, not {type(side_effect)}.")
+        self._reference = reference if reference is not ... else None
+        self._return_value = return_value if return_value is not ... else None
+        
+        if side_effect is not ...:
+            if side_effect is not None and not isinstance(side_effect, SideEffect):
+                if callable(side_effect):
+                    self._side_effect = SideEffect(side_effect)
+                else:
+                    raise TypeError(f"side_effect must be a SideEffect instance or a callable, not {type(side_effect)}.")
+            else: # side_effect is None or already a SideEffect instance
+                self._side_effect = side_effect
         else:
-            self._side_effect = side_effect
+            self._side_effect = None # Default if not provided
+
         self._recursive = recursive
         self._strict_attrs = strict_attrs
 
         self._mock_owner_ref = None
-        if mock_owner is not None:
+        if mock_owner is not ... and mock_owner is not None:
             self._mock_owner_ref = weakref.ref(mock_owner)
 
         # Call tracking attributes
@@ -313,6 +321,40 @@ class MockContext:
                 raise AssertionError(f"Expected call sequence not found.\nExpected:\n{expected_calls_str}\nActual:\n{actual_calls_str}")
 
 
+    def configure(self, *, return_value: Optional[Any] = ..., side_effect: Optional[Union[Callable, SideEffect]] = ...,
+                  recursive: Optional[bool] = ..., strict_attrs: Optional[bool] = ...):
+        """
+            Configures the mock's behavior.
+            Allows setting return_value, side_effect, recursive, and strict_attrs.
+            Uses '...' (Ellipsis) as a sentinel to distinguish between an argument
+            being explicitly passed (even as None) and not being provided at all.
+        """
+        if return_value is not ...:
+            # Directly set _return_value. None is a valid value.
+            self._return_value = return_value
+        
+        if side_effect is not ...:
+            # Logic moved from the old set_side_effect method
+            if side_effect is not None and not isinstance(side_effect, SideEffect):
+                if callable(side_effect):
+                    self._side_effect = SideEffect(side_effect)
+                else:
+                    raise TypeError(f"configure: side_effect must be a SideEffect instance or a callable, not {type(side_effect)}.")
+            else: # side_effect is None or already a SideEffect instance
+                self._side_effect = side_effect
+
+        if recursive is not ...:
+            if not isinstance(recursive, bool):
+                raise TypeError("configure: 'recursive' must be a boolean value.")
+            self._recursive = recursive
+
+        if strict_attrs is not ...:
+            if not isinstance(strict_attrs, bool):
+                raise TypeError("configure: 'strict_attrs' must be a boolean value.")
+            self._strict_attrs = strict_attrs
+        
+        return self.get_mock() # Return the Mock instance for fluent chaining
+
     def get_attribute(self, name: str) -> Any:
 
         if not self.has_attribute(name):
@@ -353,7 +395,7 @@ class MockContext:
         
         return rtnval
 
-    def mock_method(self, name: str, return_value: Optional[Any] = None, side_effect: Optional[Union[Callable, SideEffect]] = None):
+    def mock_method(self, name: str, return_value: Optional[Any] = ..., side_effect: Optional[Union[Callable, SideEffect]] = ...):
         """
             Creates a mock method for the given name.
             
@@ -365,14 +407,14 @@ class MockContext:
         """
         this_mock = self.get_mock()
 
-        mock_method = Mock(return_value=return_value, side_effect=side_effect, mtype=MockType.Method,
+        mock_method = Mock(return_value=return_value if return_value is not ... else None, side_effect=side_effect if side_effect is not ... else None, mtype=MockType.Method,
                            mock_owner=this_mock, recursive=self.recursive, strict_attrs=self._strict_attrs)
 
         self._mock_attributes[name] = mock_method
 
         return mock_method
     
-    def mock_property(self, name: str, return_value: Optional[Any] = None, side_effect: Optional[Union[Callable, SideEffect]] = None):
+    def mock_property(self, name: str, return_value: Optional[Any] = ..., side_effect: Optional[Union[Callable, SideEffect]] = ...):
         """
             Creates a mock property for the given name.
             
@@ -382,7 +424,7 @@ class MockContext:
         """
         this_mock = self.get_mock()
 
-        mock_property = Mock(return_value=return_value, side_effect=side_effect, mtype=MockType.Property,
+        mock_property = Mock(return_value=return_value if return_value is not ... else None, side_effect=side_effect if side_effect is not ... else None, mtype=MockType.Property,
                              mock_owner=this_mock, recursive=self.recursive, strict_attrs=self._strict_attrs)
 
         self._mock_attributes[name] = mock_property
@@ -411,32 +453,6 @@ class MockContext:
             :param value: The value to set for the attribute.
         """
         self._mock_attributes[name] = value
-
-        return
-    
-    def set_return_value(self, value: Any):
-        """
-            Sets the return value of this mock context.
-        
-            :param value: The value to set as the return value.
-        """
-        self._return_value = value
-
-        return
-
-    def set_side_effect(self, side_effect: Optional[Union[Callable, SideEffect]]):
-        """
-            Sets the side effect of this mock context.
-
-            :param side_effect: The callable to set as the side effect.
-        """
-        if side_effect is not None and not isinstance(side_effect, SideEffect):
-            if callable(side_effect):
-                self._side_effect = SideEffect(side_effect)
-            else:
-                raise TypeError(f"side_effect must be a SideEffect instance or a callable, not {type(side_effect)}.")
-        else:
-            self._side_effect = side_effect
 
         return
 
@@ -472,7 +488,6 @@ class MockContext:
         # self._mock_calls.append(('', args, kwargs))
 
 
-
 class Mock:
 
     def __init__(self, *, mock_attributes: Optional[Dict[str, Any]] = None, return_value: Optional[Any] = None,
@@ -499,11 +514,14 @@ class Mock:
         if mtype is None:
             mtype = MockType.Generic
             if reference is not None:
-                mtype = MockContext.determine_mock_type(reference)
+                mtype = MockContext.determine_mock_type(reference if reference is not ... else None)
 
-        self._mock_context = MockContext(self, mtype, mock_attributes, reference=reference, return_value=return_value,
-                                         side_effect=side_effect, mock_owner=mock_owner, recursive=recursive,
-                                         strict_attrs=strict_attrs)
+        self._mock_context = MockContext(self, mtype, mock_attributes, 
+                                         reference=reference if reference is not ... else None, 
+                                         return_value=return_value if return_value is not ... else None,
+                                         side_effect=side_effect if side_effect is not ... else None, 
+                                         mock_owner=mock_owner if mock_owner is not ... else None, 
+                                         recursive=recursive, strict_attrs=strict_attrs)
 
         return
 
@@ -530,6 +548,19 @@ class Mock:
     @property
     def mock_calls(self) -> List[Tuple[str, Tuple[Any, ...], Dict[str, Any]]]:
         return self._mock_context.mock_calls
+
+    def configure(self, *, return_value: Optional[Any] = ..., side_effect: Optional[Union[Callable, SideEffect]] = ...,
+                  recursive: Optional[bool] = ..., strict_attrs: Optional[bool] = ...):
+        """
+            Configures this mock's behavior by delegating to its context.
+            Allows setting return_value, side_effect, recursive, and strict_attrs.
+            Returns self for fluent chaining.
+        """
+        # The '...' sentinel is used by MockContext.configure to know if an arg was passed.
+        self._mock_context.configure(return_value=return_value,
+                                     side_effect=side_effect,
+                                     recursive=recursive, strict_attrs=strict_attrs)
+        return self
 
     def __call__(self, *args, **kwargs) -> Any:
         """
@@ -628,9 +659,9 @@ class Mock:
 
             # Handle special mock configuration attributes
             if name == "return_value":
-                self._mock_context.set_return_value(value)
+                self._mock_context.configure(return_value=value)
             elif name == "side_effect":
-                self._mock_context.set_side_effect(value)
+                self._mock_context.configure(side_effect=value)
             elif name == "recursive":
                 self._mock_context.recursive = value
             else:

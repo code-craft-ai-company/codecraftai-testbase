@@ -124,7 +124,7 @@ def debug_recursive_mock():
     recursive_mock = Mock(recursive=True)
 
     # Scenario 1: Setting return_value via the mock_context's dedicated setter method
-    recursive_mock.foo.bar.baz.mock_context().set_return_value("Deeply Mocked Value")
+    recursive_mock.foo.bar.baz.configure(return_value="Deeply Mocked Value")
     rtnval = recursive_mock.foo.bar.baz()
     print(f"Called recursive_mock.foo.bar.baz(), got: {rtnval}")
     assert rtnval == "Deeply Mocked Value"
@@ -135,7 +135,7 @@ def debug_recursive_mock():
 
     # Scenario 2: Setting return_value via mock_context()
     child_mock_1 = recursive_mock.alpha.beta
-    child_mock_1.mock_context().set_return_value("Context Set Return Value for alpha.beta")
+    child_mock_1.configure(return_value="Context Set Return Value for alpha.beta")
     rtnval_context_set = child_mock_1()
     print(f"Called recursive_mock.alpha.beta() after context set, got: {rtnval_context_set}")
     assert rtnval_context_set == "Context Set Return Value for alpha.beta"
@@ -145,7 +145,7 @@ def debug_recursive_mock():
         print("simple_side_effect via context called!")
         return "Context Set Side Effect"
     child_mock_2 = recursive_mock.delta.epsilon
-    child_mock_2.mock_context().set_side_effect(simple_side_effect)
+    child_mock_2.configure(side_effect=simple_side_effect)
     rtnval_side_effect_context = child_mock_2()
     print(f"Called recursive_mock.delta.epsilon() after context side_effect set, got: {rtnval_side_effect_context}")
     assert rtnval_side_effect_context == "Context Set Side Effect"
@@ -164,7 +164,7 @@ def debug_patch_module_function():
     # Patching 'os.path.exists' for this example
     print(f"Original os.path.exists('/tmp'): {os.path.exists('/tmp')}")
     with create_module_patch(os.path, "exists", recursive=True) as mock_exists:
-        mock_exists.mock_context().set_return_value("Patched Exists!")
+        mock_exists.configure(return_value="Patched Exists!")
         rtnval = os.path.exists("/some/path")
         print(f"Called patched os.path.exists, got: {rtnval}")
         assert rtnval == "Patched Exists!"
@@ -174,7 +174,7 @@ def debug_patch_class_method():
     print("\n--- debug_patch_class_method ---")
     print(f"Original SomeClass.class_method('val'): {SomeClass.class_method('val')}")
     with create_class_patch(SomeClass, "class_method") as mock_cm:
-        mock_cm.mock_context().set_return_value("Patched Class Method")
+        mock_cm.configure(return_value="Patched Class Method")
         rtnval = SomeClass.class_method("another_val")
         print(f"Called patched SomeClass.class_method, got: {rtnval}")
         assert rtnval == "Patched Class Method"
@@ -184,7 +184,7 @@ def debug_patch_static_method():
     print("\n--- debug_patch_static_method ---")
     print(f"Original SomeClass.static_method('val'): {SomeClass.static_method('val')}")
     with create_class_patch(SomeClass, "static_method") as mock_sm: # Patching static method is same as class method
-        mock_sm.mock_context().set_return_value("Patched Static Method")
+        mock_sm.configure(return_value="Patched Static Method")
         rtnval = SomeClass.static_method("another_val")
         print(f"Called patched SomeClass.static_method, got: {rtnval}")
         assert rtnval == "Patched Static Method"
@@ -195,11 +195,40 @@ def debug_patch_instance_method():
     obj = SomeClass()
     print(f"Original obj.instance_method('val'): {obj.instance_method('val')}")
     with create_instance_patch(obj, "instance_method") as mock_im:
-        mock_im.mock_context().set_return_value("Patched Instance Method")
+        mock_im.configure(return_value="Patched Instance Method")
         rtnval = obj.instance_method("another_val")
         print(f"Called patched obj.instance_method, got: {rtnval}")
         assert rtnval == "Patched Instance Method"
     print(f"Restored obj.instance_method('val'): {obj.instance_method('val')}")
+
+def debug_mock_configure_method():
+    print("\n--- debug_mock_configure_method ---")
+    
+    # Create a recursive mock to get dynamically created children
+    mock_obj = Mock(recursive=True)
+
+    # Configure mocka.mockb
+    mock_b = mock_obj.alpha.beta # mock_b is now a Mock instance
+    mock_b.configure(return_value=5)
+    
+    rtn_b = mock_obj.alpha.beta()
+    print(f"Called mock_obj.alpha.beta() after configure, got: {rtn_b}")
+    assert rtn_b == 5
+    mock_obj.alpha.beta.assert_called_once_with() # Verify it was called
+
+    # Configure mocka.mockc with a side effect
+    def my_side_effect(x, y):
+        print(f"my_side_effect called with x={x}, y={y}")
+        return x + y
+    
+    mock_c = mock_obj.alpha.gamma # mock_c is another Mock instance
+    mock_c.configure(side_effect=my_side_effect, recursive=False) # Also make this child non-recursive
+    
+    rtn_c = mock_obj.alpha.gamma(10, 20)
+    print(f"Called mock_obj.alpha.gamma(10, 20) after configure, got: {rtn_c}")
+    assert rtn_c == 30
+    mock_obj.alpha.gamma.assert_called_once_with(10, 20)
+    assert mock_obj.alpha.gamma.mock_context().recursive is False
 
 def main_debug_mocking():
     debug_mock_simple_function_return_value()
@@ -212,6 +241,7 @@ def main_debug_mocking():
     debug_patch_class_method()
     debug_patch_static_method()
     debug_patch_instance_method()
+    debug_mock_configure_method()
     return
 
 if __name__ == "__main__":

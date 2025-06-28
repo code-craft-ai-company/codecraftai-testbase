@@ -21,6 +21,7 @@ click = "^8.1.8"
 automojo-errors = { git = "https://github.com/automationmojo/automojo-errors.git", branch = "main" }
 automojo-foundation = { git = "https://github.com/automationmojo/automojo-foundation.git", branch = "main" }
 automojo-interfaces = { git = "https://github.com/automationmojo/automojo-interfaces.git", branch = "main" }
+automojo-dataprofiles = { git = "https://github.com/automationmojo/automojo-dataprofiles.git", branch = "main" }
 automojo-waiting = { git = "https://github.com/automationmojo/automojo-waiting.git", branch = "main" }
 
 

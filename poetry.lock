@@ -19,7 +19,7 @@ automojo-testbase = {git = "https://github.com/automationmojo/automojo-testbase.
 type = "git"
 url = "https://github.com/automationmojo/automojo-dataprofiles.git"
 reference = "main"
-resolved_reference = "7c95b6b250dc8dcd5fb770651bbee91b0e6aa4dc"
+resolved_reference = "befda1de07c3c99520e1b35ba6c77bd3c20217db"
 
 [[package]]
 name = "automojo-errors"
@@ -57,7 +57,7 @@ pyyaml = "^6.0.2"
 type = "git"
 url = "https://github.com/automationmojo/automojo-foundation.git"
 reference = "main"
-resolved_reference = "89e1a2b670afe67ca146026be8771774ea6c0563"
+resolved_reference = "e12069d943ce6e3f85440ee50a53a667fc9f6233"
 
 [[package]]
 name = "automojo-interfaces"
@@ -87,7 +87,7 @@ develop = false
 type = "git"
 url = "https://github.com/automationmojo/automojo-presence.git"
 reference = "main"
-resolved_reference = "b2a5144741ce57d0d8d504d0d09fc243ebb3cbb0"
+resolved_reference = "acb18071204876757fa6939e9d9d77a4d25d64f4"
 
 [[package]]
 name = "automojo-waiting"

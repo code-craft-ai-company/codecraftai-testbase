@@ -4,7 +4,7 @@ import unittest
 from collections import OrderedDict
 from automojo.presence.contextpaths import ContextPaths
 from automojo.presence.wellknown import ContextSingleton
-from automojo.foundation.jsos import CHAR_RECORD_SEPERATOR
+from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
 from automojo.testbase.sequencing.testactivity import TestActivity
 from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope
 from automojo.testbase.sequencing.sequencerscopebase import SequencerScopeBase

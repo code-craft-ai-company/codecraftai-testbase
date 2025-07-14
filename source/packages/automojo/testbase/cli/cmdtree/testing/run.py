@@ -12,7 +12,7 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
-from typing import List
+from typing import List, Union
 
 import logging
 import os
@@ -72,10 +72,11 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
 @click.option("--postrun-diagnostic", is_flag=True, default=False, required=False, help=HELP_POSTRUN_DIAGNOSTIC)
 @click.option("--include-marker-exp", required=False, multiple=True, help=HELP_INCLUDE_MARKER_EXP)
 @click.option("--exclude-marker-exp", required=False, multiple=True, help=HELP_EXCLUDE_MARKER_EXP)
-def command_testbase_testing_run(root, includes, excludes, output, start, runid, branch, build, flavor, job_id, job_initiator,
-                        job_label, job_name, job_owner, console_level, logfile_level,
-                        debugger, breakpoints, prerun_diagnostic, postrun_diagnostic, include_marker_exp,
-                        exclude_marker_exp):
+def command_testbase_testing_run(root: Union[str, None], includes: List[str], excludes: List[str], output: Union[str, None], start: Union[str, None],
+                                 runid: Union[str, None], branch: Union[str, None], build: Union[str, None], flavor: Union[str, None], job_id: Union[str, None],
+                                 job_initiator: Union[str, None], job_label: Union[str, None], job_name: Union[str, None], job_owner: Union[str, None],
+                                 console_level: Union[str, None], logfile_level: Union[str, None], debugger: Union[str, None], breakpoints: List[str],
+                                 prerun_diagnostic: bool, postrun_diagnostic: bool, include_marker_exp: List[str], exclude_marker_exp: List[str]):
 
 
     # pylint: disable=unused-import,import-outside-toplevel

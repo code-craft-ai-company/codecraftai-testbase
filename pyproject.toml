@@ -19,9 +19,12 @@ packages = [{include="automojo", from="source/packages"}]
 python = ">=3.10,<4.0"
 click = "^8.1.8"
 automojo-errors = { git = "https://github.com/automationmojo/automojo-errors.git", branch = "main" }
-automojo-foundation = { git = "https://github.com/automationmojo/automojo-foundation.git", branch = "main" }
+automojo-presence = { git = "https://github.com/automationmojo/automojo-presence.git", branch = "main" }
+automojo-configuration = { git = "https://github.com/automationmojo/automojo-configuration.git", branch = "main" }
+automojo-runtime = { git = "https://github.com/automationmojo/automojo-runtime.git", branch = "main" }
 automojo-interfaces = { git = "https://github.com/automationmojo/automojo-interfaces.git", branch = "main" }
 automojo-dataprofiles = { git = "https://github.com/automationmojo/automojo-dataprofiles.git", branch = "main" }
+automojo-xmodules = { git = "https://github.com/automationmojo/automojo-xmodules.git", branch = "main" }
 automojo-waiting = { git = "https://github.com/automationmojo/automojo-waiting.git", branch = "main" }
 
 

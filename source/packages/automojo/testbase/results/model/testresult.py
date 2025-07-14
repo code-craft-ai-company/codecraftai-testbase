@@ -24,7 +24,7 @@ from automojo.testbase.results.model.resultcode import ResultCode
 from automojo.testbase.results.model.resultnode import ResultNode
 from automojo.testbase.results.model.resulttype import ResultType
 
-from automojo.foundation.xdatetime import format_datetime_with_fractional
+from automojo.xmodules.xdatetime import format_datetime_with_fractional
 
 class TestResult(ResultNode):
     """

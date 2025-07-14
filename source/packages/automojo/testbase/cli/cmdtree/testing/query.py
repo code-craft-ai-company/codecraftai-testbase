@@ -13,7 +13,7 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-from typing import List
+from typing import List, Union
 
 import logging
 import os
@@ -35,8 +35,7 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
 @click.option("--includes", "-i", multiple=True, help=HELP_INCLUDES)
 @click.option("--include-marker-exp", required=False, multiple=True, help=HELP_INCLUDE_MARKER_EXP)
 @click.option("--exclude-marker-exp", required=False, multiple=True, help=HELP_EXCLUDE_MARKER_EXP)
-def command_testbase_testing_query(root, includes, excludes,
-    include_marker_exp, exclude_marker_exp):
+def command_testbase_testing_query(root: Union[str, None], includes: List[str], excludes: List[str], include_marker_exp: List[str], exclude_marker_exp: List[str]):
     
     # pylint: disable=unused-import,import-outside-toplevel
 
@@ -47,13 +46,13 @@ def command_testbase_testing_query(root, includes, excludes,
     # IMPORTANT: We need to load the context first because it will trigger the loading
     # of the default user configuration
 
-    from automojo.foundation.collections.contextpaths import ContextPaths
-    from automojo.foundation.collections.wellknown import ContextSingleton
+    from automojo.presence.contextpaths import ContextPaths
+    from automojo.presence.wellknown import ContextSingleton
 
-    from automojo.foundation.xpython import prepend_python_path
+    from automojo.xmodules.xpython import prepend_python_path
 
-    from automojo.foundation.runtime.activation import activate_runtime, ActivationProfile
-    from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+    from automojo.runtime.activation import activate_runtime, ActivationProfile
+    from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
 
     # STEP 2 - Resolve the configuration variables (performed by the root command)
 
@@ -68,7 +67,7 @@ def command_testbase_testing_query(root, includes, excludes,
 
     # STEP 4 - Apply any Option Overrides
 
-    from automojo.foundation.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
+    from automojo.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
 
     from automojo.testbase.markers import MetaFilter, parse_marker_expression
 
@@ -114,7 +113,7 @@ def command_testbase_testing_query(root, includes, excludes,
 
     logger = logging.getLogger()
 
-    from automojo.foundation.extension.wellknown import ConfiguredSuperFactorySingleton
+    from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
     from automojo.testbase.extensionprotocols import TestBaseExtensionProtocol
 
     sfactory = ConfiguredSuperFactorySingleton()

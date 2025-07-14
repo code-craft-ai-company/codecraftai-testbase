@@ -19,9 +19,9 @@ import click
 
 
 from automojo.testbase.server.resultserver import TestResultServer, TestResultRequestHandler, try_create_bug_server_interface_from_environment
-from automojo.foundation.runtime.activation import activate_profile_service
-from automojo.foundation.runtime.paths import get_presence_directory
-from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+from automojo.runtime.activation import activate_profile_service
+from automojo.runtime.paths import get_presence_directory
+from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
 
 
 HELP_DIRECTORY = "The root directory to serve the test results from."

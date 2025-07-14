@@ -19,15 +19,15 @@ from typing import List, Optional
 import os
 import traceback
 
-from automojo.foundation.collections.contextpaths import ContextPaths
+from automojo.presence.contextpaths import ContextPaths
 from automojo.foundation.collections.contextuser import ContextUser
 
-from automojo.foundation.xformatting import CommandOutputFormat
-from automojo.foundation.xdebugger import WELLKNOWN_BREAKPOINTS, debugger_wellknown_breakpoint_entry
-from automojo.foundation.xlogging.foundations import EnhancedLogger
+from automojo.xmodules.xformatting import CommandOutputFormat
+from automojo.xmodules.xdebugger import WELLKNOWN_BREAKPOINTS, debugger_wellknown_breakpoint_entry
+from automojo.xmodules.xlogging.foundations import EnhancedLogger
 
-from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES, DefaultValue
-from automojo.foundation.runtime.paths import (
+from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES, DefaultValue
+from automojo.runtime.paths import (
     get_summary_html_template_source,
     get_summary_static_resource_dest_dir,
     get_summary_static_resource_src_dir,

@@ -18,7 +18,7 @@ import inspect
 
 from automojo.errors.exceptions import SemanticError
 
-from automojo.foundation.xinspect import is_typed_from_type
+from automojo.xmodules.xinspect import is_typed_from_type
 
 
 from automojo.testbase.origins.resourceorigin import ResourceOrigin

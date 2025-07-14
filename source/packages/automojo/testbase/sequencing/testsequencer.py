@@ -26,15 +26,15 @@ import uuid
 from io import TextIOWrapper
 from types import TracebackType
 
-from automojo.foundation.collections.contextuser import ContextUser
-from automojo.foundation.collections.contextpaths import ContextPaths
+from automojo.xmodules.xcollections.contextuser import ContextUser
 
 from automojo.errors.exceptions import SemanticError
 
-from automojo.foundation.ximport import import_file
+from automojo.xmodules.ximport import import_file
+from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
+from automojo.xmodules.xdebugger import WELLKNOWN_BREAKPOINTS, debugger_wellknown_breakpoint_code_append
 
-from automojo.foundation.jsos import CHAR_RECORD_SEPERATOR
-from automojo.foundation.xdebugger import WELLKNOWN_BREAKPOINTS, debugger_wellknown_breakpoint_code_append
+from automojo.presence.contextpaths import ContextPaths
 
 from automojo.testbase.injection.injectionregistry import injection_registry
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
@@ -54,7 +54,7 @@ from automojo.testbase.results.model.testresult import TestResult
 
 from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 
-from automojo.foundation.runtime.paths import get_path_for_testresults, get_path_for_diagnostics
+from automojo.runtime.paths import get_path_for_testresults, get_path_for_diagnostics
 
 from automojo.testbase.constraints import Constraints
 from automojo.testbase.testcollector import TestCollector

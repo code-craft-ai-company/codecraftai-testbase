@@ -30,8 +30,8 @@ from automojo.errors.xtraceback import (
 )
 
 
-from automojo.foundation.xdatetime import format_datetime_with_fractional
-from automojo.foundation.xformatting import indent_lines_list
+from automojo.xmodules.xdatetime import format_datetime_with_fractional
+from automojo.xmodules.xformatting import indent_lines_list
 
 from automojo.testbase.results.model.resultcode import ResultCode
 from automojo.testbase.results.model.resultnode import ResultNode

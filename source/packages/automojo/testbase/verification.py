@@ -19,7 +19,7 @@ import re
 
 from pprint import pformat
 
-from automojo.foundation.xformatting import indent_lines
+from automojo.xmodules.xformatting import indent_lines
 
 from automojo.errors.xtraceback import TracebackFormatPolicy
 

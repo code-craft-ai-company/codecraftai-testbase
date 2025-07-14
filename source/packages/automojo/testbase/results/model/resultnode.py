@@ -28,7 +28,7 @@ from automojo.errors.xtraceback import TracebackDetail
 from automojo.testbase.results.model.resultcode import ResultCode
 from automojo.testbase.results.model.resulttype import ResultType
 
-from automojo.foundation.xdatetime import format_datetime_with_fractional
+from automojo.xmodules.xdatetime import format_datetime_with_fractional
 
 class ResultNode:
     """

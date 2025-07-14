@@ -12,7 +12,7 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-from automojo.foundation.constants import URL_SEPARATOR
+from automojo.xmodules.constants import URL_SEPARATOR
 
 
 HELP_ROOT = "The root directory to use when scanning for tests."

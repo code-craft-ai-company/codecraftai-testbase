@@ -21,7 +21,7 @@ from datetime import datetime
 from automojo.testbase.results.model.resulttype import ResultType
 from automojo.testbase.results.model.resultcontainer import ResultContainer
 
-from automojo.foundation.xdatetime import format_datetime_with_fractional
+from automojo.xmodules.xdatetime import format_datetime_with_fractional
 
 
 class TaskingGroup(ResultContainer):

@@ -20,7 +20,7 @@ import sys
 
 import click
 
-from automojo.foundation.xlogging.levels import LOG_LEVEL_NAMES
+from automojo.xmodules.xlogging.levels import LOG_LEVEL_NAMES
 from automojo.interfaces.itestjob import ITestJob
 
 from automojo.testbase.cli.cmdtree.testing.constants import (
@@ -87,15 +87,15 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
     # IMPORTANT: We need to load the context first because it will trigger the loading
     # of the default user configuration
 
-    from automojo.foundation.collections.contextpaths import ContextPaths
-    from automojo.foundation.collections.wellknown import ContextSingleton
+    from automojo.presence.contextpaths import ContextPaths
+    from automojo.presence.wellknown import ContextSingleton
 
-    from automojo.foundation.xpython import prepend_python_path
+    from automojo.xmodules.xpython import prepend_python_path
 
-    from automojo.foundation.runtime.activation import activate_runtime, ActivationProfile
-    from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+    from automojo.runtime.activation import activate_runtime, ActivationProfile
+    from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
     
-    from automojo.foundation.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
+    from automojo.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
 
     # STEP 1 - Initialize the Runtime (Performed by the root command)
 
@@ -220,7 +220,7 @@ def command_testbase_testing_run(root, includes, excludes, output, start, runid,
 
     # STEP 8 - Create and kick off the job
 
-    from automojo.foundation.extension.wellknown import ConfiguredSuperFactorySingleton
+    from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
     from automojo.testbase.extensionprotocols import TestBaseExtensionProtocol
 
     # At this point in the code, we either lookup an existing test job or we create a test job

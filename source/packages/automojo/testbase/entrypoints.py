@@ -22,10 +22,10 @@ import os
 import sys
 
 
-from automojo.foundation.collections.wellknown import ContextSingleton
-from automojo.foundation.runtime.paths import get_path_for_testresults
-from automojo.foundation.xlogging.levels import LOG_LEVEL_NAMES
-from automojo.foundation.ximport import import_by_name
+from automojo.presence.wellknown import ContextSingleton
+from automojo.runtime.paths import get_path_for_testresults
+from automojo.xmodules.xlogging.levels import LOG_LEVEL_NAMES
+from automojo.xmodules.ximport import import_by_name
 
 from automojo.testbase.injection.injectionregistry import InjectionRegistry
 
@@ -45,7 +45,7 @@ def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
     from automojo.testbase.initialize import initialize_testbase_runtime, initialize_testbase_results
     initialize_testbase_runtime()
 
-    from automojo.foundation.runtime.activation import activate_runtime, ActivationProfile
+    from automojo.runtime.activation import activate_runtime, ActivationProfile
 
     activate_runtime(profile=ActivationProfile.TestRun)
 
@@ -74,7 +74,7 @@ def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
         os.makedirs(test_results_dir)
     env["output_directory"] = test_results_dir
 
-    from automojo.foundation.xlogging.foundations import logging_initialize
+    from automojo.xmodules.xlogging.foundations import logging_initialize
     logging_initialize()
 
     logger = logging.getLogger()

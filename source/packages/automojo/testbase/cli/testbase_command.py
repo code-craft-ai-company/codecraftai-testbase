@@ -34,7 +34,7 @@ from automojo.testbase.cli.cmdtree.utilities import group_testbase_utilities
 @click.option('-v', '--verbose', count=True)
 def testbase_root_command(verbose):
 
-    from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+    from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
 
     if verbose == 0:
         AM_RUNTIME_VARIABLES.AM_INTERACTIVE_CONSOLE = True

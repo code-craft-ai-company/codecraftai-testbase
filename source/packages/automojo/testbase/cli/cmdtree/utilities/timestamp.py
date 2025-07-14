@@ -20,7 +20,7 @@ import click
 @click.command("timestamp")
 def command_testbase_utilities_timestamp():
 
-    from automojo.foundation.xdatetime import DATETIME_FORMAT_FILESYSTEM
+    from automojo.xmodules.xdatetime import DATETIME_FORMAT_FILESYSTEM
 
     now = datetime.now()
     timestamp = now.strftime(DATETIME_FORMAT_FILESYSTEM).replace(" ", "T")

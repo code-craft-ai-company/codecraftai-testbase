@@ -35,7 +35,7 @@ from http import HTTPStatus
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
-from automojo.foundation.runtime.variablenames import AM_RUNTIME_VARNAMES
+from automojo.runtime.variablenames import AM_RUNTIME_VARNAMES
 
 logger = logging.getLogger()
 

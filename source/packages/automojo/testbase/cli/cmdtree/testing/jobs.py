@@ -12,6 +12,8 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
+from typing import List, Union
+
 import argparse
 import logging
 import os
@@ -19,7 +21,7 @@ import sys
 
 import click
 
-from automojo.foundation.xlogging.levels import LOG_LEVEL_NAMES
+from automojo.xmodules.xlogging.levels import LOG_LEVEL_NAMES
 
 @click.group("jobs", help="Contains commands for working with test jobs.")
 def group_testbase_testing_jobs():
@@ -61,7 +63,8 @@ def command_testbase_testing_jobs_show():
 @click.option("--flavor", default=None, required=False, help=HELP_FLAVOR)
 @click.option("--console-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_CONSOLE_LOG_LEVEL)
 @click.option("--logfile-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_FILE_LOG_LEVEL)
-def command_testbase_testing_jobs_run(root, job, output, start, branch, build, flavor, console_level, logfile_level):
+def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: Union[str, None], start: Union[str, None], branch: Union[str, None],
+                                      build: Union[str, None], flavor: Union[str, None], console_level: Union[str, None], logfile_level: Union[str, None]):
 
     # pylint: disable=unused-import,import-outside-toplevel
 
@@ -72,11 +75,11 @@ def command_testbase_testing_jobs_run(root, job, output, start, branch, build, f
     # IMPORTANT: We need to load the context first because it will trigger the loading
     # of the default user configuration
 
-    from automojo.foundation.collections.contextpaths import ContextPaths
-    from automojo.foundation.collections.wellknown import ContextSingleton
+    from automojo.presence.contextpaths import ContextPaths
+    from automojo.presence.wellknown import ContextSingleton
 
-    from automojo.foundation.ximport import import_by_name
-    from automojo.foundation.xpython import prepend_python_path
+    from automojo.xmodules.ximport import import_by_name
+    from automojo.xmodules.xpython import prepend_python_path
 
     try:
         ctx = ContextSingleton()
@@ -94,14 +97,14 @@ def command_testbase_testing_jobs_run(root, job, output, start, branch, build, f
 
         # We perform activation a little later in the testrunner.py file so we can
         # handle exceptions in the context of testrunner_main function
-        from automojo.foundation.runtime.activation import activate_runtime, ActivationProfile
+        from automojo.runtime.activation import activate_runtime, ActivationProfile
         activate_runtime(profile=ActivationProfile.Console)
 
         from automojo.testbase.initialize import initialize_testbase_results
         initialize_testbase_results()
 
         # Initialize logging
-        from automojo.foundation.xlogging.foundations import logging_initialize
+        from automojo.xmodules.xlogging.foundations import logging_initialize
         logging_initialize()
 
         logger = logging.getLogger()
@@ -109,7 +112,7 @@ def command_testbase_testing_jobs_run(root, job, output, start, branch, build, f
         tpmod = sys.modules["automojo.testbase"]
         tpmod.logger = logger
 
-        from automojo.foundation.extension.wellknown import ConfiguredSuperFactorySingleton
+        from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
         from automojo.testbase.extensionprotocols import TestBaseExtensionProtocol
 
         # At this point in the code, we either lookup an existing test job or we create a test job

@@ -21,7 +21,7 @@ import json
 from datetime import datetime
 
 
-from automojo.foundation.jsos import CHAR_RECORD_SEPERATOR
+from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
 
 from automojo.testbase.results.model.buildinfo import BuildInfo
 from automojo.testbase.results.model.jobinfo import JobInfo

@@ -20,7 +20,7 @@ import fnmatch
 import sys
 import traceback
 
-from automojo.foundation.ximport import import_by_name
+from automojo.xmodules.ximport import import_by_name
 
 from automojo.testbase.testref import TestRef
 

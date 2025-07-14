@@ -23,7 +23,6 @@ automojo-presence = { git = "https://github.com/automationmojo/automojo-presence
 automojo-configuration = { git = "https://github.com/automationmojo/automojo-configuration.git", branch = "main" }
 automojo-runtime = { git = "https://github.com/automationmojo/automojo-runtime.git", branch = "main" }
 automojo-interfaces = { git = "https://github.com/automationmojo/automojo-interfaces.git", branch = "main" }
-automojo-dataprofiles = { git = "https://github.com/automationmojo/automojo-dataprofiles.git", branch = "main" }
 automojo-xmodules = { git = "https://github.com/automationmojo/automojo-xmodules.git", branch = "main" }
 automojo-waiting = { git = "https://github.com/automationmojo/automojo-waiting.git", branch = "main" }
 

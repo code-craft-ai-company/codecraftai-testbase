@@ -19,8 +19,8 @@ import json
 
 from datetime import datetime
 
-from automojo.foundation.xdatetime import format_datetime_with_fractional
-from automojo.foundation.jsos import CHAR_RECORD_SEPERATOR
+from automojo.xmodules.xdatetime import format_datetime_with_fractional
+from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
 
 from types import TracebackType
 

@@ -15,13 +15,13 @@ __credits__ = []
 
 import os
 
-from automojo.foundation.collections.contextpaths import ContextPaths
-from automojo.foundation.collections.wellknown import ContextSingleton
+from automojo.presence.contextpaths import ContextPaths
+from automojo.presence.wellknown import ContextSingleton
 
-from automojo.foundation.xlogging.foundations import logging_initialize
+from automojo.xmodules.xlogging.foundations import logging_initialize
     
-from automojo.foundation.runtime.initialize import initialize_runtime, AM_RUNTIME_STATE
-from automojo.foundation.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+from automojo.runtime.initialize import initialize_runtime, AM_RUNTIME_STATE
+from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
 
 TESTPLUS_DIR = os.path.dirname(__file__)
 

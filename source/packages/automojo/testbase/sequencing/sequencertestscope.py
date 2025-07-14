@@ -25,7 +25,7 @@ from collections import OrderedDict
 from automojo.errors.exceptions import SkipError
 from automojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
 
-from automojo.foundation.runtime.paths import get_path_for_testcase_by_products
+from automojo.runtime.paths import get_path_for_testcase_by_products
 
 from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 

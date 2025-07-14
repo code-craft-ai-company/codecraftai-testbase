@@ -19,12 +19,13 @@ from typing import List, Optional
 import os
 import traceback
 
-from automojo.presence.contextpaths import ContextPaths
-from automojo.foundation.collections.contextuser import ContextUser
-
+from automojo.xmodules.xcollections.contextuser import ContextUser
 from automojo.xmodules.xformatting import CommandOutputFormat
-from automojo.xmodules.xdebugger import WELLKNOWN_BREAKPOINTS, debugger_wellknown_breakpoint_entry
-from automojo.xmodules.xlogging.foundations import EnhancedLogger
+from automojo.xmodules.debugging import debugger_wellknown_breakpoint_entry
+from automojo.xmodules.xlogging.enhancedloggers import EnhancedLogger
+
+from automojo.presence.contextpaths import ContextPaths
+from automojo.presence.wellknown import ContextSingleton
 
 from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES, DefaultValue
 from automojo.runtime.paths import (
@@ -34,6 +35,7 @@ from automojo.runtime.paths import (
     get_path_for_testresults
 )
 
+from automojo.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
 from automojo.testbase.results.model.buildinfo import BuildInfo
 from automojo.testbase.results.model.jobinfo import JobInfo
 from automojo.testbase.results.model.pipelineinfo import PipelineInfo
@@ -173,7 +175,12 @@ class TestJob(ContextUser, ITestJob):
             # order in the automation code and that we provide the ability for configuration
             # issues to be discovered as early as possible.
 
-            debugger_wellknown_breakpoint_entry(WELLKNOWN_BREAKPOINTS.TEST_DISCOVERY)
+            ctx = ContextSingleton()
+
+            debugger_name = ctx.lookup(ContextPaths.DEBUG_DEBUGGER)
+            configured_breakpoints = ctx.lookup(ContextPaths.DEBUG_BREAKPOINTS)
+            if debugger_name is not None and configured_breakpoints is not None:
+                debugger_wellknown_breakpoint_entry(debugger_name, WELLKNOWN_BREAKPOINTS.TEST_DISCOVERY, configured_breakpoints)
 
             # STEP 1: We discover the tests first so we can build a listing of the
             # Integration and Scope couplings.  We don't want to execute any test code, setup,

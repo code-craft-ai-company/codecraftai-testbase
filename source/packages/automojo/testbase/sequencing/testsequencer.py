@@ -32,9 +32,11 @@ from automojo.errors.exceptions import SemanticError
 
 from automojo.xmodules.ximport import import_file
 from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
-from automojo.xmodules.xdebugger import WELLKNOWN_BREAKPOINTS, debugger_wellknown_breakpoint_code_append
+
+from automojo.xmodules.debugging import debugger_wellknown_breakpoint_code_append
 
 from automojo.presence.contextpaths import ContextPaths
+from automojo.presence.wellknown import ContextSingleton
 
 from automojo.testbase.injection.injectionregistry import injection_registry
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
@@ -56,7 +58,7 @@ from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 
 from automojo.runtime.paths import get_path_for_testresults, get_path_for_diagnostics
 
-from automojo.testbase.constraints import Constraints
+from automojo.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
 from automojo.testbase.testcollector import TestCollector
 from automojo.testbase.testgroup import TestGroup
 from automojo.testbase.testref import TestRef
@@ -582,7 +584,13 @@ class TestSequencer(ContextUser):
             '{}"""'.format(current_indent)
         ]
 
-        debugger_wellknown_breakpoint_code_append(WELLKNOWN_BREAKPOINTS.TESTRUN_START, method_lines, current_indent)
+        ctx = ContextSingleton()
+
+        debugger_name = ctx.lookup(ContextPaths.DEBUG_DEBUGGER)
+        configured_breakpoints = ctx.lookup(ContextPaths.DEBUG_BREAKPOINTS)
+
+        if debugger_name is not None and configured_breakpoints is not None:
+            debugger_wellknown_breakpoint_code_append(debugger_name, WELLKNOWN_BREAKPOINTS.TESTRUN_START, method_lines, current_indent, configured_breakpoints)
 
         method_lines.append('')
         method_lines.append('{}with sequencer.enter_session_scope_context() as ssc:'.format(current_indent))

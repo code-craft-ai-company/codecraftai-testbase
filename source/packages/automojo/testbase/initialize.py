@@ -18,12 +18,14 @@ import os
 from automojo.presence.contextpaths import ContextPaths
 from automojo.presence.wellknown import ContextSingleton
 
-from automojo.xmodules.xlogging.foundations import logging_initialize
-    
+from automojo.runtime.enumerations import JobType
+from automojo.runtime.activation import activate_profile_job
 from automojo.runtime.initialize import initialize_runtime, AM_RUNTIME_STATE
 from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
 
+
 TESTPLUS_DIR = os.path.dirname(__file__)
+
 
 class TestBaseVariables:
     """
@@ -41,9 +43,11 @@ def initialize_testbase_runtime():
         name="automojo"
         home_dir = os.path.join(os.path.expanduser("~"), name)
         initialize_runtime(name=name, home_dir=home_dir, logger_name="TP")
+
     return
 
 def initialize_testbase_results():
+
     dest_static_dir = os.path.join(AM_RUNTIME_VARIABLES.AM_PRESENCE_DIRECTORY, "results", TestBaseVariables.TESTPLUS_RESOURCE_DEST_LEAF)
 
     if AM_RUNTIME_VARIABLES.AM_RESULTS_STATIC_RESOURCE_SRC_DIR is None:
@@ -58,6 +62,6 @@ def initialize_testbase_results():
     ctx.insert(ContextPaths.DIR_RESULTS_RESOURCE_DEST, AM_RUNTIME_VARIABLES.AM_RESULTS_STATIC_RESOURCE_DEST_DIR)
     ctx.insert(ContextPaths.FILE_RESULTS_TEMPLATE, AM_RUNTIME_VARIABLES.AM_RESULTS_STATIC_SUMMARY_TEMPLATE)
     
-    logging_initialize()
+    activate_profile_job(JobType.TestRun)
 
     return

@@ -21,7 +21,7 @@ import types
 import weakref
 
 
-class MockType(enum.StrEnum):
+class MockType(str, enum.Enum):
     """
         The type of the mock object.
     """

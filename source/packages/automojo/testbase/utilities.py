@@ -20,7 +20,7 @@ import json
 import os
 
 from automojo.errors.exceptions import ConfigurationError
-from automojo.foundation.fspath import collect_python_modules
+from automojo.xmodules.fspath import collect_python_modules
 
 def catalog_tree(rootdir: str, ignore_dirs=[]):
     """

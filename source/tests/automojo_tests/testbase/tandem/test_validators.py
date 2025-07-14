@@ -71,7 +71,8 @@ class ValidatorFinalizeTests(unittest.TestCase):
         val = FailingValidator()
         scope = DummyScope()
         val.attach_to_test(scope, "f")
-        val.finalize()
+        with self.assertRaises(RuntimeError) as xe:
+            val.finalize()
         self.assertEqual(val._result._result_code.name, "FAILED")
 
     def test_finalize_error(self):

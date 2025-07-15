@@ -1,14 +1,3 @@
-"""
-    .. module:: automojo.testbase.cli.testbase_command
-    :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module for testbase_command.
-
-    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
-"""
-
-
-
-
 #!/usr/bin/env python3
 """
 .. module:: testbase_command

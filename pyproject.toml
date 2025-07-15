@@ -31,6 +31,9 @@ automojo-waiting = { git = "https://github.com/automationmojo/automojo-waiting.g
 
 [tool.poetry.group.dbio.dependencies]
 
+[tool.poetry.scripts]
+testbase = "automojo.testbase.cli.testbase_command:testbase_root_command"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

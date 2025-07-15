@@ -101,13 +101,10 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
     # STEP 1 - Initialize the Runtime (Performed by the root command)
 
     # STEP 2 - Resolve the configuration variables (Performed by the root command)
-
-    # STEP 3 - Activate the runtime for the given activation class (Could be done by a parent command or self)
-    activate_runtime(profile=ActivationProfile.TestRun)
     
     ctx = ContextSingleton()
 
-    # STEP 4 - Apply any "Command Line" option overrides
+    # STEP 3 - Apply any "Command Line" option overrides
 
     from automojo.testbase.markers import MetaFilter, parse_marker_expression
 
@@ -150,7 +147,7 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
     if runid is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_run_id(runid)
 
-    # STEP 6 - Applying runtime options must happen after we have resolved configuration
+    # STEP 4 - Applying runtime options must happen after we have resolved configuration
     # maps because some of those settings will get overridden by the options.  So the runtime
     # needs to be loaded and set first before we apply runtime options
 
@@ -209,7 +206,7 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
         metafilters.append(mfilter)
 
 
-    # STEP 7 - Initialize the Results Output
+    # STEP 5 - Initialize the Results Output
 
     # Initialize testbase results and logging
     from automojo.testbase.initialize import initialize_testbase_results
@@ -219,7 +216,7 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
     logger = logging.getLogger()
 
 
-    # STEP 8 - Create and kick off the job
+    # STEP 6 - Create and kick off the job
 
     from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
     from automojo.testbase.extensionprotocols import TestBaseExtensionProtocol

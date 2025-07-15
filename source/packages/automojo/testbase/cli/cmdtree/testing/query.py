@@ -114,7 +114,7 @@ def command_testbase_testing_query(root: Union[str, None], includes: List[str], 
     logger = logging.getLogger()
 
     from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
-    from automojo.testbase.extensionprotocols import TestBaseExtensionProtocol
+    from automojo.testbase.factoryprotocols import TestBaseExtensionProtocol
 
     sfactory = ConfiguredSuperFactorySingleton()
     TestJobType = sfactory.get_override_types_by_order(TestBaseExtensionProtocol.get_testbase_default_job_type)

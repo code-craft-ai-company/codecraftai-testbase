@@ -113,7 +113,7 @@ def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: 
         tpmod.logger = logger
 
         from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
-        from automojo.testbase.extensionprotocols import TestBaseExtensionProtocol
+        from automojo.testbase.factoryprotocols import TestBaseExtensionProtocol
 
         # At this point in the code, we either lookup an existing test job or we create a test job
         # from the includes, excludes or test_module

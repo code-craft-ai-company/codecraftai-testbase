@@ -7,7 +7,7 @@ from typing import Type
 
 from automojo.extension.factory.factoryextension import FactoryExtension
 
-from automojo.testbase.extensionprotocols import TestBaseExtensionProtocol
+from automojo.testbase.factoryprotocols import TestBaseExtensionProtocol
 
 from automojo.testbase.testjob import TestJob, DefaultTestJob
 

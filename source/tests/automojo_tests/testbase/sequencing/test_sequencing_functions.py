@@ -2,9 +2,14 @@ import os
 import tempfile
 import unittest
 from collections import OrderedDict
+
 from automojo.presence.contextpaths import ContextPaths
 from automojo.presence.wellknown import ContextSingleton
 from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
+
+from automojo.runtime.enumerations import JobType
+from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+
 from automojo.testbase.sequencing.testactivity import TestActivity
 from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope
 from automojo.testbase.sequencing.sequencerscopebase import SequencerScopeBase
@@ -93,6 +98,7 @@ class SequencerTestScopeTests(unittest.TestCase):
         ctx = ContextSingleton()
         self.tempdir = tempfile.TemporaryDirectory()
         ctx.insert(ContextPaths.RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        AM_RUNTIME_VARIABLES.AM_JOB_TYPE = JobType.TestRun
         self.seq = DummySequencer()
         self.rec = DummyRecorder()
 

@@ -62,6 +62,6 @@ def initialize_testbase_results():
     ctx.insert(ContextPaths.DIR_RESULTS_RESOURCE_DEST, AM_RUNTIME_VARIABLES.AM_RESULTS_STATIC_RESOURCE_DEST_DIR)
     ctx.insert(ContextPaths.FILE_RESULTS_TEMPLATE, AM_RUNTIME_VARIABLES.AM_RESULTS_STATIC_SUMMARY_TEMPLATE)
     
-    activate_runtime(ActivationProfile.Job, JobType.TestRun)
+    activate_runtime(profile=ActivationProfile.Job, job_type=JobType.TestRun)
 
     return

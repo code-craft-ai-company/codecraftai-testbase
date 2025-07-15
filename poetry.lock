@@ -89,7 +89,7 @@ automojo-xmodules = {git = "https://github.com/automationmojo/automojo-xmodules.
 type = "git"
 url = "https://github.com/automationmojo/automojo-presence.git"
 reference = "main"
-resolved_reference = "4c31e40218d2884ec2e8134dfc053d76b212593b"
+resolved_reference = "02e65d1c7dddc866dc3cac30d2d1785ab1ae348e"
 
 [[package]]
 name = "automojo-runtime"
@@ -112,7 +112,7 @@ debugpy = "^1.8.12"
 type = "git"
 url = "https://github.com/automationmojo/automojo-runtime.git"
 reference = "main"
-resolved_reference = "1da5644d0a9dc60b55728a0718eab6aca0788f0d"
+resolved_reference = "237434c1ace7f25b79791037ee704fb409dfa16b"
 
 [[package]]
 name = "automojo-waiting"
@@ -147,7 +147,7 @@ debugpy = "^1.8.14"
 type = "git"
 url = "https://github.com/automationmojo/automojo-xmodules.git"
 reference = "main"
-resolved_reference = "245349574413ad572a39a42acb3648409a439e91"
+resolved_reference = "90b5384a84155639594a1f4db5c14c7059e1a0f1"
 
 [[package]]
 name = "certifi"

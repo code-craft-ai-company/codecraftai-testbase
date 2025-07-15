@@ -24,7 +24,7 @@ class TestBaseExtensionProtocol(FactoryProtocolBase):
         Extension protocol used by Automation Mojo testbase tooling.
     """
 
-    ext_protocol_name = "automojo-testbase-default-types"
+    factory_protocol_name = "automojo-testbase-default-types"
 
     def get_testbase_default_job_type() -> Type[TestJob]:
         """

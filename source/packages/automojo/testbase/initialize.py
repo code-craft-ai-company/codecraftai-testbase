@@ -19,7 +19,7 @@ from automojo.presence.contextpaths import ContextPaths
 from automojo.presence.wellknown import ContextSingleton
 
 from automojo.runtime.enumerations import ActivationProfile, JobType
-from automojo.runtime.activation import activate_runtime
+from automojo.runtime.activation import activate_profile_job
 from automojo.runtime.initialize import initialize_runtime, AM_RUNTIME_STATE
 from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
 
@@ -39,10 +39,11 @@ class TestBaseVariables:
     
 
 def initialize_testbase_runtime():
+
     if not AM_RUNTIME_STATE.INITIALIZED:
         name="automojo"
         home_dir = os.path.join(os.path.expanduser("~"), name)
-        initialize_runtime(name=name, home_dir=home_dir, logger_name="TP")
+        initialize_runtime(name=name, home_dir=home_dir, logger_name="TB", log_basename="testrun")
 
     return
 
@@ -62,6 +63,6 @@ def initialize_testbase_results():
     ctx.insert(ContextPaths.DIR_RESULTS_RESOURCE_DEST, AM_RUNTIME_VARIABLES.AM_RESULTS_STATIC_RESOURCE_DEST_DIR)
     ctx.insert(ContextPaths.FILE_RESULTS_TEMPLATE, AM_RUNTIME_VARIABLES.AM_RESULTS_STATIC_SUMMARY_TEMPLATE)
     
-    activate_runtime(profile=ActivationProfile.Job, job_type=JobType.TestRun)
+    activate_profile_job(job_type=JobType.TestRun)
 
     return

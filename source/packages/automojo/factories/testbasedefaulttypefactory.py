@@ -7,12 +7,12 @@ from typing import Type
 
 from automojo.extension.factory.factoryextension import FactoryExtension
 
-from automojo.testbase.factoryprotocols import TestBaseExtensionProtocol
+from automojo.testbase.factoryprotocols import TestBaseFactoryProtocol
 
 from automojo.testbase.testjob import TestJob, DefaultTestJob
 
 
-class TestPlusDefaultExtensionFactory(FactoryExtension, TestBaseExtensionProtocol):
+class TestPlusDefaultExtensionFactory(FactoryExtension, TestBaseFactoryProtocol):
 
     PRECEDENCE = 0
 

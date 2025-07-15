@@ -93,7 +93,6 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
 
     from automojo.xmodules.xpython import prepend_python_path
 
-    from automojo.runtime.activation import activate_runtime, ActivationProfile
     from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
     
     from automojo.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES

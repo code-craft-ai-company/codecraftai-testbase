@@ -19,7 +19,7 @@ from automojo.testbase.testjob import TestJob, DefaultTestJob
 
 from automojo.extension.factory.factoryprotocolbase import FactoryProtocolBase
 
-class TestBaseExtensionProtocol(FactoryProtocolBase):
+class TestBaseFactoryProtocol(FactoryProtocolBase):
     """
         Extension protocol used by Automation Mojo testbase tooling.
     """

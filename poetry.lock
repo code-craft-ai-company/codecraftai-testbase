@@ -147,7 +147,7 @@ debugpy = "^1.8.14"
 type = "git"
 url = "https://github.com/automationmojo/automojo-xmodules.git"
 reference = "main"
-resolved_reference = "66e11d71b29b36fbaf07bfd93048861158baa301"
+resolved_reference = "eab5feb102197bd96406a81a2dc4285d6bbe03ab"
 
 [[package]]
 name = "certifi"

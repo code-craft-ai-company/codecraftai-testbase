@@ -22,7 +22,6 @@ import email.utils
 import html
 import io
 import json
-import logging
 import os
 import posixpath
 import shutil
@@ -35,9 +34,11 @@ from http import HTTPStatus
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+
 from automojo.runtime.variablenames import AM_RUNTIME_VARNAMES
 
-logger = logging.getLogger()
+logger = getEnhancedLogger()
 
 
 SUPPORTED_BUG_SERVERS = ["JIRA"]

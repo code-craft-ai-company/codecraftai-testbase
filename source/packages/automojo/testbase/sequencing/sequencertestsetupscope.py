@@ -15,16 +15,17 @@ __credits__ = []
 
 from typing import TYPE_CHECKING
 
-import logging
 import os
 
 from automojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
 from automojo.errors.exceptions import SkipError
 
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+
 from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 from automojo.testbase.sequencing.sequencerscopebase import SequencerScopeBase
 
-logger = logging.getLogger()
+logger = getEnhancedLogger()
 
 
 if TYPE_CHECKING:

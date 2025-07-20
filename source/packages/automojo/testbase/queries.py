@@ -14,17 +14,17 @@ __credits__ = []
 
 
 import inspect
-import logging
 import os
 import fnmatch
 import sys
 import traceback
 
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 from automojo.xmodules.ximport import import_by_name
 
 from automojo.testbase.testref import TestRef
 
-logger = logging.getLogger()
+logger = getEnhancedLogger()
 
 def collect_test_references(root, included_files, filter_package, filter_module, filter_testname, test_prefix):
     """

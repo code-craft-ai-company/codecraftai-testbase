@@ -13,7 +13,6 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-import logging
 import os
 import threading
 import time
@@ -21,10 +20,14 @@ import uuid
 
 from automojo.errors.exceptions import AbstractMethodError, SemanticError
 from automojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
+
+from automojo.waiting import wait_for_it, TimeoutContext
+
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+
 from automojo.testbase.results.model.testresult import TestResult
 from automojo.testbase.coupling.validatorcoupling import ValidatorCoupling
 from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope
-from automojo.waiting import wait_for_it, TimeoutContext
 
 
 class Validator(ValidatorCoupling):
@@ -43,7 +46,7 @@ class Validator(ValidatorCoupling):
         self._validator_name = None
         self._recorder = None
 
-        self._logger = logging.getLogger()
+        self._logger = getEnhancedLogger()
         return
 
     @property

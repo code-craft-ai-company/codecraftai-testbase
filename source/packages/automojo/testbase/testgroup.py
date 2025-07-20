@@ -14,13 +14,13 @@ __credits__ = []
 
 
 
-import logging
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
 from automojo.testbase.testref import TestRef
-
 from automojo.testbase.injection.injectiongroup import InjectionGroup
 
-logger = logging.getLogger()
+
+logger = getEnhancedLogger()
 
 class TestGroup(InjectionGroup):
     """

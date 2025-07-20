@@ -15,7 +15,6 @@ __credits__ = []
 
 from typing import List, Union
 
-import logging
 import os
 import sys
 
@@ -111,7 +110,8 @@ def command_testbase_testing_query(root: Union[str, None], includes: List[str], 
         mfilter = parse_marker_expression("-" + imexp)
         metafilters.append(mfilter)
 
-    logger = logging.getLogger()
+    from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+    logger = getEnhancedLogger()
 
     from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
     from automojo.testbase.factoryprotocols import TestBaseExtensionProtocol

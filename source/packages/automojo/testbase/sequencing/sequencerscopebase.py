@@ -15,22 +15,20 @@ __credits__ = []
 
 from typing import TYPE_CHECKING
 
-import logging
 import uuid
 
 from automojo.errors.xtraceback import TracebackDetail
 
-from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
+from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 from automojo.testbase.testgroup import TestGroup
 from automojo.testbase.testref import TestRef
 
 if TYPE_CHECKING:
     from automojo.testbase.sequencing.testsequencer import TestSequencer
 
-
-logger = logging.getLogger()
-
+logger = getEnhancedLogger()
 
 class SequencerScopeBase:
     """

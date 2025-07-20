@@ -15,7 +15,6 @@ __credits__ = []
 from typing import Optional
 
 import json
-import logging
 import requests
 import os
 import threading
@@ -25,9 +24,10 @@ import traceback
 from socketserver import _AfInetAddress, ThreadingMixIn
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+
 from automojo.testbase.results.model.forwardinginfo import ForwardingInfo
 from automojo.testbase.results.model.progressinfo import ProgressInfo
-
 from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 
 
@@ -96,7 +96,7 @@ class ProgressConcentratorServer(ThreadingMixIn, HTTPServer):
         self._server_thread = None
         self._server_running = False
 
-        self._logger = logging.getLogger()
+        self._logger = getEnhancedLogger()
 
         return
 

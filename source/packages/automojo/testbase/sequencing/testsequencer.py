@@ -18,7 +18,6 @@ from typing import Any, Dict, List, OrderedDict, Optional, Sequence, Tuple, Type
 
 import collections
 import json
-import logging
 import os
 import sys
 import uuid
@@ -30,9 +29,9 @@ from automojo.xmodules.xcollections.contextuser import ContextUser
 
 from automojo.errors.exceptions import SemanticError
 
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 from automojo.xmodules.ximport import import_file
 from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
-
 from automojo.xmodules.debugging import debugger_wellknown_breakpoint_code_append
 
 from automojo.presence.contextpaths import ContextPaths
@@ -72,7 +71,7 @@ from automojo.testbase.constraints import ConstraintsCatalog
 
 constraints_catalog = ConstraintsCatalog()
 
-logger = logging.getLogger()
+logger = getEnhancedLogger()
 
 
 CONSTRAINT_IMPORT_INSERTION_POINT = "# ------- INSERT CONSTRAINT IMPORTS HERE -------"
@@ -91,9 +90,11 @@ __traceback_format_policy__ = "Brief"
 
 import logging
 
-logger = logging.getLogger()
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
 from automojo.testbase.constraints import ConstraintsCatalog
+
+logger = getEnhancedLogger()
 
 constraints_catalog = ConstraintsCatalog()
 

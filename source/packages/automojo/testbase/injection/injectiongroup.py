@@ -16,17 +16,17 @@ __credits__ = []
 
 from typing import Dict, List, Optional, Union
 
-import logging
 import sys
 
 from automojo.errors.exceptions import SemanticError
 
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+
 from automojo.testbase.injection.injectionregistry import injection_registry
 from automojo.testbase.injection.injectionscope import InjectionScope
-
 from automojo.testbase.injection.injectionmoment import InjectionMoment
 
-logger = logging.getLogger()
+logger = getEnhancedLogger()
 
 class InjectionGroup:
     """

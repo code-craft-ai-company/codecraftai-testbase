@@ -13,7 +13,7 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-import logging
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
 
 class BaseCoupling:
@@ -22,4 +22,4 @@ class BaseCoupling:
         resources.
     """
 
-    logger = logging.getLogger()
+    logger = getEnhancedLogger()

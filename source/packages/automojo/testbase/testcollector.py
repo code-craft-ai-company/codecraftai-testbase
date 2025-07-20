@@ -15,10 +15,11 @@ __credits__ = []
 from typing import Dict, List, Sequence, Tuple
 from types import ModuleType
 
-import logging
 import os
 
 from automojo.errors.exceptions import SemanticError, UnknownParameterError
+
+from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
 from automojo.testbase.markers import MetaFilter
 from automojo.testbase.injection.injectionregistry import injection_registry
@@ -31,7 +32,7 @@ from automojo.testbase.queries import collect_test_references
 from automojo.testbase.testgroup import TestGroup
 from automojo.testbase.testref import TestRef
 
-logger = logging.getLogger()
+logger = getEnhancedLogger()
 
 def catagorize_exclusions(excluded: str) -> Tuple[List[str], List[str]]:
     """

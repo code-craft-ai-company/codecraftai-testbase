@@ -14,7 +14,6 @@ __credits__ = []
 
 from typing import List, Union
 
-import logging
 import os
 import sys
 
@@ -209,11 +208,11 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
 
     # Initialize testbase results and logging
     from automojo.testbase.initialize import initialize_testbase_results
+    from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
     initialize_testbase_results()
 
-    logger = logging.getLogger()
-
+    logger = getEnhancedLogger()
 
     # STEP 6 - Create and kick off the job
 

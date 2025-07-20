@@ -12,10 +12,9 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
-from typing import List, Union
+from typing import Union
 
 import argparse
-import logging
 import os
 import sys
 
@@ -104,10 +103,8 @@ def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: 
         initialize_testbase_results()
 
         # Initialize logging
-        from automojo.xmodules.xlogging.foundations import logging_initialize
-        logging_initialize()
-
-        logger = logging.getLogger()
+        from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+        logger = getEnhancedLogger()
 
         tpmod = sys.modules["automojo.testbase"]
         tpmod.logger = logger

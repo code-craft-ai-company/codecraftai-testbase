@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120">
+  <rect width="400" height="120" fill="#EEF" />
+  <text x="20" y="40" font-size="14">Custom Artifact</text>
+  <text x="20" y="60" font-size="14">(loaded via iframe)</text>
+  <text x="20" y="80" font-size="14">Any hand-curated HTML</text>
+</svg>

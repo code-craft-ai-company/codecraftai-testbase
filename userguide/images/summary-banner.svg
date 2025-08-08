@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="80">
+  <rect width="400" height="80" fill="#F0F0F0" />
+  <text x="10" y="20" font-size="16">Automation Pod: demo-apod</text>
+  <text x="10" y="40" font-size="16">Build: 2024.1.0</text>
+  <text x="10" y="60" font-size="16">Result: PASSED</text>
+</svg>

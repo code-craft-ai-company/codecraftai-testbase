@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100">
+  <rect width="400" height="100" fill="#FFFFFF" stroke="#000" />
+  <text x="10" y="20" font-size="14">Tests Passed: 8</text>
+  <text x="10" y="40" font-size="14">Tests Failed: 1</text>
+  <text x="10" y="60" font-size="14">Tests Errored: 1</text>
+  <text x="10" y="80" font-size="14">Total: 10</text>
+</svg>

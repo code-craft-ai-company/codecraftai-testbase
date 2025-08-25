@@ -87,7 +87,72 @@ The ``automojo.testbase.results.model`` package defines structures used in the J
 All classes implement ``as_dict`` or ``to_json`` helpers to produce the encoded form consumed by the renderer.
 
 
-4. JSON/YAML Data Objects and Rendering Components
+4. Result Types and Web Components
+----------------------------------
+
+Each node in the result stream is tagged with a :class:`ResultType` value that identifies its role in the tree【F:source/packages/automojo/testbase/results/model/resulttype.py†L19-L33】.  The table below links these type codes to the Python classes that emit them and the WebComponents that render them.
+
+.. list-table::
+   :header-rows: 1
+
+   * - ResultType
+     - Python class
+     - Creation
+     - WebComponent
+   * - ``JOB``
+     - :class:`JobContainer`
+     - Root container created when a test run starts【F:source/packages/automojo/testbase/results/model/jobcontainer.py†L19-L31】
+     - ``<testsummary-banner>``【F:source/packages/automojo/testbase/templates/v2/static/javascript/testsummary-components.js†L8-L112】
+   * - ``TEST_CONTAINER``
+     - :class:`TestContainer`
+     - Generated for packages and modules to group tests【F:source/packages/automojo/testbase/results/model/testcontainer.py†L20-L34】
+     - ``TestSummaryResultGroup``【F:source/packages/automojo/testbase/templates/v2/static/javascript/testsummary-components.js†L771-L835】
+   * - ``TEST``
+     - :class:`TestResult`
+     - Emitted for each executed test case【F:source/packages/automojo/testbase/results/model/testresult.py†L29-L48】
+     - ``TestSummaryResultItem``【F:source/packages/automojo/testbase/templates/v2/static/javascript/testsummary-components.js†L875-L915】
+   * - ``TASKING_GROUP``
+     - :class:`TaskingGroup`
+     - Groups a set of asynchronous taskings【F:source/packages/automojo/testbase/results/model/taskinggroup.py†L27-L41】
+     - *(component pending)*
+   * - ``TASKING``
+     - :class:`TaskingResult`
+     - Result from an individual asynchronous task【F:source/packages/automojo/testbase/results/model/taskingresult.py†L41-L66】
+     - *(component pending)*
+
+Example entries from ``testrun_results.jsos``【F:source/testroots/report-tests/result-tests/v2/example1/testrun_results.jsos†L2-L64】:
+
+.. code-block:: json
+
+   { "name": "<session>", "instance": "73c241cd-dc48-444d-b4a7-d3607820cb3e", "parent": null, "rtype": "JOB" }
+   { "name": "automojo.tests", "instance": "7d164f1b-4275-48fd-97f9-07bc83b48381", "parent": "93e205cc-f586-497b-a9fb-13c6348be898", "rtype": "TEST_CONTAINER" }
+   { "name": "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging",
+     "monikers": [], "pivots": {}, "instance": "e6a3ad03-11e9-4a5d-841b-b22cf95c4a17",
+     "parent": "2957cb90-098d-4103-bf6f-5e3296acb7a9", "rtype": "TEST",
+     "result": "PASSED", "start": "2025-01-19T13:20:26.432775", "stop": "2025-01-19T13:20:30.445887" }
+
+Tasking results appear when task groups are exercised【F:source/testroots/report-tests/result-tests/v2/example3/testrun_results.jsos†L60-L82】:
+
+.. code-block:: json
+
+   { "name": "Hello Group", "instance": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
+     "parent": "4e478966-e5ce-4cea-9dfa-651c263435c5", "rtype": "TASKING_GROUP",
+     "start": "2025-01-19T12:09:18.418822", "stop": "" }
+   { "name": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+     "instance": "e1d4b858-9ab3-40f7-9bbe-e3a3b7a921e9", "parent": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
+     "rtype": "TASKING", "result": "PASSED", "worker": "172.16.1.44", "start": "2025-01-19T12:09:20.073567", "stop": "2025-01-19T12:11:07.425047" }
+
+The banner and result grid of the HTML report reflect these objects:
+
+.. figure:: images/summary-banner.svg
+   :alt: Job banner example
+   :width: 400
+
+.. figure:: images/result-counters.svg
+   :alt: Test result counters
+   :width: 400
+
+5. JSON/YAML Data Objects and Rendering Components
 --------------------------------------------------
 
 testrun_summary.json
@@ -253,7 +318,7 @@ Rendering workflow:
    :width: 400
 
 
-5. Impact on Downstream Tooling
+6. Impact on Downstream Tooling
 -------------------------------
 
 * **Structured ingestion:** Analytics or dashboard services can ingest the JSON streams directly, mapping ``ResultCode`` and ``ResultType`` to normalized tables.
@@ -262,7 +327,7 @@ Rendering workflow:
 * **Future promotion:** As additional result fields (e.g., performance metrics, custom artifacts) are captured, ETL jobs can promote them into long-term data stores without changing the report renderer.
 
 
-6. Future Enhancements
+7. Future Enhancements
 ----------------------
 
 * Implement web components to render ``task-summary.json`` objects.

@@ -45,6 +45,50 @@ Key files:
 * ``artifacts/*`` – captured images, audio, or custom tabs grouped by catalog files.
 * ``tc-by-products/*`` – test-case specific files such as logs or generated data.
 
+JSOS Streams
+~~~~~~~~~~~~
+
+The ``testrun_results.jsos`` file is written as a JavaScript Object Stream (JSOS).  Each item in the file is a JSON document separated by the ASCII record separator character (``0x1E``), allowing the stream to be consumed incrementally as new results are appended.  The test framework may emit multiple objects for the same logical element: a *preview* when a test or task group starts and a *final* record when it completes.  Preview objects omit the ``stop`` timestamp and ``detail`` block so user interfaces can display in-progress activity, while final results include both fields to summarize the outcome.
+
+Preview
+:::::::
+
+.. code-block:: json
+
+    {
+        "name": "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging",
+        "monikers": [],
+        "pivots": {},
+        "instance": "e6a3ad03-11e9-4a5d-841b-b22cf95c4a17",
+        "parent": "2957cb90-098d-4103-bf6f-5e3296acb7a9",
+        "rtype": "TEST",
+        "result": "UNSET",
+        "start": "2025-01-19T13:20:26.432775",
+        "stop": ""
+    }
+
+Final Result
+::::::::::::
+
+.. code-block:: json
+
+    {
+        "name": "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging",
+        "monikers": [],
+        "pivots": {},
+        "instance": "e6a3ad03-11e9-4a5d-841b-b22cf95c4a17",
+        "parent": "2957cb90-098d-4103-bf6f-5e3296acb7a9",
+        "rtype": "TEST",
+        "result": "PASSED",
+        "start": "2025-01-19T13:20:26.432775",
+        "stop": "2025-01-19T13:20:30.445887",
+        "detail": {
+            "errors": [],
+            "failures": [],
+            "warnings": []
+        }
+    }
+
 
 2. Encoded vs. Pre-rendered Data
 --------------------------------

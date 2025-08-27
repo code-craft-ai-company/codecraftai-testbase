@@ -4,7 +4,7 @@
         "import_errors.jsos",
         "runtime-declared.yaml",
         "startup-configuration.json",
-        "testrun_results.jsos",
+        "testrun_results_stream.jsos",
         "testrun_sequence.py",
         "testrun_summary.json",
         "testsummary.html",

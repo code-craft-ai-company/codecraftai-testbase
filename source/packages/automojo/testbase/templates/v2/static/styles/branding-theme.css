@@ -39,25 +39,25 @@
 @property --color-error-background {
     syntax: "<color>";
     inherits: false;
-    initial-value: rgb(119, 55, 55);
+    initial-value: rgb(252, 142, 142);
 }
 
 @property --color-fail-background {
     syntax: "<color>";
     inherits: false;
-    initial-value: rgb(248, 108, 108);
+    initial-value: rgb(255, 171, 171);
 }
 
 @property --color-ghost-background {
     syntax: "<color>";
     inherits: false;
-    initial-value: #B0B0B0;
+    initial-value: #d6d4d4;
 }
 
 @property --color-pass-background {
     syntax: "<color>";
     inherits: false;
-    initial-value: rgb(113, 155, 113);
+    initial-value: rgb(175, 231, 175);
 }
 
 @property --color-skip-background {

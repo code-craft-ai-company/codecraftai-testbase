@@ -1085,18 +1085,28 @@ class TestSummaryTaskResult extends HTMLElement {
         var skipped = taskItem.result == "SKIPPED" ? 1 : 0;
         var passed = taskItem.result == "PASSED" ? 1 : 0;
 
+        var detailsEl = this.shadowRoot.querySelector("details");
         var summaryEl = this.shadowRoot.querySelector("summary");
+        var statusOutlineColor = "var(--color-ghost)";
+        var statusBackgroundColor = "var(--color-ghost-background)";
         if (!taskItem.result || (errored + failed + skipped + passed) === 0) {
-            summaryEl.style.backgroundColor = "var(--color-ghost)";
+            statusOutlineColor = "var(--color-ghost)";
+            statusBackgroundColor = "var(--color-ghost-background)";
         } else if (errored > 0) {
-            summaryEl.style.backgroundColor = "var(--color-error)";
+            statusOutlineColor = "var(--color-error)";
+            statusBackgroundColor = "var(--color-error-background)";
         } else if (failed > 0) {
-            summaryEl.style.backgroundColor = "var(--color-fail)";
+            statusOutlineColor = "var(--color-fail)";
+            statusBackgroundColor = "var(--color-fail-background)";
         } else if (passed > 0) {
-            summaryEl.style.backgroundColor = "var(--color-pass)";
+            statusOutlineColor = "var(--color-pass)";
+            statusBackgroundColor = "var(--color-pass-background)";
         } else if (skipped > 0) {
-            summaryEl.style.backgroundColor = "var(--color-skip)";
+            statusOutlineColor = "var(--color-skip)";
+            statusBackgroundColor = "var(--color-skip-background)";
         }
+        summaryEl.style.backgroundColor = statusBackgroundColor;
+        detailsEl.style.border = "1px solid " + statusOutlineColor;
 
         var itemErrorEl = this.shadowRoot.querySelector("#id-tris-error");
         if (errored > 0) {
@@ -1231,16 +1241,28 @@ class TestSummaryTaskGroup extends HTMLElement {
         }
 
         var grpSummaryEl = this.shadowRoot.querySelector("#id-tgrp-summary");
+        var grpDetailsEl = this.shadowRoot.querySelector("details");
         var finished = errored + failed + skipped + passed;
+        var grpStatusColor = "var(--color-pass)";
+        var grpStatusBackground = "var(--color-pass-background)";
         if (total === 0 || finished < total) {
-            grpSummaryEl.style.backgroundColor = "var(--color-ghost)";
+            grpStatusColor = "var(--color-ghost)";
+            grpStatusBackground = "var(--color-ghost-background)";
         } else if (errored > 0) {
-            grpSummaryEl.style.backgroundColor = "var(--color-error)";
+            grpStatusColor = "var(--color-error)";
+            grpStatusBackground = "var(--color-error-background)";
         } else if (failed > 0) {
-            grpSummaryEl.style.backgroundColor = "var(--color-fail)";
-        } else {
-            grpSummaryEl.style.backgroundColor = "var(--color-pass)";
+            grpStatusColor = "var(--color-fail)";
+            grpStatusBackground = "var(--color-fail-background)";
+        } else if (passed > 0) {
+            grpStatusColor = "var(--color-pass)";
+            grpStatusBackground = "var(--color-pass-background)";
+        } else if (skipped > 0) {
+            grpStatusColor = "var(--color-skip)";
+            grpStatusBackground = "var(--color-skip-background)";
         }
+        grpSummaryEl.style.backgroundColor = grpStatusBackground;
+        grpDetailsEl.style.border = "1px solid " + grpStatusColor;
 
         var grpErrorEl = this.shadowRoot.querySelector("#id-tgs-error");
         if (errored > 0) {

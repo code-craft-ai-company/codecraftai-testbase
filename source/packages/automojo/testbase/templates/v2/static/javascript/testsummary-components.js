@@ -1004,6 +1004,275 @@ class TestSummaryResultItem extends HTMLElement {
 
             itemDetailEl.appendChild(failsCollapsibleEl);
         }
+        if ("tasking_groups" in testItem) {
+            for (const tgroup of testItem.tasking_groups) {
+                var taskGroupEl = document.createElement(TestSummaryTaskGroup.tagname);
+                taskGroupEl.syncData(tgroup);
+                itemDetailEl.appendChild(taskGroupEl);
+            }
+        }
+    }
+}
+
+class TestSummaryTaskResult extends HTMLElement {
+
+    static tagname = 'testsummary-taskresult'
+
+    static template = `
+        <details>
+            <summary>
+                <div class="ts-results-items-grid">
+                    <span id="id-tris-start" class="ts-results-item-start"></span>
+                    <span id="id-tris-name" class="ts-results-item-name"></span>
+                    <span id="id-tris-error" class="ts-results-item-score"></span>
+                    <span id="id-tris-failure" class="ts-results-item-score"></span>
+                    <span id="id-tris-skip" class="ts-results-item-score"></span>
+                    <span id="id-tris-pass" class="ts-results-item-score"></span>
+                </div>
+            </summary>
+            <div id="id-taskresult-detail">
+                <div class="ts-results-item-detail">
+                    <div class="ts-results-item-prop-row" >
+                        <div class="ts-results-item-prop-pair" >
+                            <div class="ts-results-item-prop-label">InstId</div>
+                            <div id="id-trip-inst-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                        <div class="ts-results-item-prop-pair" >
+                            <div class="ts-results-item-prop-label">Worker</div>
+                            <div id="id-trip-worker-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                        <div class="ts-results-item-prop-pair" >
+                            <div class="ts-results-item-prop-label">Start</div>
+                            <div id="id-trip-start-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                        <div class="ts-results-item-prop-pair" >
+                            <div class="ts-results-item-prop-label">Stop</div>
+                            <div id="id-trip-stop-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                        <div class="ts-results-item-prop-pair" >
+                            <div class="ts-results-item-prop-label">Elapsed</div>
+                            <div id="id-trip-elapsed-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </details>
+    `
+
+    constructor() {
+        super();
+
+        const shadowRoot = this.attachShadow({mode: 'open'})
+        shadowRoot.innerHTML = this.getTemplate();
+
+        addGlobalStylesToShadowRoot(shadowRoot);
+    }
+
+    getTemplate() {
+        return TestSummaryTaskResult.template;
+    }
+
+    syncData (taskItem) {
+
+        var itemNameEl = this.shadowRoot.querySelector("#id-tris-name");
+        itemNameEl.innerHTML = taskItem.name + " (" + taskItem.worker + ")";
+
+        var itemStartEl = this.shadowRoot.querySelector("#id-tris-start");
+        itemStartEl.innerHTML = taskItem.start;
+
+        var errored = taskItem.result == "ERRORED" ? 1 : 0;
+        var failed = taskItem.result == "FAILED" ? 1 : 0;
+        var skipped = taskItem.result == "SKIPPED" ? 1 : 0;
+        var passed = taskItem.result == "PASSED" ? 1 : 0;
+
+        var summaryEl = this.shadowRoot.querySelector("summary");
+        if (!taskItem.result || (errored + failed + skipped + passed) === 0) {
+            summaryEl.style.backgroundColor = "var(--color-ghost)";
+        } else if (errored > 0) {
+            summaryEl.style.backgroundColor = "var(--color-error)";
+        } else if (failed > 0) {
+            summaryEl.style.backgroundColor = "var(--color-fail)";
+        } else if (passed > 0) {
+            summaryEl.style.backgroundColor = "var(--color-pass)";
+        } else if (skipped > 0) {
+            summaryEl.style.backgroundColor = "var(--color-skip)";
+        }
+
+        var itemErrorEl = this.shadowRoot.querySelector("#id-tris-error");
+        if (errored > 0) {
+            itemErrorEl.classList.add("color-error");
+        } else {
+            itemErrorEl.classList.add("color-ghost");
+        }
+        itemErrorEl.innerHTML = errored.toString();
+
+        var itemFailureEl = this.shadowRoot.querySelector("#id-tris-failure");
+        if (failed > 0) {
+            itemFailureEl.classList.add("color-fail");
+        } else {
+            itemFailureEl.classList.add("color-ghost");
+        }
+        itemFailureEl.innerHTML = failed.toString();
+
+        var itemSkipEl = this.shadowRoot.querySelector("#id-tris-skip");
+        if (skipped > 0) {
+            itemSkipEl.classList.add("color-skip");
+        } else {
+            itemSkipEl.classList.add("color-ghost");
+        }
+        itemSkipEl.innerHTML = skipped.toString();
+
+        var itemPassEl = this.shadowRoot.querySelector("#id-tris-pass");
+        if (passed > 0) {
+            itemPassEl.classList.add("color-pass");
+        } else {
+            itemPassEl.classList.add("color-ghost");
+        }
+        itemPassEl.innerHTML = passed.toString();
+
+        var itemInstValEl = this.shadowRoot.querySelector("#id-trip-inst-value");
+        itemInstValEl.innerHTML = taskItem.instance;
+
+        var itemWorkerValEl = this.shadowRoot.querySelector("#id-trip-worker-value");
+        itemWorkerValEl.innerHTML = taskItem.worker;
+
+        var itemStartValEl = this.shadowRoot.querySelector("#id-trip-start-value");
+        itemStartValEl.innerHTML = taskItem.start;
+
+        var itemStopValEl = this.shadowRoot.querySelector("#id-trip-stop-value");
+        itemStopValEl.innerHTML = taskItem.stop;
+
+        var elapsed = get_time_difference(taskItem.start, taskItem.stop);
+
+        var itemElapsedValEl = this.shadowRoot.querySelector("#id-trip-elapsed-value");
+        itemElapsedValEl.innerHTML = elapsed;
+
+        if (taskItem.detail && taskItem.detail.errors && taskItem.detail.errors.length > 0) {
+            var errorsCollapsibleEl = document.createElement(TestSummaryErrorsCollapsible.tagname);
+            errorsCollapsibleEl.syncData(taskItem.detail.errors);
+            this.shadowRoot.querySelector("#id-taskresult-detail").appendChild(errorsCollapsibleEl);
+        }
+
+        if (taskItem.detail && taskItem.detail.failures && taskItem.detail.failures.length > 0) {
+            var failsCollapsibleEl = document.createElement(TestSummaryFailuresCollapsible.tagname);
+            failsCollapsibleEl.syncData(taskItem.detail.failures);
+            this.shadowRoot.querySelector("#id-taskresult-detail").appendChild(failsCollapsibleEl);
+        }
+    }
+}
+
+
+class TestSummaryTaskGroup extends HTMLElement {
+
+    static tagname = 'testsummary-taskgroup'
+
+    static template = `
+        <details>
+            <summary id="id-tgrp-summary">
+                <div class="ts-results-grp-grid">
+                    <span id="id-tgs-name" class="ts-results-grp-name"></span>
+                    <span id="id-tgs-error" class="ts-results-grp-score"></span>
+                    <span id="id-tgs-failure" class="ts-results-grp-score"></span>
+                    <span id="id-tgs-skip" class="ts-results-grp-score"></span>
+                    <span id="id-tgs-pass" class="ts-results-grp-score"></span>
+                </div>
+            </summary>
+            <div id="id-taskgroup-detail" style="margin-left: 20px;">
+            </div>
+        </details>
+    `
+
+    constructor() {
+        super();
+
+        const shadowRoot = this.attachShadow({mode: 'open'})
+        shadowRoot.innerHTML = this.getTemplate();
+
+        addGlobalStylesToShadowRoot(shadowRoot);
+    }
+
+    getTemplate() {
+        return TestSummaryTaskGroup.template;
+    }
+
+    syncData (groupInfo) {
+        var grpDetailEl = this.shadowRoot.querySelector("#id-taskgroup-detail");
+        grpDetailEl.innerHTML = "";
+
+        var grpNameEl = this.shadowRoot.querySelector("#id-tgs-name");
+        grpNameEl.innerHTML = groupInfo.name;
+
+        var errored = 0;
+        var failed = 0;
+        var skipped = 0;
+        var passed = 0;
+        var total = 0;
+
+        if (groupInfo.taskings) {
+            total = groupInfo.taskings.length;
+            for (const taskItem of groupInfo.taskings) {
+                var itemResult = taskItem.result;
+
+                if (itemResult == "PASSED") {
+                    passed += 1;
+                } else if (itemResult == "FAILED") {
+                    failed += 1;
+                } else if (itemResult == "ERRORED") {
+                    errored += 1;
+                } else if (itemResult == "SKIPPED") {
+                    skipped += 1;
+                }
+
+                var taskItemEl = document.createElement(TestSummaryTaskResult.tagname);
+                taskItemEl.syncData(taskItem);
+
+                grpDetailEl.appendChild(taskItemEl);
+            }
+        }
+
+        var grpSummaryEl = this.shadowRoot.querySelector("#id-tgrp-summary");
+        var finished = errored + failed + skipped + passed;
+        if (total === 0 || finished < total) {
+            grpSummaryEl.style.backgroundColor = "var(--color-ghost)";
+        } else if (errored > 0) {
+            grpSummaryEl.style.backgroundColor = "var(--color-error)";
+        } else if (failed > 0) {
+            grpSummaryEl.style.backgroundColor = "var(--color-fail)";
+        } else {
+            grpSummaryEl.style.backgroundColor = "var(--color-pass)";
+        }
+
+        var grpErrorEl = this.shadowRoot.querySelector("#id-tgs-error");
+        if (errored > 0) {
+            grpErrorEl.classList.add("color-error");
+        } else {
+            grpErrorEl.classList.add("color-ghost");
+        }
+        grpErrorEl.innerHTML = errored.toString();
+
+        var grpFailEl = this.shadowRoot.querySelector("#id-tgs-failure");
+        if (failed > 0) {
+            grpFailEl.classList.add("color-fail");
+        } else {
+            grpFailEl.classList.add("color-ghost");
+        }
+        grpFailEl.innerHTML = failed.toString();
+
+        var grpSkipEl = this.shadowRoot.querySelector("#id-tgs-skip");
+        if (skipped > 0) {
+            grpSkipEl.classList.add("color-skip");
+        } else {
+            grpSkipEl.classList.add("color-ghost");
+        }
+        grpSkipEl.innerHTML = skipped.toString();
+
+        var grpPassEl = this.shadowRoot.querySelector("#id-tgs-pass");
+        if (passed > 0) {
+            grpPassEl.classList.add("color-pass");
+        } else {
+            grpPassEl.classList.add("color-ghost");
+        }
+        grpPassEl.innerHTML = passed.toString();
 
     }
 }
@@ -1594,6 +1863,8 @@ function register_testsummary_components() {
     customElements.define(TestSummaryImportFailures.tagname, TestSummaryImportFailures);
     customElements.define(TestSummaryImportFailureItem.tagname, TestSummaryImportFailureItem);
     customElements.define(TestSummaryImportFailureTrace.tagname, TestSummaryImportFailureTrace);
+    customElements.define(TestSummaryTaskGroup.tagname, TestSummaryTaskGroup);
+    customElements.define(TestSummaryTaskResult.tagname, TestSummaryTaskResult);
     customElements.define(TestSummaryResultGroup.tagname, TestSummaryResultGroup);
     customElements.define(TestSummaryResultItem.tagname, TestSummaryResultItem);
     customElements.define(TestSummaryResultDetail.tagname, TestSummaryResultDetail);

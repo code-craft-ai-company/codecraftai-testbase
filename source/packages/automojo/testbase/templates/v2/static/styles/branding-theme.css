@@ -36,6 +36,43 @@
 }
 
 
+@property --color-error-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: rgb(119, 55, 55);
+}
+
+@property --color-fail-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: rgb(248, 108, 108);
+}
+
+@property --color-ghost-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #B0B0B0;
+}
+
+@property --color-pass-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: rgb(113, 155, 113);
+}
+
+@property --color-skip-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: rgb(221, 199, 199);
+}
+
+@property --color-warn-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: rgb(204, 170, 108);
+}
+
+
 @property --color-banner-background-color {
     syntax: "<color>";
     inherits: false;

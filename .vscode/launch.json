@@ -40,6 +40,20 @@
             ],
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "Python: Test Rendering",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/source/packages/automojo/testbase/cli/testbase_command.py",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "services",
+                "results",
+                "--directory=${workspaceFolder}/source/testroots/report-tests"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

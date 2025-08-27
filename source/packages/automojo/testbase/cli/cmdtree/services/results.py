@@ -48,6 +48,8 @@ def command_testbase_services_results(directory, bind, port):
 
     bug_svc = try_create_bug_server_interface_from_environment()
 
+    print(f"Serving test results on port={port} from folder='{directory}'")
+
     server = TestResultServer(svc_directory, svc_endpoint, TestResultRequestHandler, bug_svc)
     server.serve_forever()
 

@@ -12,7 +12,7 @@ from automojo.testbase.factoryprotocols import TestBaseFactoryProtocol
 from automojo.testbase.testjob import TestJob, DefaultTestJob
 
 
-class TestPlusDefaultExtensionFactory(FactoryExtension, TestBaseFactoryProtocol):
+class TestBaseDefaultExtensionFactory(FactoryExtension, TestBaseFactoryProtocol):
 
     PRECEDENCE = 0
 

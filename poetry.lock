@@ -54,7 +54,7 @@ develop = false
 type = "git"
 url = "https://github.com/automationmojo/automojo-extension.git"
 reference = "main"
-resolved_reference = "29bb2b3b20ed4e0639fad75a6db65177be866960"
+resolved_reference = "628eedf1422015cfaec9c578fc331bf76c2c202d"
 
 [[package]]
 name = "automojo-interfaces"

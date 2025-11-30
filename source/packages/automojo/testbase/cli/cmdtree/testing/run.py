@@ -87,9 +87,6 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
     # IMPORTANT: We need to load the context first because it will trigger the loading
     # of the default user configuration
 
-    from automojo.presence.contextpaths import ContextPaths
-    from automojo.presence.wellknown import ContextSingleton
-
     from automojo.xmodules.xpython import prepend_python_path
 
     from automojo.runtime.runtimevariables import RuntimeVariables
@@ -99,8 +96,6 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
     # STEP 1 - Initialize the Runtime (Performed by the root command)
 
     # STEP 2 - Resolve the configuration variables (Performed by the root command)
-    
-    ctx = ContextSingleton()
 
     # STEP 3 - Apply any "Command Line" option overrides
 

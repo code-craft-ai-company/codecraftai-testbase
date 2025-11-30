@@ -36,7 +36,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
-from automojo.runtime.variablenames import AM_RUNTIME_VARNAMES
+from automojo.runtime.runtimevariables import RuntimeVariables, RuntimeVariablesDesc
 
 logger = getEnhancedLogger()
 
@@ -153,64 +153,63 @@ def try_create_bug_server_interface_from_environment() -> Union[None, 'BugServer
     username: str = None
     token: str = None
 
-    if AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE in environ:
-        server_type = environ[AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE].upper()
+    server_type = RuntimeVariables.AM_BUG_SERVER_TYPE.upper()
 
-        while True: # Setup a breakout pipeline
+    while server_type is not None: # Setup a breakout pipeline
 
-            if server_type not in SUPPORTED_BUG_SERVERS:
-                warn_msg = f"Unknown bug server type: {server_type}"
-                logger.warning(warn_msg)
-                break
+        if server_type not in SUPPORTED_BUG_SERVERS:
+            warn_msg = f"Unknown bug server type: {server_type}"
+            logger.warning(warn_msg)
+            break
 
-            if AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT not in environ:
-                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT} variable must be set."
-                logger.warning(warn_msg)
-                break
+        if RuntimeVariables.AM_BUG_SERVER_ENDPOINT is None:
+            warn_msg = f"The Bug Server {RuntimeVariablesDesc.AM_BUG_SERVER_ENDPOINT.name} variable must be set."
+            logger.warning(warn_msg)
+            break
 
-            server_endpoint = environ[AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT]
+        server_endpoint = environ[RuntimeVariables.AM_BUG_SERVER_ENDPOINT]
 
-            if AM_RUNTIME_VARNAMES.AM_BUG_PROJECTS not in environ:
-                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_PROJECTS} variable must be set."
-                logger.warning(warn_msg)
-                break
+        if RuntimeVariables.AM_BUG_PROJECTS is None:
+            warn_msg = f"The Bug Server {RuntimeVariablesDesc.AM_BUG_PROJECTS.name} variable must be set."
+            logger.warning(warn_msg)
+            break
 
-            projects = environ[AM_RUNTIME_VARNAMES.AM_BUG_PROJECTS]
-            
-            if AM_RUNTIME_VARNAMES.AM_BUG_TEAM not in environ:
-                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_TEAM} variable must be set."
-                logger.warning(warn_msg)
-                break
+        projects = environ[RuntimeVariables.AM_BUG_PROJECTS]
+        
+        if RuntimeVariables.AM_BUG_TEAM is None:
+            warn_msg = f"The Bug Server {RuntimeVariablesDesc.AM_BUG_TEAM.name} variable must be set."
+            logger.warning(warn_msg)
+            break
 
-            team = environ[AM_RUNTIME_VARNAMES.AM_BUG_TEAM]
+        team = environ[RuntimeVariables.AM_BUG_TEAM]
 
-            if AM_RUNTIME_VARNAMES.AM_BUG_USERNAME not in environ:
-                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_USERNAME} variable must be set."
-                logger.warning(warn_msg)
-                break
+        if RuntimeVariables.AM_BUG_USERNAME is None:
+            warn_msg = f"The Bug Server {RuntimeVariablesDesc.AM_BUG_USERNAME.name} variable must be set."
+            logger.warning(warn_msg)
+            break
 
-            username = environ[AM_RUNTIME_VARNAMES.AM_BUG_USERNAME]
+        username = environ[RuntimeVariables.AM_BUG_USERNAME]
 
-            if AM_RUNTIME_VARNAMES.AM_BUG_TOKEN not in environ:
-                warn_msg = f"The Bug Server {AM_RUNTIME_VARNAMES.AM_BUG_TOKEN} variable must be set."
-                logger.warning(warn_msg)
-                break
+        if RuntimeVariables.AM_BUG_TOKEN is None:
+            warn_msg = f"The Bug Server {RuntimeVariablesDesc.AM_BUG_TOKEN} variable must be set."
+            logger.warning(warn_msg)
+            break
 
-            token = environ[AM_RUNTIME_VARNAMES.AM_BUG_TOKEN]
+        token = environ[RuntimeVariables.AM_BUG_TOKEN]
 
-            # If we have all the required information to construct the server interface, create it and
-            # assign it to the 'server_iface' in order to return it.
-            if server_type == "JIRA":
-                server_iface = BugServerInterfaceForJira(
-                    server_type=server_type,
-                    server_endpoint=server_endpoint,
-                    projects=projects,
-                    team=team,
-                    username=username,
-                    token=token
-                )
+        # If we have all the required information to construct the server interface, create it and
+        # assign it to the 'server_iface' in order to return it.
+        if server_type == "JIRA":
+            server_iface = BugServerInterfaceForJira(
+                server_type=server_type,
+                server_endpoint=server_endpoint,
+                projects=projects,
+                team=team,
+                username=username,
+                token=token
+            )
 
-            break # Always exit this 'while True' pipeline after one time through
+        break # Always exit this 'while True' pipeline after one time through
 
     return server_iface
 
@@ -274,12 +273,12 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
         
         if path == "/api/v1/environment":
             response = {
-                AM_RUNTIME_VARNAMES.AM_BUG_SERVER_TYPE: self._bug_server.server_type,
-                AM_RUNTIME_VARNAMES.AM_BUG_SERVER_ENDPOINT: self._bug_server.server_endpoint,
-                AM_RUNTIME_VARNAMES.AM_BUG_PROJECTS: self._bug_server.projects,
-                AM_RUNTIME_VARNAMES.AM_BUG_TEAM: self._bug_server.team,
-                AM_RUNTIME_VARNAMES.AM_BUG_USERNAME: self._bug_server.username,
-                AM_RUNTIME_VARNAMES.AM_BUG_TOKEN: self._bug_server.token
+                RuntimeVariablesDesc.AM_BUG_SERVER_TYPE.name: self._bug_server.server_type,
+                RuntimeVariablesDesc.AM_BUG_SERVER_ENDPOINT.name: self._bug_server.server_endpoint,
+                RuntimeVariablesDesc.AM_BUG_PROJECTS.name: self._bug_server.projects,
+                RuntimeVariablesDesc.AM_BUG_TEAM.name: self._bug_server.team,
+                RuntimeVariablesDesc.AM_BUG_USERNAME.name: self._bug_server.username,
+                RuntimeVariablesDesc.AM_BUG_TOKEN.name: self._bug_server.token
             }
 
             rcontent = json.dumps(response).encode('utf-8')

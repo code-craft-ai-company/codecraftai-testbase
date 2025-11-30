@@ -14,6 +14,12 @@ __credits__ = []
 
 import click
 
+from automojo.thisapp.wellknown import ThisApplicationSingleton
+
+from automojo.runtime.runtimevariables import RuntimeVariablesDesc
+
+from automojo.testbase.initialize import initialize_testbase_runtime
+
 from automojo.testbase.cli.cmdtree.services import group_testbase_services
 from automojo.testbase.cli.cmdtree.testing import group_testbase_testing
 from automojo.testbase.cli.cmdtree.utilities import group_testbase_utilities
@@ -23,21 +29,27 @@ from automojo.testbase.cli.cmdtree.utilities import group_testbase_utilities
 @click.option('-v', '--verbose', count=True)
 def testbase_root_command(verbose):
 
-    from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+    this_app = ThisApplicationSingleton()
+
+    interactive_console = None
+    log_level_console = None
 
     if verbose == 0:
-        AM_RUNTIME_VARIABLES.AM_INTERACTIVE_CONSOLE = True
+        interactive_console = True
     else:
-        AM_RUNTIME_VARIABLES.AM_INTERACTIVE_CONSOLE = False
+        interactive_console = False
 
         if verbose == 1:
-            AM_RUNTIME_VARIABLES.AM_LOG_LEVEL_CONSOLE = "INFO"
+            log_level_console = "INFO"
         elif verbose == 2:
-            AM_RUNTIME_VARIABLES.AM_LOG_LEVEL_CONSOLE = "DEBUG"
+            log_level_console = "DEBUG"
         elif verbose > 2:
-            AM_RUNTIME_VARIABLES.AM_LOG_LEVEL_CONSOLE = "NOTSET"
+            log_level_console = "NOTSET"
 
-    from automojo.testbase.initialize import initialize_testbase_runtime
+
+    this_app.override_variable_value(RuntimeVariablesDesc.AM_INTERACTIVE_CONSOLE, interactive_console)
+    this_app.override_variable_value(RuntimeVariablesDesc.AM_LOG_LEVEL_CONSOLE, log_level_console)
+
     initialize_testbase_runtime()
 
     return

@@ -92,7 +92,7 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
 
     from automojo.xmodules.xpython import prepend_python_path
 
-    from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+    from automojo.runtime.runtimevariables import RuntimeVariables
     
     from automojo.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
 
@@ -163,16 +163,14 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
         AM_RUNTIME_OPTION_OVERRIDES.override_debug_debugger('debugpy')
 
     if prerun_diagnostic:
-        ctx.insert(ContextPaths.DIAGNOSTICS_PRERUN, {})
+        AM_RUNTIME_OPTION_OVERRIDES.override_diagnostics_prerun({})
     
     if postrun_diagnostic:
-        ctx.insert(ContextPaths.DIAGNOSTICS_POSTRUN, {})
+        AM_RUNTIME_OPTION_OVERRIDES.override_diagnostics_postrun({})
 
     if root is None:
-        if AM_RUNTIME_VARIABLES.AM_TESTROOT is not None:
-            root = AM_RUNTIME_VARIABLES.AM_TESTROOT
-        elif ctx.lookup(ContextPaths.TESTROOT) is not None:
-            root = ctx.lookup(ContextPaths.TESTROOT)
+        if RuntimeVariables.AM_TESTROOT is not None:
+            root = RuntimeVariables.AM_TESTROOT
         else:
             root = "."
 
@@ -183,7 +181,7 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
             errmsg += " expanded=%s" % test_root
         raise click.BadParameter(errmsg)
 
-    AM_RUNTIME_OPTION_OVERRIDES.override_testroot(root)
+    AM_RUNTIME_OPTION_OVERRIDES.override_testroot(test_root)
 
     # Make sure we extend PATH to include the test roots parent folder so imports will
     # work properly.

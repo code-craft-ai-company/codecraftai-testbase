@@ -17,11 +17,13 @@ import os
 
 import click
 
+from automojo.thisapp.wellknown import ThisApplicationSingleton
 
-from automojo.testbase.server.resultserver import TestResultServer, TestResultRequestHandler, try_create_bug_server_interface_from_environment
 from automojo.runtime.activation import activate_profile_service
 from automojo.runtime.paths import get_presence_directory
-from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+from automojo.runtime.runtimevariables import RuntimeVariablesDesc
+
+from automojo.testbase.server.resultserver import TestResultServer, TestResultRequestHandler, try_create_bug_server_interface_from_environment
 
 
 HELP_DIRECTORY = "The root directory to serve the test results from."
@@ -34,7 +36,10 @@ HELP_PORT = "The port to bind the server to."
 @click.option("--port", default=8880, help=HELP_PORT)
 def command_testbase_services_results(directory, bind, port):
     
-    AM_RUNTIME_VARIABLES.AM_SERVICE_NAME = "Test-Result-Service"
+    this_app = ThisApplicationSingleton()
+
+    this_app.override_variable_value(RuntimeVariablesDesc.AM_SERVICE_NAME, "Test-Result-Service")
+
     activate_profile_service()
 
     svc_endpoint = (bind, port)

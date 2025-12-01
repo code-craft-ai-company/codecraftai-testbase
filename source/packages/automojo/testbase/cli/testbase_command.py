@@ -29,10 +29,10 @@ from automojo.testbase.cli.cmdtree.utilities import group_testbase_utilities
 @click.option('-v', '--verbose', count=True)
 def testbase_root_command(verbose):
 
-    this_app = ThisApplicationSingleton()
-
+    initialize_testbase_runtime()
+    
     interactive_console = None
-    log_level_console = None
+    log_level_console = "WARNING"
 
     if verbose == 0:
         interactive_console = True
@@ -46,6 +46,7 @@ def testbase_root_command(verbose):
         elif verbose > 2:
             log_level_console = "NOTSET"
 
+    this_app = ThisApplicationSingleton()
 
     this_app.override_variable_value(RuntimeVariablesDesc.AM_INTERACTIVE_CONSOLE, interactive_console)
     this_app.override_variable_value(RuntimeVariablesDesc.AM_LOG_LEVEL_CONSOLE, log_level_console)

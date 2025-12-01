@@ -24,10 +24,10 @@ from automojo.xmodules.xformatting import CommandOutputFormat
 from automojo.xmodules.debugging import debugger_wellknown_breakpoint_entry
 from automojo.xmodules.xlogging.enhancedloggers import EnhancedLogger
 
-from automojo.presence.contextpaths import ContextPaths
-from automojo.presence.wellknown import ContextSingleton
+from automojo.thisapp.wellknown import ThisApplicationSingleton
 
-from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES, DefaultValue
+from automojo.runtime.runtimecontextpaths import RuntimeContextPaths
+from automojo.runtime.runtimevariables import RuntimeVariables, DefaultValue
 from automojo.runtime.paths import (
     get_summary_html_template_source,
     get_summary_static_resource_dest_dir,
@@ -96,28 +96,28 @@ class TestJob(ContextUser, ITestJob):
 
         self._testpacks = None
 
-        self._apod = AM_RUNTIME_VARIABLES.AM_AUTOMATION_POD
-        self._release = AM_RUNTIME_VARIABLES.AM_BUILD_RELEASE
-        self._branch = AM_RUNTIME_VARIABLES.AM_BUILD_BRANCH
-        self._build = AM_RUNTIME_VARIABLES.AM_BUILD_NAME
-        self._flavor = AM_RUNTIME_VARIABLES.AM_BUILD_FLAVOR
-        self._build_url = AM_RUNTIME_VARIABLES.AM_BUILD_URL
+        self._apod = RuntimeVariables.AM_AUTOMATION_POD
+        self._release = RuntimeVariables.AM_BUILD_RELEASE
+        self._branch = RuntimeVariables.AM_BUILD_BRANCH
+        self._build = RuntimeVariables.AM_BUILD_NAME
+        self._flavor = RuntimeVariables.AM_BUILD_FLAVOR
+        self._build_url = RuntimeVariables.AM_BUILD_URL
 
-        self._run_id = AM_RUNTIME_VARIABLES.AM_RUN_ID
+        self._run_id = RuntimeVariables.AM_RUN_ID
 
-        self._pipeline_id = AM_RUNTIME_VARIABLES.AM_PIPELINE_ID
-        self._pipeline_name = AM_RUNTIME_VARIABLES.AM_PIPELINE_NAME
-        self._pipeline_instance = AM_RUNTIME_VARIABLES.AM_PIPELINE_INSTANCE
+        self._pipeline_id = RuntimeVariables.AM_PIPELINE_ID
+        self._pipeline_name = RuntimeVariables.AM_PIPELINE_NAME
+        self._pipeline_instance = RuntimeVariables.AM_PIPELINE_INSTANCE
 
-        self._job_initiator = AM_RUNTIME_VARIABLES.AM_JOB_INITIATOR
-        self._job_id = AM_RUNTIME_VARIABLES.AM_JOB_ID
-        self._job_label = AM_RUNTIME_VARIABLES.AM_JOB_LABEL
-        self._job_name = AM_RUNTIME_VARIABLES.AM_JOB_NAME
-        self._job_owner = AM_RUNTIME_VARIABLES.AM_JOB_OWNER
-        self._job_seed = AM_RUNTIME_VARIABLES.AM_JOB_SEED
-        self._job_type = AM_RUNTIME_VARIABLES.AM_JOB_TYPE
-        self._job_venue = AM_RUNTIME_VARIABLES.AM_JOB_VENUE
-        self._job_tag = AM_RUNTIME_VARIABLES.AM_JOB_TAG
+        self._job_initiator = RuntimeVariables.AM_JOB_INITIATOR
+        self._job_id = RuntimeVariables.AM_JOB_ID
+        self._job_label = RuntimeVariables.AM_JOB_LABEL
+        self._job_name = RuntimeVariables.AM_JOB_NAME
+        self._job_owner = RuntimeVariables.AM_JOB_OWNER
+        self._job_seed = RuntimeVariables.AM_JOB_SEED
+        self._job_type = RuntimeVariables.AM_JOB_TYPE
+        self._job_venue = RuntimeVariables.AM_JOB_VENUE
+        self._job_tag = RuntimeVariables.AM_JOB_TAG
         
         self._import_errors = []
 
@@ -146,7 +146,7 @@ class TestJob(ContextUser, ITestJob):
 
         env = self.context.lookup("/environment")
 
-        self._starttime = AM_RUNTIME_VARIABLES.AM_STARTTIME
+        self._starttime = RuntimeVariables.AM_STARTTIME
 
         self._test_results_dir = get_path_for_testresults()
         
@@ -175,10 +175,10 @@ class TestJob(ContextUser, ITestJob):
             # order in the automation code and that we provide the ability for configuration
             # issues to be discovered as early as possible.
 
-            ctx = ContextSingleton()
+            this_app = ThisApplicationSingleton()
 
-            debugger_name = ctx.lookup(ContextPaths.DEBUG_DEBUGGER)
-            configured_breakpoints = ctx.lookup(ContextPaths.DEBUG_BREAKPOINTS)
+            debugger_name = RuntimeVariables.AM_DEBUG_DEBUGGER
+            configured_breakpoints = RuntimeVariables.AM_DEBUG_BREAKPOINTS
             if debugger_name is not None and configured_breakpoints is not None:
                 debugger_wellknown_breakpoint_entry(debugger_name, WELLKNOWN_BREAKPOINTS.TEST_DISCOVERY, configured_breakpoints)
 

@@ -118,7 +118,7 @@ debugpy = "^1.8.12"
 type = "git"
 url = "https://github.com/automationmojo/automojo-runtime.git"
 reference = "main"
-resolved_reference = "8739df946b808ad9c31a8a170da4269ded85589a"
+resolved_reference = "076bbecea047b36969d419cb2e7c749ade2b4bc4"
 
 [[package]]
 name = "automojo-this-app"
@@ -138,7 +138,7 @@ automojo-extension = {git = "https://github.com/automationmojo/automojo-extensio
 type = "git"
 url = "https://github.com/automationmojo/automojo-this-app.git"
 reference = "main"
-resolved_reference = "b6a88acedd5e8f2c2d1d3b8118408febb2cac08b"
+resolved_reference = "8bc8bb1a6d9bd75d5deffd129cdb17a219eae785"
 
 [[package]]
 name = "automojo-waiting"

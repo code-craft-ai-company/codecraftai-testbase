@@ -20,7 +20,7 @@ from automojo.thisapp.persona import establish_app_persona
 
 from automojo.runtime.enumerations import ActivationProfile, JobType
 from automojo.runtime.activation import activate_profile_job
-from automojo.runtime.runtimevariables import RuntimeVariables
+from automojo.runtime.runtimevariables import RuntimeVariables, RuntimeVariablesDesc
 
 
 TESTPLUS_DIR = os.path.dirname(__file__)
@@ -53,11 +53,11 @@ def initialize_testbase_results():
     dest_static_dir = os.path.join(RuntimeVariables.AM_PRESENCE_DIR, "results", TestBaseConstants.TESTPLUS_RESOURCE_DEST_LEAF)
 
     if RuntimeVariables.AM_RESULTS_STATIC_RESOURCE_SRC_DIR is None:
-        this_app.override_variable_value(RuntimeVariables.AM_RESULTS_STATIC_RESOURCE_SRC_DIR, TestBaseConstants.TESTPLUS_RESOURCE_SRC_DIR)
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULTS_STATIC_RESOURCE_SRC_DIR, TestBaseConstants.TESTPLUS_RESOURCE_SRC_DIR)
     if RuntimeVariables.AM_RESULTS_STATIC_RESOURCE_DEST_DIR is None:
-        this_app.override_variable_value(RuntimeVariables.AM_RESULTS_STATIC_RESOURCE_DEST_DIR, dest_static_dir)
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULTS_STATIC_RESOURCE_DEST_DIR, dest_static_dir)
     if RuntimeVariables.AM_RESULTS_STATIC_SUMMARY_TEMPLATE is None:
-        this_app.override_variable_value(RuntimeVariables.AM_RESULTS_STATIC_SUMMARY_TEMPLATE, TestBaseConstants.TESTPLUS_SUMMARY_TEMPLATE)
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULTS_STATIC_SUMMARY_TEMPLATE, TestBaseConstants.TESTPLUS_SUMMARY_TEMPLATE)
     
     activate_profile_job(job_type=JobType.TestRun)
 

@@ -20,12 +20,13 @@ import inspect
 import os
 import sys
 
-
-from automojo.presence.wellknown import ContextSingleton
-from automojo.runtime.paths import get_path_for_testresults
 from automojo.xmodules.xlogging.levels import LOG_LEVEL_NAMES
 from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 from automojo.xmodules.ximport import import_by_name
+
+from automojo.thisapp.wellknown import ThisApplicationSingleton
+
+from automojo.runtime.paths import get_path_for_testresults
 
 from automojo.testbase.injection.injectionregistry import InjectionRegistry
 

@@ -51,8 +51,6 @@ def testbase_root_command(verbose):
     this_app.override_variable_value(RuntimeVariablesDesc.AM_INTERACTIVE_CONSOLE, interactive_console)
     this_app.override_variable_value(RuntimeVariablesDesc.AM_LOG_LEVEL_CONSOLE, log_level_console)
 
-    initialize_testbase_runtime()
-
     return
 
 

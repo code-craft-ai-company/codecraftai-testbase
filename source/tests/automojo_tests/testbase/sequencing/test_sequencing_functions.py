@@ -3,12 +3,13 @@ import tempfile
 import unittest
 from collections import OrderedDict
 
-from automojo.presence.contextpaths import ContextPaths
-from automojo.presence.wellknown import ContextSingleton
+import automojo.runtime.paths as runtime_paths
 from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
 
 from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+from automojo.runtime.runtimevariables import RuntimeVariablesDesc
+from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
+from automojo.thisapp.wellknown import ThisApplicationSingleton
 
 from automojo.testbase.sequencing.testactivity import TestActivity
 from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope
@@ -95,10 +96,18 @@ class TestActivityTests(unittest.TestCase):
 class SequencerTestScopeTests(unittest.TestCase):
 
     def setUp(self):
-        ctx = ContextSingleton()
+        if not APP_PERSONA_ESTABLISHED:
+            establish_app_persona(name="automojo-testbase", logger_name="automojo-testbase", log_basename="automojo-testbase")
+
         self.tempdir = tempfile.TemporaryDirectory()
-        ctx.insert(ContextPaths.RESULT_PATH_FOR_TESTS, self.tempdir.name)
-        AM_RUNTIME_VARIABLES.AM_JOB_TYPE = JobType.TestRun
+
+        # Reset cached runtime paths so overrides take effect for each test
+        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
+        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+
+        this_app = ThisApplicationSingleton()
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
         self.seq = DummySequencer()
         self.rec = DummyRecorder()
 

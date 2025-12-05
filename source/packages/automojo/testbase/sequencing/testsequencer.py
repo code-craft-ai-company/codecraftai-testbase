@@ -34,8 +34,7 @@ from automojo.xmodules.ximport import import_file
 from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
 from automojo.xmodules.debugging import debugger_wellknown_breakpoint_code_append
 
-from automojo.presence.contextpaths import ContextPaths
-from automojo.presence.wellknown import ContextSingleton
+from automojo.runtime.runtimevariables import RuntimeVariables
 
 from automojo.testbase.injection.injectionregistry import injection_registry
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
@@ -314,8 +313,8 @@ class TestSequencer(ContextUser):
         """
             Perform a pre-run diagnostic on the devices in the test landscape.
         """
-
-        prerun_info = self.context.lookup(ContextPaths.DIAGNOSTICS_PRERUN)
+        
+        prerun_info = RuntimeVariables.AM_DIAGNOSTICS_PRERUN
 
         if prerun_info is not None and prerun_info == True:
             label = DiagnosticLabel.PRERUN_DIAGNOSTIC
@@ -330,7 +329,7 @@ class TestSequencer(ContextUser):
         """
             Perform a post-run diagnostic on the devices in the test landscape.
         """
-        postrun_info = self.context.lookup(ContextPaths.DIAGNOSTICS_POSTRUN)
+        postrun_info = RuntimeVariables.AM_DIAGNOSTICS_POSTRUN
 
         if postrun_info is not None and postrun_info == True:
 
@@ -585,10 +584,8 @@ class TestSequencer(ContextUser):
             '{}"""'.format(current_indent)
         ]
 
-        ctx = ContextSingleton()
-
-        debugger_name = ctx.lookup(ContextPaths.DEBUG_DEBUGGER)
-        configured_breakpoints = ctx.lookup(ContextPaths.DEBUG_BREAKPOINTS)
+        debugger_name = RuntimeVariables.AM_DEBUG_DEBUGGER
+        configured_breakpoints = RuntimeVariables.AM_DEBUG_BREAKPOINTS
 
         if debugger_name is not None and configured_breakpoints is not None:
             debugger_wellknown_breakpoint_code_append(debugger_name, WELLKNOWN_BREAKPOINTS.TESTRUN_START, method_lines, current_indent, configured_breakpoints)

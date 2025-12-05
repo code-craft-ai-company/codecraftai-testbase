@@ -19,14 +19,12 @@ from typing import List, Optional
 import os
 import traceback
 
-from automojo.xmodules.xcollections.contextuser import ContextUser
 from automojo.xmodules.xformatting import CommandOutputFormat
 from automojo.xmodules.debugging import debugger_wellknown_breakpoint_entry
 from automojo.xmodules.xlogging.enhancedloggers import EnhancedLogger
 
 from automojo.thisapp.wellknown import ThisApplicationSingleton
 
-from automojo.runtime.runtimecontextpaths import RuntimeContextPaths
 from automojo.runtime.runtimevariables import RuntimeVariables, DefaultValue
 from automojo.runtime.paths import (
     get_summary_html_template_source,
@@ -46,7 +44,7 @@ from automojo.testbase.results.recorders.jsonresultrecorder import ResultRecorde
 from automojo.testbase.sequencing.testsequencer import TestSequencer
 from automojo.interfaces.itestjob import ITestJob
 
-class TestJob(ContextUser, ITestJob):
+class TestJob(ITestJob):
     """
         The :class:`TestJob` spans the execution of all :class:`TestPack` and organizes the
         flow of execution of test packs.  It allows for the sequencing of the execution of test
@@ -143,8 +141,6 @@ class TestJob(ContextUser, ITestJob):
         """
             Called at the beginning of a test job in order to setup the recording of test results.
         """
-
-        env = self.context.lookup("/environment")
 
         self._starttime = RuntimeVariables.AM_STARTTIME
 

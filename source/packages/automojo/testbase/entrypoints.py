@@ -64,8 +64,10 @@ def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
 
     test_module = sys.modules["__main__"]
 
-    ctx = ContextSingleton()
-    env = ctx.lookup("/environment")
+    from automojo.thisapp.wellknown import ThisApplicationSingleton
+
+    this_app = ThisApplicationSingleton()
+    env = this_app.context.lookup("/environment")
 
     # Set the jobtype
     env["jobtype"] = "testrun"

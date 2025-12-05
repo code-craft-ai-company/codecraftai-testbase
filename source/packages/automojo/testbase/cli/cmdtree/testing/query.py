@@ -45,13 +45,10 @@ def command_testbase_testing_query(root: Union[str, None], includes: List[str], 
     # IMPORTANT: We need to load the context first because it will trigger the loading
     # of the default user configuration
 
-    from automojo.presence.contextpaths import ContextPaths
-    from automojo.presence.wellknown import ContextSingleton
-
     from automojo.xmodules.xpython import prepend_python_path
 
     from automojo.runtime.activation import activate_runtime, ActivationProfile
-    from automojo.runtime.runtimevariables import AM_RUNTIME_VARIABLES
+    from automojo.runtime.runtimevariables import RuntimeVariables
 
     # STEP 2 - Resolve the configuration variables (performed by the root command)
 
@@ -61,9 +58,6 @@ def command_testbase_testing_query(root: Union[str, None], includes: List[str], 
     # handle exceptions in the context of testrunner_main function
     activate_runtime(profile=ActivationProfile.Console)
 
-    ctx = ContextSingleton()
-    env = ctx.lookup("/environment")
-
     # STEP 4 - Apply any Option Overrides
 
     from automojo.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
@@ -72,12 +66,11 @@ def command_testbase_testing_query(root: Union[str, None], includes: List[str], 
 
     # Setup the Test Root
     if root is None:
-        if AM_RUNTIME_VARIABLES.AM_TESTROOT is not None:
-            root = AM_RUNTIME_VARIABLES.AM_TESTROOT
-        elif ctx.lookup(ContextPaths.TESTROOT) is not None:
-            root = ctx.lookup(ContextPaths.TESTROOT)
+        if RuntimeVariables.AM_TESTROOT is not None:
+            root = RuntimeVariables.AM_TESTROOT
         else:
             root = "."
+
 
     test_root = os.path.abspath(os.path.expandvars(os.path.expanduser(root)))
     if not os.path.isdir(test_root):
@@ -113,7 +106,7 @@ def command_testbase_testing_query(root: Union[str, None], includes: List[str], 
     from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
     logger = getEnhancedLogger()
 
-    from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
+    from automojo.thisapp.wellknown import ConfiguredSuperFactorySingleton
     from automojo.testbase.factoryprotocols import TestBaseExtensionProtocol
 
     sfactory = ConfiguredSuperFactorySingleton()

@@ -74,15 +74,10 @@ def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: 
     # IMPORTANT: We need to load the context first because it will trigger the loading
     # of the default user configuration
 
-    from automojo.presence.contextpaths import ContextPaths
-    from automojo.presence.wellknown import ContextSingleton
-
     from automojo.xmodules.ximport import import_by_name
     from automojo.xmodules.xpython import prepend_python_path
 
     try:
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.JOB_TYPE, 'testrun')
 
         test_root = os.path.abspath(os.path.expandvars(os.path.expanduser(root)))
         if not os.path.isdir(test_root):
@@ -109,7 +104,7 @@ def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: 
         tpmod = sys.modules["automojo.testbase"]
         tpmod.logger = logger
 
-        from automojo.presence.wellknown import ConfiguredSuperFactorySingleton
+        from automojo.thisapp.wellknown import ConfiguredSuperFactorySingleton
         from automojo.testbase.factoryprotocols import TestBaseExtensionProtocol
 
         # At this point in the code, we either lookup an existing test job or we create a test job

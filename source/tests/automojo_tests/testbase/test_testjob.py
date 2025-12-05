@@ -2,6 +2,12 @@ import os
 import tempfile
 import unittest
 
+import automojo.runtime.paths as runtime_paths
+from automojo.runtime.enumerations import JobType
+from automojo.runtime.runtimevariables import RuntimeVariablesDesc
+from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
+from automojo.thisapp.wellknown import ThisApplicationSingleton
+
 from automojo.testbase.testjob import TestJob
 from automojo.testbase.results.model.buildinfo import BuildInfo
 from automojo.testbase.results.model.pipelineinfo import PipelineInfo
@@ -85,6 +91,25 @@ class QueryJob(TestJob):
 
 
 class TestJobTests(unittest.TestCase):
+
+    def setUp(self):
+        if not APP_PERSONA_ESTABLISHED:
+            establish_app_persona(name="automojo-testbase", logger_name="automojo-testbase", log_basename="automojo-testbase")
+
+        self.tempdir = tempfile.TemporaryDirectory()
+
+        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
+        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+
+        this_app = ThisApplicationSingleton()
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+
+    def tearDown(self):
+        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
+        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+        self.tempdir.cleanup()
+
     def test_context_manager_calls_begin_and_finalize(self):
         job = DummyJob()
         with job as j:

@@ -25,8 +25,6 @@ import uuid
 from io import TextIOWrapper
 from types import TracebackType
 
-from automojo.xmodules.xcollections.contextuser import ContextUser
-
 from automojo.errors.exceptions import SemanticError
 
 from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
@@ -115,7 +113,7 @@ class TEST_SEQUENCER_PHASES:
     Traversal = 4
 
 
-class TestSequencer(ContextUser):
+class TestSequencer:
     """
         The :class:`TestSequencer` is a state machine that helps to orchestrate the flow fo the test run.  It ensures
         that the steps of the test flow are consistent between runs.

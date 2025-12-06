@@ -31,7 +31,7 @@ def testbase_root_command(verbose):
 
     initialize_testbase_runtime()
     
-    interactive_console = None
+    interactive_console = False
     log_level_console = "WARNING"
 
     if verbose == 0:

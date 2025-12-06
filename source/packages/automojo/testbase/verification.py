@@ -178,6 +178,76 @@ def assert_expression(found: str, expr: Union[str, re.Pattern], api: Optional[st
     return
 
 
+def assert_true(found: Any, api: Optional[str] = None):
+    """
+        Verifies that the specified return result from the specified API is true.
+        If the verification fails then an :class:`AssertionError` is created and returned, otherwise None
+        is returned. It is the resposibility of the calling test to raise the returned error.
+
+        :param found: The value to be evaluated
+        :param api: The name of the API that returned the result being inspected.
+        
+        :returns: None
+        :raises: :class:`AssertionError` if the verification fails.
+    """
+
+    if not found:
+
+        msg_prefix = PREFIX_STD if api is None else PREFIX_API.format(api)
+
+        err_msg_lines = [
+            "{} verification failed because the found value evaluated to False.".format(msg_prefix)
+        ]
+
+        found_format_lines = pformat(found, indent=4).splitlines()
+        if len(found_format_lines) == 1:
+            err_msg_lines.append("FOUND: {}".format(found_format_lines[0]))
+        elif len(found_format_lines) > 1:
+            err_msg_lines.append("FOUND:")
+            found_format_lines = indent_lines(found_format_lines, 1)
+            err_msg_lines.extend(found_format_lines)
+
+        errmsg = os.linesep.join(err_msg_lines)
+        raise AssertionError(errmsg)
+
+    return
+
+
+def assert_false(found: Any, api: Optional[str] = None):
+    """
+        Verifies that the specified return result from the specified API is false.
+        If the verification fails then an :class:`AssertionError` is created and returned, otherwise None
+        is returned. It is the resposibility of the calling test to raise the returned error.
+
+        :param found: The value to be evaluated
+        :param api: The name of the API that returned the result being inspected.
+        
+        :returns: None
+        :raises: :class:`AssertionError` if the verification fails.
+    """
+
+    if found:
+
+        msg_prefix = PREFIX_STD if api is None else PREFIX_API.format(api)
+
+        err_msg_lines = [
+            "{} verification failed because the found value evaluated to True.".format(msg_prefix)
+        ]
+
+        found_format_lines = pformat(found, indent=4).splitlines()
+        if len(found_format_lines) == 1:
+            err_msg_lines.append("FOUND: {}".format(found_format_lines[0]))
+        elif len(found_format_lines) > 1:
+            err_msg_lines.append("FOUND:")
+            found_format_lines = indent_lines(found_format_lines, 1)
+            err_msg_lines.extend(found_format_lines)
+
+        errmsg = os.linesep.join(err_msg_lines)
+        raise AssertionError(errmsg)
+
+    return
+
+
 def assert_greater(found: Any, boundary: Any, api: Optional[str] = None):
     """
         Verifies that the specified return result from the specified API has a value greater than the
@@ -513,4 +583,3 @@ def _verify_dict_has_paths_descend(search_path: str, cursor: dict, leaf_parts: l
                 _verify_dict_has_paths_descend(search_path, nxt_val, desc_leaf_parts)
 
     return found
-

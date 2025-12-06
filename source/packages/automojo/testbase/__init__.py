@@ -28,11 +28,13 @@ from automojo.testbase.verification import (
     assert_dict_response_has_paths,
     assert_equal,
     assert_expression,
+    assert_false,
     assert_greater,
     assert_lessthan,
     assert_list_length,
     assert_list_length_greater,
     assert_not_equal,
+    assert_true,
     assert_type
 )
 

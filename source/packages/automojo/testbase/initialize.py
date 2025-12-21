@@ -20,8 +20,7 @@ from automojo.thisapp.persona import establish_app_persona
 
 from automojo.runtime.enumerations import ActivationProfile, JobType
 from automojo.runtime.activation import activate_profile_job
-from automojo.runtime.runtimevariables import RuntimeVariables, RuntimeVariablesDesc
-
+from automojo.runtime.runtimevariables import RuntimeVariables, RuntimeVariablesDesc, resolve_runtime_variables
 
 TESTPLUS_DIR = os.path.dirname(__file__)
 
@@ -43,6 +42,8 @@ def initialize_testbase_runtime():
     home_dir = os.path.join(os.path.expanduser("~"), name)
     
     establish_app_persona(name=name, home_dir=home_dir, logger_name="TB", log_basename="testrun")
+
+    resolve_runtime_variables()
 
     return
 

@@ -1,5 +1,5 @@
 ===========================================================
-Automation Mojo TestBase Test Framework - aut0mojo-testbase
+Automation Mojo TestBase Test Framework - automojo-testbase
 ===========================================================
 This is a template repository that can be used to quickly create a python package project.
 

@@ -99,7 +99,7 @@ def find_included_modules_under_root(root: str, package: Union[str, None], modul
                 for fname in filenames:
                     fbase, fext = os.path.splitext(fname)
                     if fext == ".py" and fbase != "__init__" and \
-                        fbase.startswith(module) and fnmatch.fnmatch(fbase, module):
+                        (fbase.startswith(module) or fnmatch.fnmatch(fbase, module)):
                         ffull = os.path.join(dirpath, fname)
                         included_file_candidates.add(ffull)
 

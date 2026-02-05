@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+from datetime import datetime
 
 import automojo.runtime.paths as runtime_paths
 from automojo.runtime.enumerations import JobType
@@ -139,7 +140,7 @@ class TestJobTests(unittest.TestCase):
             jinfo = JobInfo(id="jid", name="jnm", type="t", owner="o", label="l", initiator="i", venue="v", tag="tag")
             rec = job._create_recorder(
                 runid="rid",
-                start="s",
+                start=datetime.now(),
                 render_info=rinfo,
                 build_info=binfo,
                 pipeline_info=pinfo,

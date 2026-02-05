@@ -1,4 +1,5 @@
 import unittest
+import os
 from unittest import mock
 
 from automojo.testbase.testcollector import (
@@ -10,10 +11,10 @@ from automojo.testbase.testgroup import TestGroup
 
 
 class CategorizeExclusionsTests(unittest.TestCase):
-    def test_returns_specific_exclusions_when_no_at_symbol(self):
+    def test_returns_file_exclusions_when_no_at_symbol(self):
         files, specific = catagorize_exclusions(["pkg.module"])
-        self.assertEqual(files, [])
-        self.assertEqual(specific, ["pkg.module"])
+        self.assertEqual(files, ["pkg" + os.sep + "module"])
+        self.assertEqual(specific, [])
 
     def test_with_at_symbol_also_specific(self):
         files, specific = catagorize_exclusions(["pkg.module@Test"])

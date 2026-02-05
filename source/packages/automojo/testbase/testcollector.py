@@ -49,7 +49,7 @@ def catagorize_exclusions(excluded: str) -> Tuple[List[str], List[str]]:
 
     if excluded is not None:
         for ex in excluded:
-            if ex.find("@") < -1:
+            if ex.find("@") == -1:
                 path_prefix = ex.replace(".", os.sep)
                 file_exclusions.append(path_prefix)
             else:

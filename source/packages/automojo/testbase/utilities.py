@@ -130,10 +130,11 @@ def find_testmodule_root(module) -> str:
     while True:
         pkg_dir_file = os.path.join(mod_dir, "__testroot__.py")
         if not os.path.exists(pkg_dir_file):
-            if mod_dir == "/":
+            parent_dir = os.path.dirname(mod_dir)
+            if parent_dir == mod_dir:
                 errmsg = "TestBase test files must exist inside a test root directory marked with a __testroot__.py file."
                 raise ConfigurationError(errmsg)
-            mod_dir = os.path.dirname(mod_dir)
+            mod_dir = parent_dir
         else:
             break
 

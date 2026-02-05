@@ -31,4 +31,4 @@ class TestBaseFactoryProtocol(FactoryProtocolBase):
             Used to lookup and return the most relevant default job type as determined
             by the super factory search path.
         """
-        return 
+        return DefaultTestJob

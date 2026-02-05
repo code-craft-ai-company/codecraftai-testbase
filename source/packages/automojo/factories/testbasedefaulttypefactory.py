@@ -16,7 +16,7 @@ class TestBaseDefaultExtensionFactory(FactoryExtension, TestBaseFactoryProtocol)
 
     PRECEDENCE = 0
 
-    def get_testbase_default_job_type() -> Type[TestJob]:
+    def get_testbase_default_job_type(self) -> Type[TestJob]:
         """
             Used to lookup and return the most relevant default job type as determined
             by the super factory search path.

@@ -36,12 +36,15 @@ class InjectionMoment:
         us to cleanup the runtime instance and state as soon as it is no longer being used.
     """
 
-    def __init__(self, injfunc: FunctionType, monikers: Optional[List[str]] = None, pivots: OrderedDict[str, Any]=collections.OrderedDict()):
+    def __init__(self, injfunc: FunctionType, monikers: Optional[List[str]] = None, pivots: Optional[OrderedDict[str, Any]] = None):
         """
             Initializes the injectable reference object.
         """
         if monikers is None:
             monikers = []
+
+        if pivots is None:
+            pivots = collections.OrderedDict()
  
         self._inj_function = injfunc
         self._monikers = monikers

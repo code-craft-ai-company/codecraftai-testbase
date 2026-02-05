@@ -15,6 +15,7 @@ __credits__ = []
 
 
 from typing import List, Optional
+from datetime import datetime
 
 import os
 import traceback
@@ -225,7 +226,7 @@ class TestJob(ITestJob):
 
                 title = self.name
                 runid = self._run_id
-                start = str(self._starttime)
+                start = self._starttime
 
                 static_resource_source = get_summary_static_resource_src_dir()
                 static_resource_destination = get_summary_static_resource_dest_dir()
@@ -408,7 +409,7 @@ class TestJob(ITestJob):
         """
         return
 
-    def _create_recorder(self, runid: str, start: str, render_info: RenderInfo, build_info: BuildInfo,
+    def _create_recorder(self, runid: str, start: datetime, render_info: RenderInfo, build_info: BuildInfo,
                          pipeline_info: PipelineInfo, job_info: JobInfo) -> ResultRecorder:
         """
             Simple hook function to make it possible to overload the type of ResultRecorder that is created for

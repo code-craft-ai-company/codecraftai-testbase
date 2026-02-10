@@ -13,14 +13,14 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-from typing import Union
+from typing import Dict, Union
 
 import fnmatch
 import json
 import os
 
-from automojo.errors.exceptions import ConfigurationError
-from automojo.xmodules.fspath import collect_python_modules
+from automojo.errors.exceptions import ConfigurationError, UnSupportedPlatformError
+from automojo.xmodules.ximport import import_file
 
 def catalog_tree(rootdir: str, ignore_dirs=[]):
     """
@@ -50,6 +50,103 @@ def create_testpack_key(testpack_cls):
     mtpkey = testpack_cls.__module__ + "@" + testpack_cls.__name__
     return mtpkey
 
+def _build_platforms_module_name(root: str, dirpath: str) -> str:
+    root = os.path.abspath(root)
+    dirpath = os.path.abspath(dirpath)
+
+    root_pkg = os.path.basename(root)
+    rel_dir = os.path.relpath(dirpath, root)
+
+    if rel_dir in (".", ""):
+        modname = "{}.{}".format(root_pkg, "__platforms__")
+    else:
+        rel_mod = rel_dir.replace(os.path.sep, ".")
+        modname = "{}.{}.{}".format(root_pkg, rel_mod, "__platforms__")
+
+    return modname
+
+def _is_platform_supported(root: str, dirpath: str, platforms_cache: Dict[str, bool]) -> bool:
+    dirpath = os.path.abspath(dirpath)
+
+    if dirpath in platforms_cache:
+        return platforms_cache[dirpath]
+
+    platforms_file = os.path.join(dirpath, "__platforms__.py")
+    if not os.path.exists(platforms_file):
+        platforms_cache[dirpath] = True
+        return True
+
+    modname = _build_platforms_module_name(root, dirpath)
+
+    try:
+        import_file(modname, platforms_file)
+    except UnSupportedPlatformError:
+        platforms_cache[dirpath] = False
+        return False
+    # If the exception is unexpected, just let it bubble
+
+    platforms_cache[dirpath] = True
+
+    return True
+
+def collect_python_modules_for_tests(search_dir: str, root: str, platforms_cache: Dict[str, bool], max_depth=None):
+    """
+        Walks a directory tree of python modules and collects the names
+        of all of the python module files or .py files.  This method allows
+        for python namespaces by not forcing the root folder to contain a
+        __init__.py file.  The search will skip any directory whose
+        __platforms__.py file raises UnSupportedPlatformError.
+
+        :params searchdir: The root directory to search when collecting python modules.
+        :params root: The root directory used to calculate module names for __platforms__.py files.
+        :params platforms_cache: A cache of directory paths to platform support decisions.
+        :params max_depth: The maximum depth to search for python modules.  If this is None
+                        then the entire directory tree will be searched.  If this is
+                        an integer then the search will be limited to that depth.
+        
+        :returns: A list of the full paths to the python module files.
+    """
+    pyfiles = []
+
+    search_dir = os.path.abspath(search_dir)
+    root = os.path.abspath(root)
+    search_dir_len = len(search_dir)
+
+    if not _is_platform_supported(root, search_dir, platforms_cache):
+        return pyfiles
+
+    for root_dir, dirnames, files in os.walk(search_dir, topdown=True):
+
+        if not _is_platform_supported(root, root_dir, platforms_cache):
+            dirnames[:] = []
+            continue
+
+        if max_depth is not None:
+            dir_leaf = root_dir[search_dir_len:].strip(os.path.sep)
+            depth = 0
+            if dir_leaf != '':
+                dir_leaf_parts = dir_leaf.split(os.path.sep)
+                depth = len(dir_leaf_parts)
+                if depth > max_depth:
+                    dirnames[:] = []
+                    continue
+
+        if len(dirnames) > 0:
+            supported_dirnames = []
+            for dname in dirnames:
+                dpath = os.path.join(root_dir, dname)
+                if _is_platform_supported(root, dpath, platforms_cache):
+                    supported_dirnames.append(dname)
+            dirnames[:] = supported_dirnames
+
+        for fname in files:
+            fbase, fext = os.path.splitext(fname)
+            if fext == '.py' and fbase not in ("__init__", "__platforms__"):
+                ffull = os.path.join(root_dir, fname)
+                pyfiles.append(ffull)
+
+    return pyfiles
+
 def find_included_modules_under_root(root: str, package: Union[str, None], module: str, excluded_path_prefixes: list = []):
     """
         Walks through a directory tree starting at a root directory and finds all of the files that corresponded to
@@ -67,6 +164,10 @@ def find_included_modules_under_root(root: str, package: Union[str, None], modul
     root_pkg = os.path.basename(root)
 
     included_file_candidates = set()
+    platforms_cache: Dict[str, bool] = {}
+
+    if not _is_platform_supported(root, root, platforms_cache):
+        return [], []
 
     if package is None:
         # If package is None, then we had a single item expression, this means
@@ -78,27 +179,39 @@ def find_included_modules_under_root(root: str, package: Union[str, None], modul
                 ffull = os.path.join(root, fname)
                 if os.path.isfile(ffull):
                     fbase, fext = os.path.splitext(fname)
-                    if fext == ".py" and fbase != "__init__":
+                    if fext == ".py" and fbase not in ("__init__", "__platforms__"):
                         included_file_candidates.add(ffull)
                 elif os.path.isdir(ffull):
-                    module_list = collect_python_modules(ffull)
+                    module_list = collect_python_modules_for_tests(ffull, root, platforms_cache)
                     for mod in module_list:
                         included_file_candidates.add(mod)
     else:
         pkgpathpfx = package.replace(".", "/")
         fullpathpfx = pkgpathpfx + "/" + module
-        for dirpath, _, filenames in os.walk(root):
+        for dirpath, dirnames, filenames in os.walk(root, topdown=True):
+            if not _is_platform_supported(root, dirpath, platforms_cache):
+                dirnames[:] = []
+                continue
+
+            if len(dirnames) > 0:
+                supported_dirnames = []
+                for dname in dirnames:
+                    dpath = os.path.join(dirpath, dname)
+                    if _is_platform_supported(root, dpath, platforms_cache):
+                        supported_dirnames.append(dname)
+                dirnames[:] = supported_dirnames
+
             dirleaf = root_pkg + "/" + dirpath[len(root):].lstrip(os.sep)
             dirleaf = dirleaf.rstrip("/")
 
             if dirleaf.startswith(fullpathpfx) or fnmatch.fnmatch(dirleaf, fullpathpfx):
-                collected_modules = collect_python_modules(dirpath)
+                collected_modules = collect_python_modules_for_tests(dirpath, root, platforms_cache)
                 for cm in collected_modules:
                     included_file_candidates.add(cm)
             elif dirleaf.startswith(pkgpathpfx) or fnmatch.fnmatch(dirleaf, pkgpathpfx):
                 for fname in filenames:
                     fbase, fext = os.path.splitext(fname)
-                    if fext == ".py" and fbase != "__init__" and \
+                    if fext == ".py" and fbase not in ("__init__", "__platforms__") and \
                         (fbase.startswith(module) or fnmatch.fnmatch(fbase, module)):
                         ffull = os.path.join(dirpath, fname)
                         included_file_candidates.add(ffull)

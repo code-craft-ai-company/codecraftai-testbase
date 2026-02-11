@@ -6,23 +6,29 @@
     .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
 
-
-
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
-from typing import List, Union
+from typing import List, Union, Optional
 
 import os
 import sys
+import argparse
 
-import click
+from automojo.arcli import decorators as arcli
 
 from automojo.xmodules.xlogging.levels import LOG_LEVEL_NAMES
 from automojo.interfaces.itestjob import ITestJob
 
-from automojo.testbase.cli.cmdtree.testing.constants import (
+from automojo.testbase.cli.options import (
+    RootOptionGroup,
+    OutputOptionGroup,
+    BuildOptionGroup,
+    JobOptionGroup,
+    LoggingOptionGroup,
+    DiagnosticOptionGroup,
+    FilteringOptionGroup,
     HELP_ROOT,
     HELP_EXCLUDES,
     HELP_INCLUDES,
@@ -47,36 +53,23 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
     HELP_EXCLUDE_MARKER_EXP
 )
 
-
-@click.command("run", help="Command used to run collections of tests.")
-@click.option("--root", default=None,  type=str, required=False, help=HELP_ROOT)
-@click.option("--excludes", "-x", multiple=True, required=False, help=HELP_EXCLUDES)
-@click.option("--includes", "-i", multiple=True, help=HELP_INCLUDES)
-@click.option("--output", "-o", default=None, required=False, help=HELP_OUTPUT)
-@click.option("--start", default=None, required=False, help=HELP_START)
-@click.option("--runid", default=None, required=False, help=HELP_RUNID)
-@click.option("--branch", default=None, required=False, help=HELP_BRANCH)
-@click.option("--build", default=None, required=False, help=HELP_BUILD)
-@click.option("--flavor", default=None, required=False, help=HELP_FLAVOR)
-@click.option("--job-id", default=None, required=False, help=HELP_JOB_ID)
-@click.option("--job-initiator", default=None, required=False, help=HELP_JOB_INITIATOR)
-@click.option("--job-label", default=None, required=False, help=HELP_JOB_LABEL)
-@click.option("--job-name", default=None, required=False, help=HELP_JOB_NAME)
-@click.option("--job-owner", default=None, required=False, help=HELP_JOB_OWNER)
-@click.option("--console-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_CONSOLE_LOG_LEVEL)
-@click.option("--logfile-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_FILE_LOG_LEVEL)
-@click.option("--debugger", default=None, required=False, type=click.Choice(['pdb', 'debugpy']), help=HELP_DEBUGGER)
-@click.option("--breakpoint", "breakpoints", default=None, required=False, multiple=True, type=click.Choice(['test-discovery', 'testrun-start']), help=HELP_BREAKPOINT)
-@click.option("--prerun-diagnostic", is_flag=True, default=False, required=False, help=HELP_PRERUN_DIAGNOSTIC)
-@click.option("--postrun-diagnostic", is_flag=True, default=False, required=False, help=HELP_POSTRUN_DIAGNOSTIC)
-@click.option("--include-marker-exp", required=False, multiple=True, help=HELP_INCLUDE_MARKER_EXP)
-@click.option("--exclude-marker-exp", required=False, multiple=True, help=HELP_EXCLUDE_MARKER_EXP)
-def command_testbase_testing_run(root: Union[str, None], includes: List[str], excludes: List[str], output: Union[str, None], start: Union[str, None],
-                                 runid: Union[str, None], branch: Union[str, None], build: Union[str, None], flavor: Union[str, None], job_id: Union[str, None],
-                                 job_initiator: Union[str, None], job_label: Union[str, None], job_name: Union[str, None], job_owner: Union[str, None],
-                                 console_level: Union[str, None], logfile_level: Union[str, None], debugger: Union[str, None], breakpoints: List[str],
-                                 prerun_diagnostic: bool, postrun_diagnostic: bool, include_marker_exp: List[str], exclude_marker_exp: List[str]):
-
+@RootOptionGroup.attach(help_fill={"action": "run"})
+@FilteringOptionGroup.attach(help_fill={"action": "run"})
+@OutputOptionGroup.attach()
+@BuildOptionGroup.attach()
+@JobOptionGroup.attach()
+@LoggingOptionGroup.attach()
+@DiagnosticOptionGroup.attach()
+@arcli.command("run")
+def command_testbase_testing_run(root: Optional[str], includes: Optional[List[str]], excludes: Optional[List[str]], output: Optional[str],
+                                 start: Optional[str], runid: Optional[str], branch: Optional[str], build: Optional[str], flavor: Optional[str],
+                                 job_id: Optional[str], job_initiator: Optional[str], job_label: Optional[str], job_name: Optional[str],
+                                 job_owner: Optional[str], console_level: Optional[str], logfile_level: Optional[str],
+                                 debugger: Optional[str], breakpoints: Optional[List[str]], prerun_diagnostic: bool, postrun_diagnostic: bool,
+                                 include_marker_exp: Optional[List[str]], exclude_marker_exp: Optional[List[str]]):
+    """
+    Command used to run collections of tests.
+    """
 
     # pylint: disable=unused-import,import-outside-toplevel
 
@@ -86,6 +79,13 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
 
     # IMPORTANT: We need to load the context first because it will trigger the loading
     # of the default user configuration
+
+    # Initialize lists
+    if includes is None: includes = []
+    if excludes is None: excludes = []
+    if breakpoints is None: breakpoints = []
+    if include_marker_exp is None: include_marker_exp = []
+    if exclude_marker_exp is None: exclude_marker_exp = []
 
     from automojo.xmodules.xpython import prepend_python_path
 
@@ -110,7 +110,7 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
     if flavor is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_build_flavor(flavor)
 
-    if job_initiator is not None:
+    if job_id is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_job_id(job_id)
 
     if job_initiator is not None:
@@ -146,7 +146,7 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
 
     # Process the commandline args here and then set the variables on the environment
     # as necessary.  We need to do this before we import activate.
-    if breakpoints is not None:
+    if breakpoints is not None and len(breakpoints) > 0:
         AM_RUNTIME_OPTION_OVERRIDES.override_debug_breakpoints(breakpoints)
 
         # If a breakpoint was passed bug the debugger was not, use 'debugpy' for the
@@ -174,7 +174,7 @@ def command_testbase_testing_run(root: Union[str, None], includes: List[str], ex
         errmsg = "The specified root folder does not exist. root=%s" % root
         if test_root != root:
             errmsg += " expanded=%s" % test_root
-        raise click.BadParameter(errmsg)
+        raise ValueError(errmsg)
 
     AM_RUNTIME_OPTION_OVERRIDES.override_testroot(test_root)
 

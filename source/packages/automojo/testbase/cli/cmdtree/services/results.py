@@ -12,10 +12,12 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
+from typing import Optional
 
 import os
 
-import click
+from automojo.arcli import decorators as arcli
+from automojo.arcli.model.parameters.integerparameter import IntegerParameter
 
 from automojo.thisapp.wellknown import ThisApplicationSingleton
 
@@ -30,11 +32,14 @@ HELP_DIRECTORY = "The root directory to serve the test results from."
 HELP_BIND = "The IP address to bind the server to."
 HELP_PORT = "The port to bind the server to."
 
-@click.command("results", help="Command used to launch the test results server.")
-@click.option("--directory", default=None, type=str, help=HELP_DIRECTORY)
-@click.option("--bind", default="", help=HELP_BIND)
-@click.option("--port", default=8880, help=HELP_PORT)
-def command_testbase_services_results(directory, bind, port):
+@arcli.option("--port", default=8880, ptype=IntegerParameter, help=HELP_PORT)
+@arcli.option("--bind", default="", help=HELP_BIND)
+@arcli.option("--directory", default=None, help=HELP_DIRECTORY)
+@arcli.command("results")
+def command_testbase_services_results(directory: Optional[str], bind: str, port: int):
+    """
+    Command used to launch the test results server.
+    """
     
     this_app = ThisApplicationSingleton()
 

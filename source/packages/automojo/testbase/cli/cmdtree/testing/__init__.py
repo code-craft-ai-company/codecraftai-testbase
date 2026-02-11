@@ -12,14 +12,17 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
-import click
+from automojo.arcli import decorators as arcli
 
 from automojo.testbase.cli.cmdtree.testing.jobs import group_testbase_testing_jobs
 from automojo.testbase.cli.cmdtree.testing.query import command_testbase_testing_query
 from automojo.testbase.cli.cmdtree.testing.run import command_testbase_testing_run
 
-@click.group("testing", help="Contains command for working with tests and test results.")
+@arcli.group("testing")
 def group_testbase_testing():
+    """
+    Contains command for working with tests and test results.
+    """
     return
 
 group_testbase_testing.add_command(group_testbase_testing_jobs)

@@ -1,18 +1,21 @@
-#!/usr/bin/env python3
 """
-.. module:: testbase_command
+    .. module:: testbase_command
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: The script entrypoint for the 'testbase' command.
 
-.. moduleauthor:: Myron Walker <myron.walker@gmail.com>
+    .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
 
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
+from typing import Optional
 
-import click
+from automojo.arcli import decorators as arcli
+from automojo.arcli import CliRunner
+from automojo.arcli.model.fields.optionfield import OptionMode
+from automojo.arcli.model.parameters.booleanparameter import BooleanParameter
 
 from automojo.thisapp.wellknown import ThisApplicationSingleton
 
@@ -25,9 +28,9 @@ from automojo.testbase.cli.cmdtree.testing import group_testbase_testing
 from automojo.testbase.cli.cmdtree.utilities import group_testbase_utilities
 
 
-@click.group("testbase")
-@click.option('-v', '--verbose', count=True)
-def testbase_root_command(verbose):
+@arcli.option('-v', '--verbose', default=0, mode=OptionMode.Counter, help="Set the verbosity level.")
+@arcli.entry("testbase")
+def testbase_root_command(verbose: int):
 
     initialize_testbase_runtime()
     

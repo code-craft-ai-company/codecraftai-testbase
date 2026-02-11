@@ -13,13 +13,16 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 __version__ = "1.0.0"
 
-import click
+from automojo.arcli import decorators as arcli
 
 from automojo.testbase.cli.cmdtree.utilities.timestamp import command_testbase_utilities_timestamp
 
 
-@click.group("utilities", help="Contains various automation pipeline utility commands.")
+@arcli.group("utilities")
 def group_testbase_utilities():
+    """
+    Contains various automation pipeline utility commands.
+    """
     return
 
 group_testbase_utilities.add_command(command_testbase_utilities_timestamp)

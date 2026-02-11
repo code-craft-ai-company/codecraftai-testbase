@@ -6,21 +6,22 @@
     .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
 
-
-
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-from typing import List, Union
+from typing import List, Union, Optional
 
+import argparse
 import os
 import sys
 
-import click
+from automojo.arcli import decorators as arcli
 
-from automojo.testbase.cli.cmdtree.testing.constants import (
+from automojo.testbase.cli.options import (
+    RootOptionGroup,
+    FilteringOptionGroup,
     HELP_ROOT,
     HELP_EXCLUDES,
     HELP_INCLUDES,
@@ -28,13 +29,14 @@ from automojo.testbase.cli.cmdtree.testing.constants import (
     HELP_INCLUDE_MARKER_EXP
 )
 
-@click.command("query", help="Command used to query information about tests.")
-@click.option("--root", default=None, type=str, help=HELP_ROOT)
-@click.option("--excludes", "-x", multiple=True, help=HELP_EXCLUDES)
-@click.option("--includes", "-i", multiple=True, help=HELP_INCLUDES)
-@click.option("--include-marker-exp", required=False, multiple=True, help=HELP_INCLUDE_MARKER_EXP)
-@click.option("--exclude-marker-exp", required=False, multiple=True, help=HELP_EXCLUDE_MARKER_EXP)
-def command_testbase_testing_query(root: Union[str, None], includes: List[str], excludes: List[str], include_marker_exp: List[str], exclude_marker_exp: List[str]):
+@RootOptionGroup.attach(help_fill={"action": "query"})
+@FilteringOptionGroup.attach(help_fill={"action": "query"})
+@arcli.command("query")
+def command_testbase_testing_query(root: Optional[str], includes: Optional[List[str]], excludes: Optional[List[str]],
+                                   include_marker_exp: Optional[List[str]], exclude_marker_exp: Optional[List[str]]):
+    """
+    Command used to query information about tests.
+    """
     
     # pylint: disable=unused-import,import-outside-toplevel
 
@@ -49,6 +51,12 @@ def command_testbase_testing_query(root: Union[str, None], includes: List[str], 
 
     from automojo.runtime.activation import activate_runtime, ActivationProfile
     from automojo.runtime.runtimevariables import RuntimeVariables
+
+    # Initialize lists if they are None
+    if includes is None: includes = []
+    if excludes is None: excludes = []
+    if include_marker_exp is None: include_marker_exp = []
+    if exclude_marker_exp is None: exclude_marker_exp = []
 
     # STEP 2 - Resolve the configuration variables (performed by the root command)
 
@@ -77,7 +85,7 @@ def command_testbase_testing_query(root: Union[str, None], includes: List[str], 
         errmsg = "The specified root folder does not exist. root=%s" % root
         if test_root != root:
             errmsg += " expanded=%s" % test_root
-        raise click.BadParameter(errmsg)
+        raise ValueError(errmsg)
 
     AM_RUNTIME_OPTION_OVERRIDES.override_testroot(root)
 

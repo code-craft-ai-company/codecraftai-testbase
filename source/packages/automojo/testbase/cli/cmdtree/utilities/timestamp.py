@@ -15,10 +15,13 @@ __credits__ = []
 
 from datetime import datetime
 
-import click
+from automojo.arcli import decorators as arcli
 
-@click.command("timestamp")
+@arcli.command("timestamp")
 def command_testbase_utilities_timestamp():
+    """
+    Command that prints a timestamp.
+    """
 
     from automojo.xmodules.xdatetime import DATETIME_FORMAT_FILESYSTEM
 

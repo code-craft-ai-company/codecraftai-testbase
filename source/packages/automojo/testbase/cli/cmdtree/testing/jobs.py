@@ -6,64 +6,69 @@
     .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
 
-
-
 __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
-from typing import Union
+from typing import Union, Optional
 
 import argparse
 import os
 import sys
 
-import click
+from automojo.arcli import decorators as arcli
+from automojo.arcli.model.fields.optionfield import OptionMode
+from automojo.arcli.model.parameters.booleanparameter import BooleanParameter
 
-from automojo.xmodules.xlogging.levels import LOG_LEVEL_NAMES
+from automojo.testbase.cli.options import (
+    RootOptionGroup,
+    OutputOptionGroup,
+    BuildOptionGroup,
+    LoggingOptionGroup,
+    DebugOptionGroup,
+    HELP_ROOT,
+    HELP_FILTER,
+    HELP_JOB,
+    HELP_OUTPUT,
+    HELP_START,
+    HELP_BRANCH,
+    HELP_BUILD,
+    HELP_FLAVOR,
+    HELP_CONSOLE_LOG_LEVEL,
+    HELP_FILE_LOG_LEVEL,
+    HELP_DEBUG
+)
 
-@click.group("jobs", help="Contains commands for working with test jobs.")
+@arcli.group("jobs")
 def group_testbase_testing_jobs():
+    """
+    Contains commands for working with test jobs.
+    """
     return
 
-HELP_ROOT = "The root directory to use when scanning for tests."
-HELP_JOB = "The identifier of the job to run."
-HELP_FILTER = "Add a job filter expression."
-HELP_OUTPUT = "The output directory where results and artifacts are collected."
-HELP_START = r"A time stamp to associate with the start of the run. Example: 2020-10-17T15:30:11.989120  Bash: date +%Y-%m-%dT%H:%M:%S.%N"
-HELP_BRANCH = "The name of the branch to associate with the test run results."
-HELP_BUILD = "The name of the build to associate with the test run results."
-HELP_FLAVOR = "The name of the flavor to associate with the test run results."
-HELP_CONSOLE_LOG_LEVEL = "The logging level for console output."
-HELP_FILE_LOG_LEVEL = "The logging level for logfile output."
-HELP_DEBUG = "Output debug information to the console."
-
-@click.command("list")
-@click.option("--root", default=".", type=str, help=HELP_ROOT)
-@click.option("--filter", "-f", required=False, help=HELP_FILTER)
-@click.option("--debug", default=False, type=bool, help=HELP_DEBUG)
-def command_testing_jobs_list():
+@arcli.option("--filter", "-f", required=False, help=HELP_FILTER)
+@RootOptionGroup.attach(help_fill={"action": "list"})
+@DebugOptionGroup.attach()
+@arcli.command("list")
+def command_testing_jobs_list(root: Optional[str], filter: Optional[str], debug: bool):
     return
 
-@click.command("show")
-@click.option("--root", default=".", type=str, help=HELP_ROOT)
-@click.option("--job", "-j", required=True, help=HELP_JOB)
-@click.option("--debug", default=False, type=bool, help=HELP_DEBUG)
-def command_testbase_testing_jobs_show():
+@arcli.option("--job", "-j", required=True, help=HELP_JOB.format(action="show"))
+@RootOptionGroup.attach(help_fill={"action": "show"})
+@DebugOptionGroup.attach()
+@arcli.command("show")
+def command_testbase_testing_jobs_show(root: Optional[str], job: str, debug: bool):
     return
 
-@click.command("run")
-@click.option("--root", default=".", type=str, help=HELP_ROOT)
-@click.option("--job", "-j", required=True, help=HELP_JOB)
-@click.option("--output", "-o", required=False, help=HELP_OUTPUT)
-@click.option("--start", default=None, required=False, help=HELP_START)
-@click.option("--branch", default=None, required=False, help=HELP_BRANCH)
-@click.option("--build", default=None, required=False, help=HELP_BUILD)
-@click.option("--flavor", default=None, required=False, help=HELP_FLAVOR)
-@click.option("--console-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_CONSOLE_LOG_LEVEL)
-@click.option("--logfile-level", default=None, required=False, type=click.Choice(LOG_LEVEL_NAMES, case_sensitive=False), help=HELP_FILE_LOG_LEVEL)
-def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: Union[str, None], start: Union[str, None], branch: Union[str, None],
-                                      build: Union[str, None], flavor: Union[str, None], console_level: Union[str, None], logfile_level: Union[str, None]):
+@arcli.option("--job", "-j", required=True, help=HELP_JOB.format(action="run"))
+@RootOptionGroup.attach(help_fill={"action": "run"})
+@OutputOptionGroup.attach()
+@BuildOptionGroup.attach()
+@LoggingOptionGroup.attach()
+@arcli.command("run")
+def command_testbase_testing_jobs_run(root: Optional[str], job: str, output: Optional[str], start: Optional[str], runid: Optional[str],
+                                      branch: Optional[str], build: Optional[str], flavor: Optional[str],
+                                      console_level: Optional[str], logfile_level: Optional[str]):
 
     # pylint: disable=unused-import,import-outside-toplevel
 
@@ -78,13 +83,16 @@ def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: 
     from automojo.xmodules.xpython import prepend_python_path
 
     try:
+        # Default root to "." if None to match original behavior
+        if root is None:
+            root = "."
 
         test_root = os.path.abspath(os.path.expandvars(os.path.expanduser(root)))
         if not os.path.isdir(test_root):
             errmsg = "The specified root folder does not exist. root=%s" % root
             if test_root != root:
                 errmsg += " expanded=%s" % test_root
-            raise argparse.ArgumentError("--root", errmsg)
+            raise argparse.ArgumentError(None, errmsg)
 
         # Make sure we extend PATH to include the test root
         prepend_python_path(test_root)
@@ -116,7 +124,7 @@ def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: 
             job_parts = job.split("@")
             if len(job_parts) != 2:
                 errmsg = "A --job parameter must be of the form 'package.module@JobClass'"
-                raise click.UsageError(errmsg)
+                raise ValueError(errmsg)
 
             job_package, job_class = job_parts
 
@@ -124,11 +132,11 @@ def command_testbase_testing_jobs_run(root: Union[str, None], job: str, output: 
                 job_mod = import_by_name(job_package)
             except ImportError as imperr:
                 errmsg = "Failure while importing job package %r"  % job_package
-                raise argparse.ArgumentError("--job", errmsg) from imperr
+                raise argparse.ArgumentError(None, errmsg) from imperr
 
             if not hasattr(job_mod, job_class):
                 errmsg = "The job package %r does not have a job type %r." % (job_package, job_class)
-                raise argparse.ArgumentError("--job", errmsg)
+                raise argparse.ArgumentError(None, errmsg)
 
             TestJobType = getattr(job_mod, job_class)
 

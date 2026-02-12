@@ -49,8 +49,6 @@ def command_testbase_testing_query(root: Optional[str], includes: Optional[List[
 
     from automojo.xmodules.xpython import prepend_python_path
 
-    from automojo.runtime.activation import activate_runtime, ActivationProfile
-    from automojo.runtime.runtimevariables import RuntimeVariables
 
     # Initialize lists if they are None
     if includes is None: includes = []
@@ -64,8 +62,7 @@ def command_testbase_testing_query(root: Optional[str], includes: Optional[List[
 
     # We perform activation a little later in the testrunner.py file so we can
     # handle exceptions in the context of testrunner_main function
-    activate_runtime(profile=ActivationProfile.Console)
-
+    
     # STEP 4 - Apply any Option Overrides
 
     from automojo.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
@@ -115,10 +112,10 @@ def command_testbase_testing_query(root: Optional[str], includes: Optional[List[
     logger = getEnhancedLogger()
 
     from automojo.thisapp.wellknown import ConfiguredSuperFactorySingleton
-    from automojo.testbase.factoryprotocols import TestBaseExtensionProtocol
+    from automojo.testbase.factoryprotocols import TestBaseFactoryProtocol
 
     sfactory = ConfiguredSuperFactorySingleton()
-    TestJobType = sfactory.get_override_types_by_order(TestBaseExtensionProtocol.get_testbase_default_job_type)
+    TestJobType = sfactory.get_override_types_by_order(TestBaseFactoryProtocol.get_testbase_default_job_type)
 
     # At this point in the code, we either lookup an existing test job or we create a test job
     # from the includes, excludes or test_module

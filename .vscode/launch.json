@@ -29,6 +29,21 @@
             "justMyCode": false
         },
         {
+            "name": "Python: Internal Tests - Query",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/source/packages/automojo/testbase/cli/testbase_command.py",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "testing",
+                "query",
+                "--root=${workspaceFolder}/source/testroots/automojo",
+                "--includes=automojo.tests"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "Python: Test Results",
             "type": "debugpy",
             "request": "launch",

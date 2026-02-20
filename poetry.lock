@@ -17,7 +17,7 @@ automojo-errors = {git = "https://github.com/automationmojo/automojo-errors.git"
 type = "git"
 url = "https://github.com/automationmojo/automojo-arcli.git"
 reference = "main"
-resolved_reference = "2b63c7263d5b5379a0682e3e6ed24b9b86d8f7d9"
+resolved_reference = "2a33fc2680ab289f1c87b8b4aeb53284e3e56ea9"
 
 [[package]]
 name = "automojo-configuration"

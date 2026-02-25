@@ -1,7 +1,8 @@
 import inspect
 import unittest
 
-from automojo.testbase.origins.resourceorigin import ResourceOrigin, constraints_catalog
+from automojo.testbase.origins.resourceorigin import ResourceOrigin
+import automojo.testbase.origins.resourceorigin as resourceorigin
 from automojo.testbase.origins.validatororigin import ValidatorOrigin
 from automojo.testbase.sources.sourcebase import SourceBase
 from automojo.testbase.resourcelifespan import ResourceLifespan
@@ -9,8 +10,8 @@ from automojo.testbase.resourcelifespan import ResourceLifespan
 
 class OriginBaseTest(unittest.TestCase):
     def setUp(self):
-        constraints_catalog._site_constraints.clear()
-        constraints_catalog._override_constraints.clear()
+        resourceorigin.constraints_catalog._site_constraints.clear()
+        resourceorigin.constraints_catalog._override_constraints.clear()
 
         def dummy_query():
             return True
@@ -70,7 +71,7 @@ class ResourceOriginTests(OriginBaseTest):
         )
         key = "scope2:id2"
         self.assertEqual(origin.constraints_key, key)
-        self.assertIn(key, constraints_catalog._site_constraints)
+        self.assertIn(key, resourceorigin.constraints_catalog._site_constraints)
         expected_desc = f"{self.func.__module__}#{self.func.__name__} constraints='{key}'"
         self.assertEqual(origin.describe_source(), expected_desc)
 

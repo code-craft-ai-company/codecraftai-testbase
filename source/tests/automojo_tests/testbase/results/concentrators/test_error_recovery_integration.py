@@ -103,6 +103,11 @@ class ErrorRecoveryIntegrationTestBase(unittest.TestCase):
                 self.server._forwarding_running = False
                 self.server.shutdown()
                 self.server.server_close()
+                if hasattr(self.server, '_forward_thread') and self.server._forward_thread is not None:
+                    try:
+                        self.server._forward_thread.join(timeout=2.0)
+                    except Exception:
+                        pass
             except Exception:
                 pass
         

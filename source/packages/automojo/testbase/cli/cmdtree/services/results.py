@@ -44,7 +44,7 @@ def command_testbase_services_results(directory: Optional[str], bind: str, port:
     this_app = ThisApplicationSingleton()
 
     this_app.override_variable_value(RuntimeVariablesDesc.AM_SERVICE_NAME, "Test-Result-Service")
-
+    
     activate_profile_service()
 
     svc_endpoint = (bind, port)
@@ -58,7 +58,7 @@ def command_testbase_services_results(directory: Optional[str], bind: str, port:
 
     bug_svc = try_create_bug_server_interface_from_environment()
 
-    print(f"Serving test results on port={port} from folder='{directory}'")
+    print(f"Serving test results on port={port} from folder='{svc_directory}'")
 
     server = TestResultServer(svc_directory, svc_endpoint, TestResultRequestHandler, bug_svc)
     server.serve_forever()

@@ -153,7 +153,8 @@ def try_create_bug_server_interface_from_environment() -> Union[None, 'BugServer
     username: str = None
     token: str = None
 
-    server_type = RuntimeVariables.AM_BUG_SERVER_TYPE.upper()
+    if RuntimeVariables.AM_BUG_SERVER_TYPE is not None:
+        server_type = RuntimeVariables.AM_BUG_SERVER_TYPE.upper()
 
     while server_type is not None: # Setup a breakout pipeline
 

@@ -6,8 +6,10 @@
     -->
     <head>
         <title>Images</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 
         <script type="text/javascript" src="/static/v2/javascript/testsummary-helpers.js"></script>
+        <link rel="stylesheet" href="/static/v2/styles/tabs-responsive.css" ></link>
 
         <style>
 
@@ -20,13 +22,16 @@
 
             .flex-container {
                 display: flex;
+                flex-wrap: wrap;
                 width: auto;
                 height: auto;
+                gap: 15px;
             }
             
             .item-container {
                 display: flex;
                 flex-direction: column;
+                max-width: 100%;
             }
 
             .item-label {
@@ -38,6 +43,12 @@
 
             .item-content {
                 width: 100%;
+                height: auto;
+                max-width: 100%;
+            }
+            
+            .item-container img {
+                max-width: 100%;
                 height: auto;
             }
         </style>

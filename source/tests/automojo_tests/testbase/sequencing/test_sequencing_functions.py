@@ -128,6 +128,126 @@ class SequencerTestScopeTests(unittest.TestCase):
         self.assertEqual(pivs["b"], str(nmap["b"]))
         self.assertEqual(pivs["c"], "3")
 
+    def test_moniker_extraction_with_moniker_attribute(self):
+        """
+        Test that moniker extraction uses the moniker attribute when present.
+        Validates: Requirements 27.3
+        """
+        class NotableWithMoniker:
+            moniker = "custom_moniker"
+        
+        nmap = OrderedDict([("param1", NotableWithMoniker())])
+        scope = SequencerTestScope(self.seq, self.rec, "test_func", notables=nmap)
+        monikers, _ = scope._get_monikers_and_pivots()
+        
+        self.assertEqual(monikers, ["custom_moniker"])
+
+    def test_moniker_extraction_without_moniker_attribute(self):
+        """
+        Test that moniker extraction uses string representation when moniker attribute is absent.
+        Validates: Requirements 27.4
+        """
+        class NotableWithoutMoniker:
+            def __str__(self):
+                return "string_representation"
+        
+        nmap = OrderedDict([("param1", NotableWithoutMoniker())])
+        scope = SequencerTestScope(self.seq, self.rec, "test_func", notables=nmap)
+        monikers, _ = scope._get_monikers_and_pivots()
+        
+        self.assertEqual(monikers, ["string_representation"])
+
+    def test_moniker_extraction_with_primitive_values(self):
+        """
+        Test that moniker extraction handles primitive values correctly.
+        Validates: Requirements 27.4
+        """
+        nmap = OrderedDict([
+            ("int_param", 42),
+            ("str_param", "hello"),
+            ("float_param", 3.14)
+        ])
+        scope = SequencerTestScope(self.seq, self.rec, "test_func", notables=nmap)
+        monikers, _ = scope._get_monikers_and_pivots()
+        
+        self.assertEqual(monikers, ["42", "hello", "3.14"])
+
+    def test_context_identifier_format_with_monikers(self):
+        """
+        Test that context identifier follows the format {test_name}:{moniker1},{moniker2},...
+        Validates: Requirements 27.1, 27.2
+        """
+        class NotableA:
+            moniker = "mon_a"
+        class NotableB:
+            moniker = "mon_b"
+        
+        nmap = OrderedDict([("a", NotableA()), ("b", NotableB())])
+        scope = SequencerTestScope(self.seq, self.rec, "test_function", notables=nmap)
+        
+        expected_context_id = "test_function:mon_a,mon_b"
+        self.assertEqual(scope._context_identifier, expected_context_id)
+
+    def test_context_identifier_format_without_monikers(self):
+        """
+        Test that context identifier is correctly formed when no notables are provided.
+        Validates: Requirements 27.1, 27.2
+        """
+        scope = SequencerTestScope(self.seq, self.rec, "test_function", notables={})
+        
+        expected_context_id = "test_function:"
+        self.assertEqual(scope._context_identifier, expected_context_id)
+
+    def test_context_identifier_format_with_mixed_notables(self):
+        """
+        Test context identifier with a mix of objects with and without moniker attributes.
+        Validates: Requirements 27.1, 27.2, 27.3, 27.4
+        """
+        class NotableWithMoniker:
+            moniker = "has_moniker"
+        
+        nmap = OrderedDict([
+            ("obj_with", NotableWithMoniker()),
+            ("primitive", 123),
+            ("string", "test_str")
+        ])
+        scope = SequencerTestScope(self.seq, self.rec, "my_test", notables=nmap)
+        
+        expected_context_id = "my_test:has_moniker,123,test_str"
+        self.assertEqual(scope._context_identifier, expected_context_id)
+
+    def test_context_identifier_used_for_scope_id_management(self):
+        """
+        Test that context identifier is used as the scope name for scope ID management.
+        Validates: Requirements 27.5
+        """
+        class NotableA:
+            moniker = "param_a"
+        class NotableB:
+            moniker = "param_b"
+        
+        nmap = OrderedDict([("a", NotableA()), ("b", NotableB())])
+        scope = SequencerTestScope(self.seq, self.rec, "test_parameterized", notables=nmap)
+        
+        expected_context_id = "test_parameterized:param_a,param_b"
+        
+        # Verify context identifier is correctly formed
+        self.assertEqual(scope._context_identifier, expected_context_id)
+        
+        # Enter the scope to trigger scope_id_create with context_identifier
+        scope.__enter__()
+        
+        # Verify the scope stack contains the context identifier as the scope name
+        self.assertEqual(len(self.seq._scope_stack), 1)
+        scope_name, scope_id = self.seq._scope_stack[0]
+        self.assertEqual(scope_name, expected_context_id)
+        
+        # Exit the scope
+        scope.__exit__(None, None, None)
+        
+        # Verify scope was popped
+        self.assertEqual(len(self.seq._scope_stack), 0)
+
     def test_mark_activity_creates_file(self):
         scope = SequencerTestScope(self.seq, self.rec, "test")
         scope.__enter__()

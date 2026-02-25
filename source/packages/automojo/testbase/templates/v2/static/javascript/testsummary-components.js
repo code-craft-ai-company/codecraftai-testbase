@@ -5,6 +5,24 @@
     Email: myron.walker@gmail.com
 */
 
+/**
+ * @fileoverview TestSummary web components for displaying test execution results.
+ * Provides specialized components for banners, configurations, results, artifacts,
+ * and error displays in the test summary report.
+ * @module testsummary-components
+ */
+
+/**
+ * Banner component displaying test run summary information.
+ * Shows automation pod name, build info, timestamps, result status, and metrics.
+ * 
+ * @class TestSummaryBanner
+ * @extends HTMLElement
+ * 
+ * @example
+ * const banner = document.getElementById('testsummary-banner');
+ * banner.syncData(summaryData);
+ */
 class TestSummaryBanner extends HTMLElement {
 
     static tagname = 'testsummary-banner'
@@ -124,10 +142,34 @@ class TestSummaryBanner extends HTMLElement {
         this.summary = {};
     }
 
+    /**
+     * Gets the HTML template for this component.
+     * @returns {string} The HTML template string.
+     */
     getTemplate() {
         return TestSummaryBanner.template;
     }
 
+    /**
+     * Synchronizes the component with summary data.
+     * Updates banner display with automation pod, build info, timestamps, and metrics.
+     * 
+     * @param {Object} summary - The test run summary object.
+     * @param {string} [summary.apod] - Automation pod name.
+     * @param {string} [summary.start] - Test run start timestamp.
+     * @param {string} [summary.stop] - Test run stop timestamp.
+     * @param {Object} [summary.build] - Build information object.
+     * @param {string} [summary.build.branch] - Branch name.
+     * @param {string} [summary.build.build] - Build number.
+     * @param {string} [summary.build.flavor] - Build flavor.
+     * @param {string} [summary.result] - Overall result status.
+     * @param {Object} [summary.detail] - Detailed metrics object.
+     * @param {number} [summary.detail.errors] - Error count.
+     * @param {number} [summary.detail.failed] - Failed count.
+     * @param {number} [summary.detail.skipped] - Skipped count.
+     * @param {number} [summary.detail.passed] - Passed count.
+     * @param {number} [summary.detail.total] - Total count.
+     */
     syncData (summary) {
         this.summary = summary;
 
@@ -191,6 +233,13 @@ class TestSummaryBanner extends HTMLElement {
 }
 
 
+/**
+ * Base component for displaying landscape configuration objects.
+ * Provides common functionality for rendering device, service, and data profile properties.
+ * 
+ * @class TestSummaryLandscapeObject
+ * @extends HTMLElement
+ */
 class TestSummaryLandscapeObject extends HTMLElement {
 
     static tagname = 'testsummary-landscapeobject'
@@ -216,6 +265,12 @@ class TestSummaryLandscapeObject extends HTMLElement {
         this.lscapeItem = undefined;
     }
 
+    /**
+     * Creates a property pair element with label and value.
+     * @param {string} label - The property label/key.
+     * @param {*} value - The property value.
+     * @returns {Array} A two-element array [labelEl, valueEl].
+     */
     createPropertyPairElement(label, value) {
         var propLabel = this.getPropertyLabel(label);
 
@@ -230,6 +285,12 @@ class TestSummaryLandscapeObject extends HTMLElement {
         return [labelEl, valueEl];
     }
 
+    /**
+     * Formats a property value for display.
+     * Handles strings, arrays, and objects with appropriate HTML formatting.
+     * @param {*} propVal - The property value to format.
+     * @returns {string} HTML string representation of the value.
+     */
     formatProperty(propVal) {
         var formattedHtml = "";
         
@@ -256,6 +317,11 @@ class TestSummaryLandscapeObject extends HTMLElement {
         return formattedHtml;
     }
 
+    /**
+     * Gets the display label for a property key.
+     * @param {string} propKey - The property key.
+     * @returns {string} The display label.
+     */
     getPropertyLabel(propKey) {
         var label = "";
 
@@ -270,18 +336,34 @@ class TestSummaryLandscapeObject extends HTMLElement {
         return label;
     }
 
+    /**
+     * Gets the property label lookup table.
+     * @returns {Object} Object mapping property keys to display labels.
+     */
     getPropertyLabelLookup() {
         return this.property_label_lookup
     }
 
+    /**
+     * Gets the preferred property display order.
+     * @returns {string[]} Array of property keys in preferred order.
+     */
     getPropertyOrder() {
         return this.property_order;
     }
 
+    /**
+     * Gets the HTML template for this component.
+     * @returns {string} The HTML template string.
+     */
     getTemplate() {
         return TestSummaryLandscapeObject.template;
     }
 
+    /**
+     * Synchronizes the component with landscape item data.
+     * @param {Object} lscapeItem - The landscape item object to display.
+     */
     syncData(lscapeItem) {
 
         this.lscapeItem = lscapeItem;
@@ -321,6 +403,11 @@ class TestSummaryLandscapeObject extends HTMLElement {
 }
 
 
+/**
+ * Component for displaying data profile configuration objects.
+ * @class TestSummaryDataProfileObject
+ * @extends HTMLElement
+ */
 class TestSummaryDataProfileObject extends HTMLElement {
 
     static tagname = 'testsummary-dataprofileobject'
@@ -349,6 +436,12 @@ class TestSummaryDataProfileObject extends HTMLElement {
 }
 
 
+/**
+ * Component for displaying device configuration objects.
+ * Shows device properties like name, type, host, role, credentials, and features.
+ * @class TestSummaryDeviceObject
+ * @extends TestSummaryLandscapeObject
+ */
 class TestSummaryDeviceObject extends TestSummaryLandscapeObject {
 
     static tagname = 'testsummary-deviceobject'
@@ -379,6 +472,12 @@ class TestSummaryDeviceObject extends TestSummaryLandscapeObject {
 }
 
 
+/**
+ * Component for displaying a group of devices.
+ * Shows the group name and contains device object components.
+ * @class TestSummaryDeviceGroup
+ * @extends HTMLElement
+ */
 class TestSummaryDeviceGroup extends HTMLElement {
 
     static tagname = 'testsummary-devicegroup'
@@ -408,10 +507,19 @@ class TestSummaryDeviceGroup extends HTMLElement {
         this.devices = undefined;
     }
 
+    /**
+     * Gets the HTML template for this component.
+     * @returns {string} The HTML template string.
+     */
     getTemplate() {
         return TestSummaryDeviceGroup.template;
     }
 
+    /**
+     * Synchronizes the component with device group data.
+     * @param {string} group_name - The name of the device group.
+     * @param {Object[]} group_devices - Array of device objects in the group.
+     */
     syncData(group_name, group_devices) {
 
         var groupNameEl = this.shadowRoot.querySelector(this.sel_group_name);
@@ -432,6 +540,12 @@ class TestSummaryDeviceGroup extends HTMLElement {
     }
 }
 
+/**
+ * Component for displaying service configuration objects.
+ * Shows service properties like name, type, host, and credentials.
+ * @class TestSummaryServiceObject
+ * @extends TestSummaryLandscapeObject
+ */
 class TestSummaryServiceObject extends TestSummaryLandscapeObject {
 
     static tagname = 'testsummary-serviceobject'
@@ -460,6 +574,12 @@ class TestSummaryServiceObject extends TestSummaryLandscapeObject {
 }
 
 
+/**
+ * Component for displaying test configuration information.
+ * Shows command, environment variables, packages, and landscape configuration.
+ * @class TestSummaryConfiguration
+ * @extends HTMLElement
+ */
 class TestSummaryConfiguration extends HTMLElement {
 
     static tagname = 'testsummary-configuration'
@@ -498,10 +618,22 @@ class TestSummaryConfiguration extends HTMLElement {
         this.packages = undefined;
     }
 
+    /**
+     * Gets the HTML template for this component.
+     * @returns {string} The HTML template string.
+     */
     getTemplate() {
         return TestSummaryConfiguration.template;
     }
 
+    /**
+     * Synchronizes the component with startup and landscape configuration data.
+     * @param {Object} startup - The startup configuration object.
+     * @param {string} [startup.command] - The command used to run tests.
+     * @param {Object} [startup.environment] - Environment variables.
+     * @param {Object} [startup.packages] - Installed packages.
+     * @param {Object} landscape - The landscape configuration object.
+     */
     syncData (startup, landscape) {
 
         this.landscape = landscape;
@@ -1300,6 +1432,17 @@ class TestSummaryTaskGroup extends HTMLElement {
 }
 
 
+/**
+ * Result detail component displaying test results in various formats.
+ * Supports grouped by package, tree view, and timeline view rendering modes.
+ * 
+ * @class TestSummaryResultDetail
+ * @extends HTMLElement
+ * 
+ * @example
+ * const resultDetail = document.getElementById('testsummary-resultdetail');
+ * resultDetail.syncData('render_by_package', resultsData);
+ */
 class TestSummaryResultDetail extends HTMLElement {
     
     static tagname = 'testsummary-resultdetail'
@@ -1308,6 +1451,59 @@ class TestSummaryResultDetail extends HTMLElement {
         <div class="ts-resultdetail-card">
             <div class="ts-section-header">
                 <h2 class="zero-margins-and-padding">Test Result Detail</h2>
+                <div id="id-display-mode-selector" class="ts-display-mode-selector">
+                    <label for="id-display-mode">View:</label>
+                    <select id="id-display-mode" class="ts-display-mode-select">
+                        <option value="render_by_package" selected>Grouped by Package</option>
+                        <option value="render_as_tree">Tree View</option>
+                        <option value="render_as_timeline">Timeline View</option>
+                    </select>
+                    <label for="id-grouping-option" class="ts-grouping-label">Group by:</label>
+                    <select id="id-grouping-option" class="ts-grouping-select">
+                        <option value="package" selected>Package</option>
+                        <option value="result">Result Status</option>
+                        <option value="module">Module</option>
+                    </select>
+                </div>
+            </div>
+            <div class="ts-filter-toolbar">
+                <div class="ts-filter-buttons">
+                    <button id="id-filter-all" class="ts-filter-btn ts-filter-btn-active" data-filter="ALL" title="Show all tests">All</button>
+                    <button id="id-filter-pass" class="ts-filter-btn ts-filter-btn-pass" data-filter="PASSED" title="Show passed tests only">
+                        <span class="ts-filter-btn-icon">✓</span> Pass
+                    </button>
+                    <button id="id-filter-fail" class="ts-filter-btn ts-filter-btn-fail" data-filter="FAILED" title="Show failed tests only">
+                        <span class="ts-filter-btn-icon">✗</span> Fail
+                    </button>
+                    <button id="id-filter-error" class="ts-filter-btn ts-filter-btn-error" data-filter="ERRORED" title="Show errored tests only">
+                        <span class="ts-filter-btn-icon">!</span> Error
+                    </button>
+                    <button id="id-filter-skip" class="ts-filter-btn ts-filter-btn-skip" data-filter="SKIPPED" title="Show skipped tests only">
+                        <span class="ts-filter-btn-icon">⊘</span> Skip
+                    </button>
+                </div>
+                <div class="ts-search-container">
+                    <input type="text" id="id-search-input" class="ts-search-input" placeholder="Search test names..." title="Search for tests by name">
+                    <button id="id-search-clear" class="ts-search-clear" title="Clear search">×</button>
+                </div>
+                <div class="ts-date-filter-container">
+                    <label for="id-date-start" class="ts-date-label">From:</label>
+                    <input type="datetime-local" id="id-date-start" class="ts-date-input" title="Filter tests starting from this date/time">
+                    <label for="id-date-end" class="ts-date-label">To:</label>
+                    <input type="datetime-local" id="id-date-end" class="ts-date-input" title="Filter tests ending at this date/time">
+                    <button id="id-date-clear" class="ts-date-clear" title="Clear date filter">Clear Dates</button>
+                </div>
+                <div class="ts-filter-summary" id="id-filter-summary">
+                    Showing all tests
+                </div>
+                <div class="ts-export-container">
+                    <button id="id-export-csv" class="ts-export-btn" title="Export results to CSV">
+                        <span class="ts-export-btn-icon">📄</span> CSV
+                    </button>
+                    <button id="id-export-pdf" class="ts-export-btn" title="Export results to PDF (Print)">
+                        <span class="ts-export-btn-icon">📑</span> PDF
+                    </button>
+                </div>
             </div>
             <div class="ts-section-detail">
                 <div id='id-test-results-header' class='ts-results-hdr-grid'>
@@ -1327,68 +1523,1133 @@ class TestSummaryResultDetail extends HTMLElement {
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
+
+        // Store reference to current results for re-rendering
+        this._currentResults = null;
+        this._currentGrouping = 'package';
+        
+        // Filter state
+        this._activeFilter = 'ALL';
+        this._searchQuery = '';
+        this._dateStart = null;
+        this._dateEnd = null;
+
+        // Set up event listeners for display mode and grouping changes
+        this._setupEventListeners();
+        
+        // Set up filter event listeners
+        this._setupFilterEventListeners();
     }
 
     getTemplate() {
         return TestSummaryResultDetail.template;
     }
 
-    syncData (renderFormat, resultsDetail) {
+    /**
+     * Sets up event listeners for display mode and grouping option changes.
+     * @private
+     */
+    _setupEventListeners() {
+        var self = this;
+
+        var displayModeSelect = this.shadowRoot.querySelector("#id-display-mode");
+        displayModeSelect.addEventListener("change", function(event) {
+            var newMode = event.target.value;
+            self._updateGroupingVisibility(newMode);
+            if (self._currentResults) {
+                self.syncData(newMode, self._currentResults, self._currentGrouping);
+            }
+        });
+
+        var groupingSelect = this.shadowRoot.querySelector("#id-grouping-option");
+        groupingSelect.addEventListener("change", function(event) {
+            var newGrouping = event.target.value;
+            self._currentGrouping = newGrouping;
+            var currentMode = self.shadowRoot.querySelector("#id-display-mode").value;
+            if (self._currentResults) {
+                self.syncData(currentMode, self._currentResults, newGrouping);
+            }
+        });
+    }
+
+    /**
+     * Updates the visibility of the grouping selector based on display mode.
+     * Grouping is only applicable for grouped and tree views.
+     * @param {string} displayMode - The current display mode.
+     * @private
+     */
+    _updateGroupingVisibility(displayMode) {
+        var groupingLabel = this.shadowRoot.querySelector(".ts-grouping-label");
+        var groupingSelect = this.shadowRoot.querySelector("#id-grouping-option");
         
+        if (displayMode === "render_as_timeline") {
+            groupingLabel.style.display = "none";
+            groupingSelect.style.display = "none";
+        } else {
+            groupingLabel.style.display = "";
+            groupingSelect.style.display = "";
+        }
+    }
+
+    /**
+     * Sets up event listeners for filter buttons, search input, and date range filters.
+     * @private
+     */
+    _setupFilterEventListeners() {
+        var self = this;
+
+        // Filter button click handlers
+        var filterButtons = this.shadowRoot.querySelectorAll(".ts-filter-btn");
+        filterButtons.forEach(function(btn) {
+            btn.addEventListener("click", function(event) {
+                var filterValue = event.currentTarget.getAttribute("data-filter");
+                self._setActiveFilter(filterValue);
+                self._applyFilters();
+            });
+        });
+
+        // Search input handler with debounce
+        var searchInput = this.shadowRoot.querySelector("#id-search-input");
+        var searchTimeout = null;
+        searchInput.addEventListener("input", function(event) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                self._searchQuery = event.target.value.trim().toLowerCase();
+                self._applyFilters();
+            }, 300); // 300ms debounce
+        });
+
+        // Search clear button
+        var searchClear = this.shadowRoot.querySelector("#id-search-clear");
+        searchClear.addEventListener("click", function() {
+            searchInput.value = "";
+            self._searchQuery = "";
+            self._applyFilters();
+        });
+
+        // Date range filter handlers
+        var dateStart = this.shadowRoot.querySelector("#id-date-start");
+        dateStart.addEventListener("change", function(event) {
+            self._dateStart = event.target.value ? new Date(event.target.value) : null;
+            self._applyFilters();
+        });
+
+        var dateEnd = this.shadowRoot.querySelector("#id-date-end");
+        dateEnd.addEventListener("change", function(event) {
+            self._dateEnd = event.target.value ? new Date(event.target.value) : null;
+            self._applyFilters();
+        });
+
+        // Date clear button
+        var dateClear = this.shadowRoot.querySelector("#id-date-clear");
+        dateClear.addEventListener("click", function() {
+            dateStart.value = "";
+            dateEnd.value = "";
+            self._dateStart = null;
+            self._dateEnd = null;
+            self._applyFilters();
+        });
+
+        // Export button handlers
+        var exportCsvBtn = this.shadowRoot.querySelector("#id-export-csv");
+        exportCsvBtn.addEventListener("click", function() {
+            self._exportToCSV();
+        });
+
+        var exportPdfBtn = this.shadowRoot.querySelector("#id-export-pdf");
+        exportPdfBtn.addEventListener("click", function() {
+            self._exportToPDF();
+        });
+    }
+
+    /**
+     * Sets the active filter and updates button styling.
+     * @param {string} filterValue - The filter value: 'ALL', 'PASSED', 'FAILED', 'ERRORED', or 'SKIPPED'.
+     * @private
+     */
+    _setActiveFilter(filterValue) {
+        this._activeFilter = filterValue;
+
+        // Update button active states
+        var filterButtons = this.shadowRoot.querySelectorAll(".ts-filter-btn");
+        filterButtons.forEach(function(btn) {
+            var btnFilter = btn.getAttribute("data-filter");
+            if (btnFilter === filterValue) {
+                btn.classList.add("ts-filter-btn-active");
+            } else {
+                btn.classList.remove("ts-filter-btn-active");
+            }
+        });
+    }
+
+    /**
+     * Applies all active filters (status, search, date range) and re-renders results.
+     * @private
+     */
+    _applyFilters() {
+        if (!this._currentResults) {
+            return;
+        }
+
+        var filteredResults = this._filterResults(this._currentResults);
+        
+        // Update filter summary
+        this._updateFilterSummary(filteredResults);
+
+        // Re-render with filtered results
         var gridResultsHeaderEl = this.shadowRoot.querySelector("#id-test-results-header");
         gridResultsHeaderEl.innerHTML = "";
-    
-        var headerEl = document.createElement("div");
-        headerEl.classList.add("ts-results-hdr-start");
-        headerEl.innerHTML = "Start";
-        gridResultsHeaderEl.appendChild(headerEl);
-
-        var headerEl = document.createElement("div");
-        headerEl.classList.add("ts-results-hdr-name");
-        headerEl.innerHTML = "TestName";
-        gridResultsHeaderEl.appendChild(headerEl);
-
-        var headerEl = document.createElement("div");
-        headerEl.classList.add("ts-results-hdr-e");
-        headerEl.innerHTML = "E";
-        gridResultsHeaderEl.appendChild(headerEl);
-
-        var headerEl = document.createElement("div");
-        headerEl.classList.add("ts-results-hdr-f");
-        headerEl.innerHTML = "F";
-        gridResultsHeaderEl.appendChild(headerEl);
-
-        var headerEl = document.createElement("div");
-        headerEl.classList.add("ts-results-hdr-s");
-        headerEl.innerHTML = "S";
-        gridResultsHeaderEl.appendChild(headerEl);
-
-        var headerEl = document.createElement("div");
-        headerEl.classList.add("ts-results-hdr-p");
-        headerEl.innerHTML = "P";
-        gridResultsHeaderEl.appendChild(headerEl);
 
         var gridResultsItemsEl = this.shadowRoot.querySelector("#id-test-results-items");
         gridResultsItemsEl.innerHTML = "";
-        
-        if (renderFormat == "render_by_package") {
-            this.renderTestsGroupedByPackage(gridResultsItemsEl, resultsDetail)
-        } else if (renderFormat == "render_as_tree") {
 
+        var currentMode = this.shadowRoot.querySelector("#id-display-mode").value;
+
+        if (currentMode == "render_by_package") {
+            this._renderStandardHeader(gridResultsHeaderEl);
+            this.renderTestsGroupedByPackage(gridResultsItemsEl, filteredResults, this._currentGrouping);
+        } else if (currentMode == "render_as_tree") {
+            this._renderStandardHeader(gridResultsHeaderEl);
+            this.renderTestsAsTree(gridResultsItemsEl, filteredResults, this._currentGrouping);
+        } else if (currentMode == "render_as_timeline") {
+            this._renderTimelineHeader(gridResultsHeaderEl);
+            this.renderTestsAsTimeline(gridResultsItemsEl, filteredResults);
         }
-
     }
 
-    renderTestsGroupedByPackage(gridResultsEl, resultsDetail) {
+    /**
+     * Filters results based on active status filter, search query, and date range.
+     * @param {Object} resultsDetail - The original results data.
+     * @returns {Object} Filtered results data.
+     * @private
+     */
+    _filterResults(resultsDetail) {
+        var self = this;
+        var filteredResults = {};
 
-        for ( const [pkgName, testGroup] of Object.entries(resultsDetail)) {
-            var resultItemEl = document.createElement("testsummary-resultgroup");
+        for (var pkgName in resultsDetail) {
+            if (resultsDetail.hasOwnProperty(pkgName)) {
+                var tests = resultsDetail[pkgName];
+                var filteredTests = tests.filter(function(test) {
+                    return self._testMatchesFilters(test, pkgName);
+                });
 
-            resultItemEl.syncData(pkgName, testGroup);
-
-            gridResultsEl.appendChild(resultItemEl);
+                if (filteredTests.length > 0) {
+                    filteredResults[pkgName] = filteredTests;
+                }
+            }
         }
 
+        return filteredResults;
+    }
+
+    /**
+     * Checks if a test matches all active filters.
+     * @param {Object} test - The test item to check.
+     * @param {string} pkgName - The package name for the test.
+     * @returns {boolean} True if the test matches all filters.
+     * @private
+     */
+    _testMatchesFilters(test, pkgName) {
+        // Check status filter
+        if (this._activeFilter !== 'ALL') {
+            var testStatus = this._getTestStatus(test);
+            if (testStatus !== this._activeFilter) {
+                return false;
+            }
+        }
+
+        // Check search query
+        if (this._searchQuery) {
+            var testName = (test.name || '').toLowerCase();
+            var fullName = (pkgName + '#' + test.name).toLowerCase();
+            if (!testName.includes(this._searchQuery) && !fullName.includes(this._searchQuery)) {
+                return false;
+            }
+        }
+
+        // Check date range
+        if (this._dateStart || this._dateEnd) {
+            var testStart = test.start ? new Date(test.start) : null;
+            
+            if (testStart) {
+                if (this._dateStart && testStart < this._dateStart) {
+                    return false;
+                }
+                if (this._dateEnd && testStart > this._dateEnd) {
+                    return false;
+                }
+            } else {
+                // If test has no start time and date filter is active, exclude it
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets the status of a test based on its detail object.
+     * @param {Object} test - The test item.
+     * @returns {string} The test status: 'PASSED', 'FAILED', 'ERRORED', or 'SKIPPED'.
+     * @private
+     */
+    _getTestStatus(test) {
+        if (test.detail) {
+            if (test.detail.errors && test.detail.errors.length > 0) {
+                return 'ERRORED';
+            }
+            if (test.detail.failures && test.detail.failures.length > 0) {
+                return 'FAILED';
+            }
+            if (test.detail.skipped) {
+                return 'SKIPPED';
+            }
+            if (test.detail.passed) {
+                return 'PASSED';
+            }
+        }
+        // Fallback to result field
+        return test.result || 'UNKNOWN';
+    }
+
+    /**
+     * Updates the filter summary text showing how many tests are displayed.
+     * @param {Object} filteredResults - The filtered results data.
+     * @private
+     */
+    _updateFilterSummary(filteredResults) {
+        var totalFiltered = 0;
+        var totalOriginal = 0;
+
+        // Count filtered tests
+        for (var pkgName in filteredResults) {
+            if (filteredResults.hasOwnProperty(pkgName)) {
+                totalFiltered += filteredResults[pkgName].length;
+            }
+        }
+
+        // Count original tests
+        for (var pkgName in this._currentResults) {
+            if (this._currentResults.hasOwnProperty(pkgName)) {
+                totalOriginal += this._currentResults[pkgName].length;
+            }
+        }
+
+        var summaryEl = this.shadowRoot.querySelector("#id-filter-summary");
+        
+        var summaryParts = [];
+        
+        if (this._activeFilter !== 'ALL') {
+            summaryParts.push(this._activeFilter.toLowerCase() + " tests");
+        }
+        
+        if (this._searchQuery) {
+            summaryParts.push('matching "' + this._searchQuery + '"');
+        }
+        
+        if (this._dateStart || this._dateEnd) {
+            summaryParts.push("in date range");
+        }
+
+        if (summaryParts.length === 0) {
+            summaryEl.innerHTML = "Showing all " + totalOriginal + " tests";
+        } else {
+            summaryEl.innerHTML = "Showing " + totalFiltered + " of " + totalOriginal + " tests (" + summaryParts.join(", ") + ")";
+        }
+    }
+
+    /**
+     * Exports the currently filtered results to CSV format.
+     * Creates a downloadable CSV file with test name, package, status, start time, and duration.
+     * @private
+     */
+    _exportToCSV() {
+        if (!this._currentResults) {
+            console.warn("No results to export");
+            return;
+        }
+
+        // Get filtered results
+        var filteredResults = this._filterResults(this._currentResults);
+        
+        // Build CSV content
+        var csvRows = [];
+        
+        // Header row
+        csvRows.push(["Test Name", "Package", "Status", "Start Time", "Stop Time", "Errors", "Failures"].join(","));
+        
+        // Data rows
+        for (var pkgName in filteredResults) {
+            if (filteredResults.hasOwnProperty(pkgName)) {
+                var tests = filteredResults[pkgName];
+                for (var i = 0; i < tests.length; i++) {
+                    var test = tests[i];
+                    var status = this._getTestStatus(test);
+                    var errorCount = (test.detail && test.detail.errors) ? test.detail.errors.length : 0;
+                    var failureCount = (test.detail && test.detail.failures) ? test.detail.failures.length : 0;
+                    
+                    // Escape CSV values
+                    var testName = this._escapeCSVValue(test.name || "");
+                    var packageName = this._escapeCSVValue(pkgName || "");
+                    var startTime = this._escapeCSVValue(test.start || "");
+                    var stopTime = this._escapeCSVValue(test.stop || "");
+                    
+                    csvRows.push([testName, packageName, status, startTime, stopTime, errorCount, failureCount].join(","));
+                }
+            }
+        }
+        
+        // Create and download file
+        var csvContent = csvRows.join("\n");
+        var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        var url = URL.createObjectURL(blob);
+        
+        var link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "test_results_" + this._getExportTimestamp() + ".csv");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the URL object
+        URL.revokeObjectURL(url);
+    }
+
+    /**
+     * Escapes a value for CSV format by wrapping in quotes if necessary.
+     * @param {string} value - The value to escape.
+     * @returns {string} The escaped CSV value.
+     * @private
+     */
+    _escapeCSVValue(value) {
+        if (value === null || value === undefined) {
+            return "";
+        }
+        var strValue = String(value);
+        // If value contains comma, newline, or quote, wrap in quotes and escape internal quotes
+        if (strValue.indexOf(",") > -1 || strValue.indexOf("\n") > -1 || strValue.indexOf('"') > -1) {
+            return '"' + strValue.replace(/"/g, '""') + '"';
+        }
+        return strValue;
+    }
+
+    /**
+     * Gets a timestamp string for export filenames.
+     * @returns {string} Timestamp in format YYYYMMDD_HHMMSS.
+     * @private
+     */
+    _getExportTimestamp() {
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = String(now.getMonth() + 1).padStart(2, "0");
+        var day = String(now.getDate()).padStart(2, "0");
+        var hours = String(now.getHours()).padStart(2, "0");
+        var minutes = String(now.getMinutes()).padStart(2, "0");
+        var seconds = String(now.getSeconds()).padStart(2, "0");
+        return year + month + day + "_" + hours + minutes + seconds;
+    }
+
+    /**
+     * Exports the currently filtered results to PDF format using browser print functionality.
+     * Opens a new window with a print-friendly view of the results.
+     * @private
+     */
+    _exportToPDF() {
+        if (!this._currentResults) {
+            console.warn("No results to export");
+            return;
+        }
+
+        // Get filtered results
+        var filteredResults = this._filterResults(this._currentResults);
+        
+        // Build HTML content for print
+        var htmlContent = this._buildPrintableHTML(filteredResults);
+        
+        // Open print window
+        var printWindow = window.open("", "_blank", "width=800,height=600");
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // Wait for content to load then trigger print
+        printWindow.onload = function() {
+            printWindow.focus();
+            printWindow.print();
+        };
+    }
+
+    /**
+     * Builds a printable HTML document for PDF export.
+     * @param {Object} filteredResults - The filtered results to include in the document.
+     * @returns {string} Complete HTML document string.
+     * @private
+     */
+    _buildPrintableHTML(filteredResults) {
+        var totalTests = 0;
+        var passedCount = 0;
+        var failedCount = 0;
+        var errorCount = 0;
+        var skippedCount = 0;
+
+        // Count totals
+        for (var pkgName in filteredResults) {
+            if (filteredResults.hasOwnProperty(pkgName)) {
+                var tests = filteredResults[pkgName];
+                totalTests += tests.length;
+                for (var i = 0; i < tests.length; i++) {
+                    var status = this._getTestStatus(tests[i]);
+                    if (status === "PASSED") passedCount++;
+                    else if (status === "FAILED") failedCount++;
+                    else if (status === "ERRORED") errorCount++;
+                    else if (status === "SKIPPED") skippedCount++;
+                }
+            }
+        }
+
+        var html = '<!DOCTYPE html><html><head><title>Test Results Report</title>';
+        html += '<style>';
+        html += 'body { font-family: Arial, sans-serif; margin: 20px; font-size: 12pt; }';
+        html += 'h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }';
+        html += 'h2 { color: #555; margin-top: 20px; }';
+        html += '.summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }';
+        html += '.summary-item { display: inline-block; margin-right: 30px; }';
+        html += '.summary-label { font-weight: bold; }';
+        html += '.pass { color: green; }';
+        html += '.fail { color: red; }';
+        html += '.error { color: maroon; }';
+        html += '.skip { color: gray; }';
+        html += 'table { width: 100%; border-collapse: collapse; margin-top: 10px; }';
+        html += 'th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }';
+        html += 'th { background-color: #f0f0f0; font-weight: bold; }';
+        html += 'tr:nth-child(even) { background-color: #fafafa; }';
+        html += '.package-header { background-color: #e0e0e0; font-weight: bold; }';
+        html += '@media print { .no-print { display: none; } }';
+        html += '</style></head><body>';
+        
+        // Header
+        html += '<h1>Test Results Report</h1>';
+        html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+        
+        // Summary section
+        html += '<div class="summary">';
+        html += '<div class="summary-item"><span class="summary-label">Total Tests:</span> ' + totalTests + '</div>';
+        html += '<div class="summary-item"><span class="summary-label pass">Passed:</span> ' + passedCount + '</div>';
+        html += '<div class="summary-item"><span class="summary-label fail">Failed:</span> ' + failedCount + '</div>';
+        html += '<div class="summary-item"><span class="summary-label error">Errors:</span> ' + errorCount + '</div>';
+        html += '<div class="summary-item"><span class="summary-label skip">Skipped:</span> ' + skippedCount + '</div>';
+        html += '</div>';
+        
+        // Filter info
+        if (this._activeFilter !== 'ALL' || this._searchQuery || this._dateStart || this._dateEnd) {
+            html += '<p><em>Filters applied: ';
+            var filters = [];
+            if (this._activeFilter !== 'ALL') filters.push('Status: ' + this._activeFilter);
+            if (this._searchQuery) filters.push('Search: "' + this._searchQuery + '"');
+            if (this._dateStart || this._dateEnd) filters.push('Date range filter');
+            html += filters.join(', ') + '</em></p>';
+        }
+        
+        // Results table
+        html += '<h2>Test Results</h2>';
+        html += '<table>';
+        html += '<thead><tr><th>Test Name</th><th>Status</th><th>Start Time</th><th>Errors</th><th>Failures</th></tr></thead>';
+        html += '<tbody>';
+        
+        for (var pkgName in filteredResults) {
+            if (filteredResults.hasOwnProperty(pkgName)) {
+                // Package header row
+                html += '<tr class="package-header"><td colspan="5">' + this._escapeHTML(pkgName) + '</td></tr>';
+                
+                var tests = filteredResults[pkgName];
+                for (var i = 0; i < tests.length; i++) {
+                    var test = tests[i];
+                    var status = this._getTestStatus(test);
+                    var statusClass = status.toLowerCase();
+                    var errCount = (test.detail && test.detail.errors) ? test.detail.errors.length : 0;
+                    var failCount = (test.detail && test.detail.failures) ? test.detail.failures.length : 0;
+                    
+                    html += '<tr>';
+                    html += '<td>' + this._escapeHTML(test.name || "") + '</td>';
+                    html += '<td class="' + statusClass + '">' + status + '</td>';
+                    html += '<td>' + this._escapeHTML(test.start || "") + '</td>';
+                    html += '<td>' + errCount + '</td>';
+                    html += '<td>' + failCount + '</td>';
+                    html += '</tr>';
+                }
+            }
+        }
+        
+        html += '</tbody></table>';
+        html += '</body></html>';
+        
+        return html;
+    }
+
+    /**
+     * Escapes HTML special characters to prevent XSS in the print view.
+     * @param {string} str - The string to escape.
+     * @returns {string} The escaped string.
+     * @private
+     */
+    _escapeHTML(str) {
+        if (str === null || str === undefined) {
+            return "";
+        }
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    /**
+     * Syncs data to the component and renders results in the specified format.
+     * @param {string} renderFormat - The rendering format: 'render_by_package', 'render_as_tree', or 'render_as_timeline'.
+     * @param {Object} resultsDetail - The results data to render.
+     * @param {string} [groupingOption='package'] - The grouping option for grouped/tree views.
+     */
+    syncData (renderFormat, resultsDetail, groupingOption = 'package') {
+        
+        // Store results for potential re-rendering
+        this._currentResults = resultsDetail;
+        this._currentGrouping = groupingOption;
+
+        var gridResultsHeaderEl = this.shadowRoot.querySelector("#id-test-results-header");
+        gridResultsHeaderEl.innerHTML = "";
+
+        var gridResultsItemsEl = this.shadowRoot.querySelector("#id-test-results-items");
+        gridResultsItemsEl.innerHTML = "";
+
+        // Update display mode selector to match current mode
+        var displayModeSelect = this.shadowRoot.querySelector("#id-display-mode");
+        displayModeSelect.value = renderFormat;
+        this._updateGroupingVisibility(renderFormat);
+
+        // Update grouping selector
+        var groupingSelect = this.shadowRoot.querySelector("#id-grouping-option");
+        groupingSelect.value = groupingOption;
+        
+        if (renderFormat == "render_by_package") {
+            this._renderStandardHeader(gridResultsHeaderEl);
+            this.renderTestsGroupedByPackage(gridResultsItemsEl, resultsDetail, groupingOption);
+        } else if (renderFormat == "render_as_tree") {
+            this._renderStandardHeader(gridResultsHeaderEl);
+            this.renderTestsAsTree(gridResultsItemsEl, resultsDetail, groupingOption);
+        } else if (renderFormat == "render_as_timeline") {
+            this._renderTimelineHeader(gridResultsHeaderEl);
+            this.renderTestsAsTimeline(gridResultsItemsEl, resultsDetail);
+        }
+    }
+
+    /**
+     * Renders the standard header for grouped and tree views.
+     * @param {HTMLElement} headerEl - The header container element.
+     * @private
+     */
+    _renderStandardHeader(headerEl) {
+        var startHeader = document.createElement("div");
+        startHeader.classList.add("ts-results-hdr-start");
+        startHeader.innerHTML = "Start";
+        headerEl.appendChild(startHeader);
+
+        var nameHeader = document.createElement("div");
+        nameHeader.classList.add("ts-results-hdr-name");
+        nameHeader.innerHTML = "TestName";
+        headerEl.appendChild(nameHeader);
+
+        var errorHeader = document.createElement("div");
+        errorHeader.classList.add("ts-results-hdr-e");
+        errorHeader.innerHTML = "E";
+        headerEl.appendChild(errorHeader);
+
+        var failHeader = document.createElement("div");
+        failHeader.classList.add("ts-results-hdr-f");
+        failHeader.innerHTML = "F";
+        headerEl.appendChild(failHeader);
+
+        var skipHeader = document.createElement("div");
+        skipHeader.classList.add("ts-results-hdr-s");
+        skipHeader.innerHTML = "S";
+        headerEl.appendChild(skipHeader);
+
+        var passHeader = document.createElement("div");
+        passHeader.classList.add("ts-results-hdr-p");
+        passHeader.innerHTML = "P";
+        headerEl.appendChild(passHeader);
+    }
+
+    /**
+     * Renders the timeline header for timeline view.
+     * @param {HTMLElement} headerEl - The header container element.
+     * @private
+     */
+    _renderTimelineHeader(headerEl) {
+        headerEl.classList.remove("ts-results-hdr-grid");
+        headerEl.classList.add("ts-timeline-header");
+
+        var timeHeader = document.createElement("div");
+        timeHeader.classList.add("ts-timeline-hdr-time");
+        timeHeader.innerHTML = "Timeline";
+        headerEl.appendChild(timeHeader);
+
+        var durationHeader = document.createElement("div");
+        durationHeader.classList.add("ts-timeline-hdr-duration");
+        durationHeader.innerHTML = "Duration";
+        headerEl.appendChild(durationHeader);
+
+        var nameHeader = document.createElement("div");
+        nameHeader.classList.add("ts-timeline-hdr-name");
+        nameHeader.innerHTML = "Test Name";
+        headerEl.appendChild(nameHeader);
+
+        var statusHeader = document.createElement("div");
+        statusHeader.classList.add("ts-timeline-hdr-status");
+        statusHeader.innerHTML = "Status";
+        headerEl.appendChild(statusHeader);
+    }
+
+    /**
+     * Renders tests grouped by package (default view).
+     * @param {HTMLElement} gridResultsEl - The container element for results.
+     * @param {Object} resultsDetail - The results data keyed by package name.
+     * @param {string} groupingOption - The grouping option.
+     */
+    renderTestsGroupedByPackage(gridResultsEl, resultsDetail, groupingOption) {
+        var groupedResults = this._groupResults(resultsDetail, groupingOption);
+
+        for (const [groupName, testGroup] of Object.entries(groupedResults)) {
+            var resultItemEl = document.createElement("testsummary-resultgroup");
+            resultItemEl.syncData(groupName, testGroup);
+            gridResultsEl.appendChild(resultItemEl);
+        }
+    }
+
+    /**
+     * Renders tests as a hierarchical tree view.
+     * Organizes tests by their module path hierarchy.
+     * @param {HTMLElement} gridResultsEl - The container element for results.
+     * @param {Object} resultsDetail - The results data.
+     * @param {string} groupingOption - The grouping option.
+     */
+    renderTestsAsTree(gridResultsEl, resultsDetail, groupingOption) {
+        // Build tree structure from package names
+        var treeRoot = this._buildTreeStructure(resultsDetail, groupingOption);
+        
+        // Render tree recursively
+        this._renderTreeNode(gridResultsEl, treeRoot, 0);
+    }
+
+    /**
+     * Renders tests as a timeline view showing execution order and duration.
+     * @param {HTMLElement} gridResultsEl - The container element for results.
+     * @param {Object} resultsDetail - The results data.
+     */
+    renderTestsAsTimeline(gridResultsEl, resultsDetail) {
+        // Flatten all results and sort by start time
+        var allTests = this._flattenResults(resultsDetail);
+        allTests.sort(function(a, b) {
+            return new Date(a.start) - new Date(b.start);
+        });
+
+        // Find time range for timeline scaling
+        var timeRange = this._calculateTimeRange(allTests);
+
+        // Create timeline container
+        var timelineContainer = document.createElement("div");
+        timelineContainer.classList.add("ts-timeline-container");
+
+        // Render each test as a timeline item
+        for (var i = 0; i < allTests.length; i++) {
+            var testItem = allTests[i];
+            var timelineItem = this._createTimelineItem(testItem, timeRange, i);
+            timelineContainer.appendChild(timelineItem);
+        }
+
+        gridResultsEl.appendChild(timelineContainer);
+    }
+
+    /**
+     * Groups results based on the specified grouping option.
+     * @param {Object} resultsDetail - The results data.
+     * @param {string} groupingOption - The grouping option: 'package', 'result', or 'module'.
+     * @returns {Object} Grouped results.
+     * @private
+     */
+    _groupResults(resultsDetail, groupingOption) {
+        if (groupingOption === 'package') {
+            // Already grouped by package
+            return resultsDetail;
+        }
+
+        var grouped = {};
+        
+        for (const [pkgName, tests] of Object.entries(resultsDetail)) {
+            for (const test of tests) {
+                var groupKey;
+                
+                if (groupingOption === 'result') {
+                    // Group by result status
+                    groupKey = test.result || 'UNKNOWN';
+                } else if (groupingOption === 'module') {
+                    // Group by module (first part of package name)
+                    var parts = pkgName.split('.');
+                    groupKey = parts.length > 0 ? parts[0] : 'unknown';
+                } else {
+                    groupKey = pkgName;
+                }
+
+                if (!grouped[groupKey]) {
+                    grouped[groupKey] = [];
+                }
+                grouped[groupKey].push(test);
+            }
+        }
+
+        return grouped;
+    }
+
+    /**
+     * Builds a tree structure from the results for tree view rendering.
+     * @param {Object} resultsDetail - The results data.
+     * @param {string} groupingOption - The grouping option.
+     * @returns {Object} Tree structure with children and tests.
+     * @private
+     */
+    _buildTreeStructure(resultsDetail, groupingOption) {
+        var root = { name: 'root', children: {}, tests: [] };
+
+        for (const [pkgName, tests] of Object.entries(resultsDetail)) {
+            // Split package name into path segments
+            var pathParts;
+            if (groupingOption === 'module') {
+                pathParts = pkgName.split('.');
+            } else if (groupingOption === 'result') {
+                // For result grouping, use result as first level
+                for (const test of tests) {
+                    var resultKey = test.result || 'UNKNOWN';
+                    if (!root.children[resultKey]) {
+                        root.children[resultKey] = { name: resultKey, children: {}, tests: [] };
+                    }
+                    root.children[resultKey].tests.push(test);
+                }
+                continue;
+            } else {
+                pathParts = pkgName.split('.');
+            }
+
+            // Navigate/create tree path
+            var currentNode = root;
+            for (var i = 0; i < pathParts.length; i++) {
+                var part = pathParts[i];
+                if (!currentNode.children[part]) {
+                    currentNode.children[part] = { name: part, children: {}, tests: [] };
+                }
+                currentNode = currentNode.children[part];
+            }
+
+            // Add tests to leaf node
+            for (const test of tests) {
+                currentNode.tests.push(test);
+            }
+        }
+
+        return root;
+    }
+
+    /**
+     * Recursively renders a tree node and its children.
+     * @param {HTMLElement} containerEl - The container element.
+     * @param {Object} node - The tree node to render.
+     * @param {number} depth - The current depth in the tree.
+     * @private
+     */
+    _renderTreeNode(containerEl, node, depth) {
+        var self = this;
+
+        // Render children first
+        var childKeys = Object.keys(node.children).sort();
+        for (var i = 0; i < childKeys.length; i++) {
+            var childKey = childKeys[i];
+            var childNode = node.children[childKey];
+
+            // Create tree node element
+            var nodeEl = document.createElement("div");
+            nodeEl.classList.add("ts-tree-node");
+            nodeEl.style.marginLeft = (depth * 20) + "px";
+
+            // Create expandable header
+            var headerEl = document.createElement("details");
+            headerEl.open = depth < 2; // Auto-expand first two levels
+
+            var summaryEl = document.createElement("summary");
+            summaryEl.classList.add("ts-tree-node-header");
+            
+            var iconEl = document.createElement("span");
+            iconEl.classList.add("ts-tree-icon");
+            iconEl.innerHTML = "📁";
+            summaryEl.appendChild(iconEl);
+
+            var nameEl = document.createElement("span");
+            nameEl.classList.add("ts-tree-node-name");
+            nameEl.innerHTML = childNode.name;
+            summaryEl.appendChild(nameEl);
+
+            // Add metrics summary
+            var metrics = this._calculateNodeMetrics(childNode);
+            var metricsEl = document.createElement("span");
+            metricsEl.classList.add("ts-tree-node-metrics");
+            metricsEl.innerHTML = this._formatMetrics(metrics);
+            summaryEl.appendChild(metricsEl);
+
+            headerEl.appendChild(summaryEl);
+
+            // Create content container for children and tests
+            var contentEl = document.createElement("div");
+            contentEl.classList.add("ts-tree-node-content");
+
+            // Recursively render children
+            this._renderTreeNode(contentEl, childNode, depth + 1);
+
+            // Render tests at this node
+            if (childNode.tests.length > 0) {
+                for (var j = 0; j < childNode.tests.length; j++) {
+                    var test = childNode.tests[j];
+                    var testEl = document.createElement("testsummary-resultitem");
+                    testEl.syncData(test);
+                    testEl.style.marginLeft = "20px";
+                    contentEl.appendChild(testEl);
+                }
+            }
+
+            headerEl.appendChild(contentEl);
+            nodeEl.appendChild(headerEl);
+            containerEl.appendChild(nodeEl);
+        }
+
+        // Render tests directly under root (if any)
+        if (depth === 0 && node.tests.length > 0) {
+            for (var k = 0; k < node.tests.length; k++) {
+                var rootTest = node.tests[k];
+                var rootTestEl = document.createElement("testsummary-resultitem");
+                rootTestEl.syncData(rootTest);
+                containerEl.appendChild(rootTestEl);
+            }
+        }
+    }
+
+    /**
+     * Calculates aggregate metrics for a tree node and all its descendants.
+     * @param {Object} node - The tree node.
+     * @returns {Object} Metrics object with passed, failed, errored, skipped counts.
+     * @private
+     */
+    _calculateNodeMetrics(node) {
+        var metrics = { passed: 0, failed: 0, errored: 0, skipped: 0 };
+
+        // Count tests at this node
+        for (var i = 0; i < node.tests.length; i++) {
+            var test = node.tests[i];
+            if (test.result === 'PASSED') metrics.passed++;
+            else if (test.result === 'FAILED') metrics.failed++;
+            else if (test.result === 'ERRORED') metrics.errored++;
+            else if (test.result === 'SKIPPED') metrics.skipped++;
+        }
+
+        // Recursively count children
+        for (var childKey in node.children) {
+            var childMetrics = this._calculateNodeMetrics(node.children[childKey]);
+            metrics.passed += childMetrics.passed;
+            metrics.failed += childMetrics.failed;
+            metrics.errored += childMetrics.errored;
+            metrics.skipped += childMetrics.skipped;
+        }
+
+        return metrics;
+    }
+
+    /**
+     * Formats metrics for display in tree node headers.
+     * @param {Object} metrics - The metrics object.
+     * @returns {string} Formatted metrics string.
+     * @private
+     */
+    _formatMetrics(metrics) {
+        var parts = [];
+        if (metrics.errored > 0) parts.push('<span class="color-error">' + metrics.errored + 'E</span>');
+        if (metrics.failed > 0) parts.push('<span class="color-fail">' + metrics.failed + 'F</span>');
+        if (metrics.skipped > 0) parts.push('<span class="color-skip">' + metrics.skipped + 'S</span>');
+        if (metrics.passed > 0) parts.push('<span class="color-pass">' + metrics.passed + 'P</span>');
+        return parts.join(' ');
+    }
+
+    /**
+     * Flattens the results object into an array of all tests.
+     * @param {Object} resultsDetail - The results data.
+     * @returns {Array} Array of all test items.
+     * @private
+     */
+    _flattenResults(resultsDetail) {
+        var allTests = [];
+        for (const [pkgName, tests] of Object.entries(resultsDetail)) {
+            for (const test of tests) {
+                // Add package name to test for display
+                test.package_name = pkgName;
+                allTests.push(test);
+            }
+        }
+        return allTests;
+    }
+
+    /**
+     * Calculates the time range for timeline scaling.
+     * @param {Array} tests - Array of test items sorted by start time.
+     * @returns {Object} Time range with start, end, and duration.
+     * @private
+     */
+    _calculateTimeRange(tests) {
+        if (tests.length === 0) {
+            return { start: new Date(), end: new Date(), duration: 0 };
+        }
+
+        var startTime = new Date(tests[0].start);
+        var endTime = startTime;
+
+        for (var i = 0; i < tests.length; i++) {
+            var test = tests[i];
+            var testStart = new Date(test.start);
+            var testEnd = test.stop ? new Date(test.stop) : testStart;
+
+            if (testStart < startTime) startTime = testStart;
+            if (testEnd > endTime) endTime = testEnd;
+        }
+
+        return {
+            start: startTime,
+            end: endTime,
+            duration: endTime - startTime
+        };
+    }
+
+    /**
+     * Creates a timeline item element for a test.
+     * @param {Object} testItem - The test item data.
+     * @param {Object} timeRange - The overall time range.
+     * @param {number} index - The index of the test in the timeline.
+     * @returns {HTMLElement} The timeline item element.
+     * @private
+     */
+    _createTimelineItem(testItem, timeRange, index) {
+        var itemEl = document.createElement("div");
+        itemEl.classList.add("ts-timeline-item");
+
+        // Calculate position and width based on time
+        var testStart = new Date(testItem.start);
+        var testEnd = testItem.stop ? new Date(testItem.stop) : testStart;
+        var testDuration = testEnd - testStart;
+
+        // Time column
+        var timeEl = document.createElement("div");
+        timeEl.classList.add("ts-timeline-item-time");
+        timeEl.innerHTML = this._formatTime(testStart);
+        itemEl.appendChild(timeEl);
+
+        // Duration bar column
+        var durationEl = document.createElement("div");
+        durationEl.classList.add("ts-timeline-item-duration");
+        
+        var barContainer = document.createElement("div");
+        barContainer.classList.add("ts-timeline-bar-container");
+
+        var bar = document.createElement("div");
+        bar.classList.add("ts-timeline-bar");
+        
+        // Calculate bar position and width
+        var offsetPercent = 0;
+        var widthPercent = 100;
+        if (timeRange.duration > 0) {
+            offsetPercent = ((testStart - timeRange.start) / timeRange.duration) * 100;
+            widthPercent = Math.max(1, (testDuration / timeRange.duration) * 100);
+        }
+        
+        bar.style.left = offsetPercent + "%";
+        bar.style.width = widthPercent + "%";
+
+        // Color based on result
+        if (testItem.result === 'PASSED') {
+            bar.classList.add("ts-timeline-bar-pass");
+        } else if (testItem.result === 'FAILED') {
+            bar.classList.add("ts-timeline-bar-fail");
+        } else if (testItem.result === 'ERRORED') {
+            bar.classList.add("ts-timeline-bar-error");
+        } else if (testItem.result === 'SKIPPED') {
+            bar.classList.add("ts-timeline-bar-skip");
+        }
+
+        barContainer.appendChild(bar);
+        
+        // Add duration text
+        var durationText = document.createElement("span");
+        durationText.classList.add("ts-timeline-duration-text");
+        durationText.innerHTML = this._formatDuration(testDuration);
+        barContainer.appendChild(durationText);
+
+        durationEl.appendChild(barContainer);
+        itemEl.appendChild(durationEl);
+
+        // Test name column
+        var nameEl = document.createElement("div");
+        nameEl.classList.add("ts-timeline-item-name");
+        nameEl.innerHTML = testItem.name || testItem.package_name;
+        nameEl.title = testItem.package_name + "#" + testItem.name;
+        itemEl.appendChild(nameEl);
+
+        // Status column
+        var statusEl = document.createElement("div");
+        statusEl.classList.add("ts-timeline-item-status");
+        var statusSpan = document.createElement("span");
+        statusSpan.innerHTML = testItem.result || 'UNKNOWN';
+        if (testItem.result === 'PASSED') statusSpan.classList.add("color-pass");
+        else if (testItem.result === 'FAILED') statusSpan.classList.add("color-fail");
+        else if (testItem.result === 'ERRORED') statusSpan.classList.add("color-error");
+        else if (testItem.result === 'SKIPPED') statusSpan.classList.add("color-skip");
+        statusEl.appendChild(statusSpan);
+        itemEl.appendChild(statusEl);
+
+        return itemEl;
+    }
+
+    /**
+     * Formats a date for display in the timeline.
+     * @param {Date} date - The date to format.
+     * @returns {string} Formatted time string.
+     * @private
+     */
+    _formatTime(date) {
+        var hours = date.getHours().toString().padStart(2, '0');
+        var minutes = date.getMinutes().toString().padStart(2, '0');
+        var seconds = date.getSeconds().toString().padStart(2, '0');
+        return hours + ':' + minutes + ':' + seconds;
+    }
+
+    /**
+     * Formats a duration in milliseconds for display.
+     * @param {number} ms - Duration in milliseconds.
+     * @returns {string} Formatted duration string.
+     * @private
+     */
+    _formatDuration(ms) {
+        if (ms < 1000) {
+            return ms + 'ms';
+        } else if (ms < 60000) {
+            return (ms / 1000).toFixed(2) + 's';
+        } else {
+            var minutes = Math.floor(ms / 60000);
+            var seconds = ((ms % 60000) / 1000).toFixed(0);
+            return minutes + 'm ' + seconds + 's';
+        }
     }
 }
 
@@ -1865,6 +3126,18 @@ class TestSummaryFilesAndFolders extends HTMLElement {
 }
 
 
+/**
+ * Registers all TestSummary components with the customElements registry.
+ * Also registers Mojo base components as a dependency.
+ * Should be called before using any TestSummary components.
+ * 
+ * @function register_testsummary_components
+ * @returns {void}
+ * 
+ * @example
+ * // Register components on page load
+ * register_testsummary_components();
+ */
 function register_testsummary_components() {
 
     register_mojo_components()

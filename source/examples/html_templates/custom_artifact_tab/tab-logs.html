@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!--
+        Custom Log File Viewer Tab
+        
+        This example demonstrates how to create a custom artifact tab page
+        for viewing log files in the HTML Report Templates system.
+        
+        @author Example Organization
+        @copyright Copyright 2024, Example Organization
+    -->
+    <head>
+        <title>Log Files</title>
+
+        <script type="text/javascript" src="/static/v2/javascript/testsummary-helpers.js"></script>
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: 10px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .page-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .page-title {
+                margin: 0;
+                font-size: 1.5em;
+                color: #333;
+            }
+
+            .search-container {
+                display: flex;
+                gap: 10px;
+            }
+
+            .search-input {
+                padding: 8px 12px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 14px;
+                width: 250px;
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: #2E5A8F;
+                box-shadow: 0 0 3px rgba(46, 90, 143, 0.3);
+            }
+
+            .log-container {
+                margin-bottom: 20px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            .log-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 15px;
+                background-color: #f5f5f5;
+                border-bottom: 1px solid #ddd;
+                cursor: pointer;
+            }
+
+            .log-header:hover {
+                background-color: #eee;
+            }
+
+            .log-filename {
+                font-weight: bold;
+                color: #333;
+            }
+
+            .log-meta {
+                font-size: 12px;
+                color: #666;
+            }
+
+            .log-toggle {
+                font-size: 18px;
+                color: #666;
+                user-select: none;
+            }
+
+            .log-content {
+                max-height: 400px;
+                overflow: auto;
+                background-color: #1e1e1e;
+                color: #d4d4d4;
+            }
+
+            .log-content.collapsed {
+                display: none;
+            }
+
+            .log-content pre {
+                margin: 0;
+                padding: 15px;
+                font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+                font-size: 13px;
+                line-height: 1.4;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+            .log-line {
+                display: block;
+            }
+
+            .log-line:hover {
+                background-color: #2d2d2d;
+            }
+
+            .log-line-number {
+                display: inline-block;
+                width: 50px;
+                color: #858585;
+                text-align: right;
+                padding-right: 15px;
+                user-select: none;
+            }
+
+            .log-line-content {
+                color: #d4d4d4;
+            }
+
+            /* Log level highlighting */
+            .log-level-error {
+                color: #f48771;
+            }
+
+            .log-level-warn {
+                color: #cca700;
+            }
+
+            .log-level-info {
+                color: #3dc9b0;
+            }
+
+            .log-level-debug {
+                color: #9cdcfe;
+            }
+
+            .highlight {
+                background-color: #613214;
+                color: #fff;
+            }
+
+            .no-logs {
+                padding: 40px;
+                text-align: center;
+                color: #666;
+            }
+
+            .loading {
+                padding: 40px;
+                text-align: center;
+                color: #666;
+            }
+        </style>
+
+        <script type="text/javascript">
+            // Supported log file extensions
+            const LOG_EXTENSIONS = ["log", "txt", "out"];
+            
+            // Global state
+            let g_logs = [];
+            let g_searchTerm = "";
+
+            /**
+             * Fetch log files from the catalog
+             */
+            async function fetch_log_files() {
+                try {
+                    const catalog = await fetch_json("catalog.json");
+                    if (!catalog || !catalog.files) {
+                        return [];
+                    }
+                    
+                    return catalog.files.filter(filename => {
+                        const ext = filename.split('.').pop().toLowerCase();
+                        return LOG_EXTENSIONS.includes(ext);
+                    });
+                } catch (err) {
+                    console.error("Failed to load catalog:", err);
+                    return [];
+                }
+            }
+
+            /**
+             * Fetch the content of a log file
+             */
+            async function fetch_log_content(filename) {
+                try {
+                    const response = await fetch(filename);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return await response.text();
+                } catch (err) {
+                    console.error(`Failed to load ${filename}:`, err);
+                    return `[Error loading file: ${err.message}]`;
+                }
+            }
+
+            /**
+             * Determine the log level from a line of text
+             */
+            function getLogLevel(line) {
+                const upperLine = line.toUpperCase();
+                if (upperLine.includes("ERROR") || upperLine.includes("FATAL") || upperLine.includes("CRITICAL")) {
+                    return "error";
+                }
+                if (upperLine.includes("WARN")) {
+                    return "warn";
+                }
+                if (upperLine.includes("INFO")) {
+                    return "info";
+                }
+                if (upperLine.includes("DEBUG") || upperLine.includes("TRACE")) {
+                    return "debug";
+                }
+                return "";
+            }
+
+            /**
+             * Format log content with line numbers and syntax highlighting
+             */
+            function formatLogContent(content, searchTerm) {
+                const lines = content.split('\n');
+                let html = '';
+                
+                lines.forEach((line, index) => {
+                    const lineNum = index + 1;
+                    const logLevel = getLogLevel(line);
+                    const levelClass = logLevel ? `log-level-${logLevel}` : '';
+                    
+                    // Escape HTML entities
+                    let escapedLine = line
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                    
+                    // Highlight search term if present
+                    if (searchTerm && searchTerm.length > 0) {
+                        const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
+                        escapedLine = escapedLine.replace(regex, '<span class="highlight">$1</span>');
+                    }
+                    
+                    html += `<span class="log-line">`;
+                    html += `<span class="log-line-number">${lineNum}</span>`;
+                    html += `<span class="log-line-content ${levelClass}">${escapedLine}</span>`;
+                    html += `</span>\n`;
+                });
+                
+                return html;
+            }
+
+            /**
+             * Escape special regex characters
+             */
+            function escapeRegex(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            /**
+             * Toggle log content visibility
+             */
+            function toggleLog(logId) {
+                const contentEl = document.getElementById(`log-content-${logId}`);
+                const toggleEl = document.getElementById(`log-toggle-${logId}`);
+                
+                if (contentEl.classList.contains('collapsed')) {
+                    contentEl.classList.remove('collapsed');
+                    toggleEl.textContent = '−';
+                } else {
+                    contentEl.classList.add('collapsed');
+                    toggleEl.textContent = '+';
+                }
+            }
+
+            /**
+             * Create a log container element
+             */
+            function createLogContainer(filename, content, index) {
+                const container = document.createElement('div');
+                container.className = 'log-container';
+                container.id = `log-${index}`;
+                
+                const lineCount = content.split('\n').length;
+                const fileSize = new Blob([content]).size;
+                const sizeStr = fileSize > 1024 
+                    ? `${(fileSize / 1024).toFixed(1)} KB` 
+                    : `${fileSize} bytes`;
+                
+                container.innerHTML = `
+                    <div class="log-header" onclick="toggleLog(${index})">
+                        <div>
+                            <span class="log-filename">${filename}</span>
+                            <span class="log-meta">${lineCount} lines, ${sizeStr}</span>
+                        </div>
+                        <span class="log-toggle" id="log-toggle-${index}">−</span>
+                    </div>
+                    <div class="log-content" id="log-content-${index}">
+                        <pre>${formatLogContent(content, g_searchTerm)}</pre>
+                    </div>
+                `;
+                
+                return container;
+            }
+
+            /**
+             * Refresh the log display
+             */
+            async function refreshLogs() {
+                const containerEl = document.getElementById('logs-container');
+                containerEl.innerHTML = '<div class="loading">Loading log files...</div>';
+                
+                const logFiles = await fetch_log_files();
+                
+                if (logFiles.length === 0) {
+                    containerEl.innerHTML = '<div class="no-logs">No log files found in this directory.</div>';
+                    return;
+                }
+                
+                containerEl.innerHTML = '';
+                
+                for (let i = 0; i < logFiles.length; i++) {
+                    const filename = logFiles[i];
+                    const content = await fetch_log_content(filename);
+                    
+                    g_logs.push({ filename, content });
+                    
+                    const logEl = createLogContainer(filename, content, i);
+                    containerEl.appendChild(logEl);
+                }
+            }
+
+            /**
+             * Handle search input
+             */
+            function handleSearch(event) {
+                g_searchTerm = event.target.value;
+                
+                // Re-render log content with highlighting
+                g_logs.forEach((log, index) => {
+                    const contentEl = document.getElementById(`log-content-${index}`);
+                    if (contentEl) {
+                        const preEl = contentEl.querySelector('pre');
+                        if (preEl) {
+                            preEl.innerHTML = formatLogContent(log.content, g_searchTerm);
+                        }
+                    }
+                });
+            }
+
+            /**
+             * Initialize the page
+             */
+            async function initPage() {
+                await refreshLogs();
+            }
+
+            // Start loading when the page is ready
+            document.addEventListener('DOMContentLoaded', initPage);
+        </script>
+    </head>
+
+    <body>
+        <div class="page-header">
+            <h3 class="page-title">Log Files</h3>
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="Search in logs..." 
+                    oninput="handleSearch(event)"
+                >
+            </div>
+        </div>
+        
+        <div id="logs-container">
+            <div class="loading">Loading...</div>
+        </div>
+    </body>
+</html>

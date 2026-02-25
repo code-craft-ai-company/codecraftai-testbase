@@ -51,14 +51,14 @@ def group_testbase_testing_jobs():
 @DebugOptionGroup.attach()
 @arcli.command("list")
 def command_testing_jobs_list(root: Optional[str], filter: Optional[str], debug: bool):
-    return
+    raise NotImplementedError("The 'jobs list' command is not yet implemented.")
 
 @arcli.option("--job", "-j", required=True, help=HELP_JOB.format(action="show"))
 @RootOptionGroup.attach(help_fill={"action": "show"})
 @DebugOptionGroup.attach()
 @arcli.command("show")
 def command_testbase_testing_jobs_show(root: Optional[str], job: str, debug: bool):
-    return
+    raise NotImplementedError("The 'jobs show' command is not yet implemented.")
 
 @arcli.option("--job", "-j", required=True, help=HELP_JOB.format(action="run"))
 @RootOptionGroup.attach(help_fill={"action": "run"})
@@ -83,24 +83,38 @@ def command_testbase_testing_jobs_run(root: Optional[str], job: str, output: Opt
     from automojo.xmodules.xpython import prepend_python_path
 
     try:
-        # Default root to "." if None to match original behavior
-        if root is None:
-            root = "."
+        from automojo.testbase.cli.utilities import resolve_test_root
+        test_root = resolve_test_root(root)
 
-        test_root = os.path.abspath(os.path.expandvars(os.path.expanduser(root)))
-        if not os.path.isdir(test_root):
-            errmsg = "The specified root folder does not exist. root=%s" % root
-            if test_root != root:
-                errmsg += " expanded=%s" % test_root
-            raise argparse.ArgumentError(None, errmsg)
-
-        # Make sure we extend PATH to include the test root
-        prepend_python_path(test_root)
+        # Make sure we extend PATH to include the test root parent folder
+        test_root_parent = os.path.dirname(test_root)
+        prepend_python_path(test_root_parent)
 
         # We perform activation a little later in the testrunner.py file so we can
         # handle exceptions in the context of testrunner_main function
         from automojo.runtime.activation import activate_runtime, ActivationProfile
         activate_runtime(profile=ActivationProfile.Console)
+
+        from automojo.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
+
+        if branch is not None:
+            AM_RUNTIME_OPTION_OVERRIDES.override_build_branch(branch)
+        if build is not None:
+            AM_RUNTIME_OPTION_OVERRIDES.override_build_name(build)
+        if flavor is not None:
+            AM_RUNTIME_OPTION_OVERRIDES.override_build_flavor(flavor)
+        if console_level is not None:
+            AM_RUNTIME_OPTION_OVERRIDES.override_loglevel_console(console_level)
+        if logfile_level is not None:
+            AM_RUNTIME_OPTION_OVERRIDES.override_loglevel_file(logfile_level)
+        if output is not None:
+            AM_RUNTIME_OPTION_OVERRIDES.override_output_directory(output)
+        if start is not None:
+            AM_RUNTIME_OPTION_OVERRIDES.override_starttime(start)
+        if runid is not None:
+            AM_RUNTIME_OPTION_OVERRIDES.override_run_id(runid)
+
+        AM_RUNTIME_OPTION_OVERRIDES.override_testroot(test_root)
 
         from automojo.testbase.initialize import initialize_testbase_results
         initialize_testbase_results()
@@ -109,6 +123,7 @@ def command_testbase_testing_jobs_run(root: Optional[str], job: str, output: Opt
         from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
         logger = getEnhancedLogger()
 
+        import automojo.testbase
         tpmod = sys.modules["automojo.testbase"]
         tpmod.logger = logger
 
@@ -132,7 +147,7 @@ def command_testbase_testing_jobs_run(root: Optional[str], job: str, output: Opt
                 job_mod = import_by_name(job_package)
             except ImportError as imperr:
                 errmsg = "Failure while importing job package %r"  % job_package
-                raise argparse.ArgumentError(None, errmsg) from imperr
+                raise RuntimeError(errmsg) from imperr
 
             if not hasattr(job_mod, job_class):
                 errmsg = "The job package %r does not have a job type %r." % (job_package, job_class)

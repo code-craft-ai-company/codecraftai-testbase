@@ -1,0 +1,9 @@
+{
+    "files": [
+        "tab.html",
+        "test-execution.log",
+        "api-requests.log",
+        "database-queries.log"
+    ],
+    "folders": []
+}

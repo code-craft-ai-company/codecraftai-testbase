@@ -20,7 +20,7 @@ logger: EnhancedLogger = getEnhancedLogger()
 
 from automojo.testbase.declaration import attachments as attach
 from automojo.testbase.declaration import registrations as register
-from automojo.testbase.declaration import originiations as originate
+from automojo.testbase.declaration import originations as originate
 
 
 from automojo.testbase.verification import (

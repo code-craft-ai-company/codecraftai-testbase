@@ -1,0 +1,75 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "TestBase: Attach",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "."
+                }
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "TestBase: Attach to Assistant",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5679
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "."
+                }
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "TestBase: Attach (Remote)",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "${input:remoteHost}",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "${input:remotePath}"
+                }
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ],
+    "inputs": [
+        {
+            "id": "remoteHost",
+            "type": "promptString",
+            "description": "Enter the remote host address",
+            "default": "localhost"
+        },
+        {
+            "id": "remotePath",
+            "type": "promptString",
+            "description": "Enter the remote workspace path",
+            "default": "/home/user/project"
+        }
+    ]
+}

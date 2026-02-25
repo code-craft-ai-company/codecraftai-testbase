@@ -6,8 +6,10 @@
     -->
     <head>
         <title>Sounds</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 
         <script type="text/javascript" src="/static/v2/javascript/testsummary-helpers.js"></script>
+        <link rel="stylesheet" href="/static/v2/styles/tabs-responsive.css" ></link>
 
         <style>
 
@@ -20,13 +22,16 @@
 
             .flex-container {
                 display: flex;
+                flex-wrap: wrap;
                 width: auto;
                 height: auto;
+                gap: 15px;
             }
             
             .item-container {
                 display: flex;
                 flex-direction: column;
+                max-width: 100%;
             }
 
             .item-label {
@@ -39,6 +44,12 @@
             .item-content {
                 width: 100%;
                 height: auto;
+            }
+            
+            .item-container audio {
+                width: 100%;
+                max-width: 400px;
+                min-width: 200px;
             }
         </style>
 

@@ -1,0 +1,13 @@
+{
+    "files": [
+        "testrun_summary.json",
+        "testrun_results_stream.jsos",
+        "landscape-declared.json",
+        "startup-configuration.json",
+        "import_errors.jsos"
+    ],
+    "folders": [
+        "artifacts",
+        "logs"
+    ]
+}

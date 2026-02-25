@@ -1,0 +1,45 @@
+{
+    "title": "Performance Metrics - Example Time Series Chart",
+    "axis": {
+        "y": {
+            "label": "Operations per Second (IOPS)"
+        },
+        "x": {
+            "label": "Timestamp"
+        }
+    },
+    "series": [
+        {
+            "name": "read-iops-node-1",
+            "src": "./series/read-perf-iops-node-1.jsos",
+            "fields": {
+                "time": "timestamp",
+                "value": "iops"
+            }
+        },
+        {
+            "name": "read-iops-node-2",
+            "src": "./series/read-perf-iops-node-2.jsos",
+            "fields": {
+                "time": "timestamp",
+                "value": "iops"
+            }
+        },
+        {
+            "name": "write-iops-node-1",
+            "src": "./series/write-perf-iops-node-1.jsos",
+            "fields": {
+                "time": "timestamp",
+                "value": "iops"
+            }
+        },
+        {
+            "name": "write-iops-node-2",
+            "src": "./series/write-perf-iops-node-2.jsos",
+            "fields": {
+                "time": "timestamp",
+                "value": "iops"
+            }
+        }
+    ]
+}

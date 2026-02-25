@@ -70,19 +70,8 @@ def command_testbase_testing_query(root: Optional[str], includes: Optional[List[
     from automojo.testbase.markers import MetaFilter, parse_marker_expression
 
     # Setup the Test Root
-    if root is None:
-        if RuntimeVariables.AM_TESTROOT is not None:
-            root = RuntimeVariables.AM_TESTROOT
-        else:
-            root = "."
-
-
-    test_root = os.path.abspath(os.path.expandvars(os.path.expanduser(root)))
-    if not os.path.isdir(test_root):
-        errmsg = "The specified root folder does not exist. root=%s" % root
-        if test_root != root:
-            errmsg += " expanded=%s" % test_root
-        raise ValueError(errmsg)
+    from automojo.testbase.cli.utilities import resolve_test_root
+    test_root = resolve_test_root(root)
 
     AM_RUNTIME_OPTION_OVERRIDES.override_testroot(root)
 

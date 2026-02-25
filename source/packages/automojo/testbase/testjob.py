@@ -217,6 +217,18 @@ class TestJob(ITestJob):
                 # outside of the execution of any test code
                 self.fire_attach_to_environment(tseq)
 
+                # STEP 8: Capture pre-run diagnostics
+                # This captures the initial state of the test environment before test execution
+                # begins, useful for understanding the starting conditions.
+                try:
+                    from automojo.testbase.diagnostic_level import get_diagnostic_level
+                    self.fire_diagnostic_capture_pre_testrun(tseq, level=get_diagnostic_level())
+                except Exception:
+                    # Log the error with full traceback but do not re-raise
+                    # This ensures the test run continues even if diagnostic capture fails
+                    err_msg = traceback.format_exc()
+                    self._logger.error(err_msg)
+
                 self._logger.section("Expanding Test Tree Based on Query")
                 tseq.expand_test_tree_based_on_query()
 
@@ -235,12 +247,11 @@ class TestJob(ITestJob):
                                          stream_results_filename=self._stream_result_filename, consolidated_results_filename=self._consolidated_result_filename, static_resource_source=static_resource_source,
                                          static_resource_destination=static_resource_destination)
 
+                
                 build_info = BuildInfo(branch=self._branch, build=self._build, flavor=self._flavor,
-                                       release=self._release, url=self._build_url)
+                                           release=self._release, url=self._build_url)
 
-                pipeline_info = None
-                if self._pipeline_id is not None:
-                    pipeline_info = PipelineInfo(id=self._pipeline_id, name=self._pipeline_name, instance=self._pipeline_instance)
+                pipeline_info = PipelineInfo(id=self._pipeline_id, name=self._pipeline_name, instance=self._pipeline_instance)
 
                 job_info = JobInfo(id=self._job_id, name=self._job_name, type=self._job_type, owner=self._job_owner, label=self._job_label,
                                    initiator=self._job_initiator, venue=self._job_venue, tag=self._job_tag)
@@ -259,10 +270,38 @@ class TestJob(ITestJob):
                         # Traverse the execution graph
                         tseq.execute_tests(runid, recorder)
 
+                        # ============================================================================
+                        # ERROR HANDLING STRATEGY - DIAGNOSTIC CAPTURE
+                        # ============================================================================
+                        # Diagnostic capture is wrapped in its own try/except block to ensure that
+                        # diagnostic failures do NOT cause the test run to fail. This is a critical
+                        # design decision based on the following principles:
+                        #
+                        # 1. ISOLATION: Diagnostic capture is a secondary concern - the primary goal
+                        #    is test execution. Diagnostic failures should not impact test results.
+                        #
+                        # 2. GRACEFUL DEGRADATION: If diagnostic capture fails, we log the error
+                        #    with full traceback for debugging but continue with finalization.
+                        #
+                        # 3. NON-BLOCKING: The test run should complete and report results even if
+                        #    diagnostic capture encounters issues (e.g., disk full, permission errors,
+                        #    integration coupling errors).
+                        #
+                        # 4. FULL TRACEBACK: We capture the complete traceback using traceback.format_exc()
+                        #    to provide maximum debugging information for diagnosing capture failures.
+                        #
+                        # This pattern ensures that test results are always available, even when
+                        # diagnostic capture encounters unexpected errors.
+                        # ============================================================================
                         try:
                             # STEP 12: Capture a post-testrun diagnostic capture
-                            self.fire_diagnostic_capture_post_testrun(tseq)
+                            # This captures the final state of the test environment after all tests
+                            # have completed, useful for post-mortem analysis and debugging.
+                            from automojo.testbase.diagnostic_level import get_diagnostic_level
+                            self.fire_diagnostic_capture_post_testrun(tseq, level=get_diagnostic_level())
                         except Exception:
+                            # Log the error with full traceback but do not re-raise
+                            # This ensures the test run continues to finalization
                             err_msg = traceback.format_exc()
                             self._logger.error(err_msg)
 
@@ -353,10 +392,106 @@ class TestJob(ITestJob):
         return
 
     def fire_diagnostic_capture_post_testrun(self, tseq: TestSequencer, level: int=9):
+        """
+        Fires the post-run diagnostic capture event, delegating to the TestSequencer.
+
+        This method is called after test execution completes but before finalization to
+        capture diagnostic information about the final state of the test environment.
+        It delegates the actual diagnostic capture to the TestSequencer's
+        :meth:`diagnostic_capture_post_testrun` method.
+
+        The diagnostic capture is wrapped in error handling at the call site to ensure
+        that diagnostic failures do not cause the test run to fail.
+
+        :param tseq: The :class:`TestSequencer` instance managing the test execution.
+            The sequencer contains the registered integration couplings that will
+            perform the actual diagnostic capture.
+        :param level: The maximum diagnostic level to capture (1-9). Higher levels
+            indicate more detailed diagnostic information. Defaults to 9 (maximum detail).
+
+            * Levels 1-3: Basic diagnostic information
+            * Levels 4-6: Standard diagnostic information
+            * Levels 7-9: Detailed diagnostic information
+
+        :returns: None. Diagnostic files are written by integration couplings.
+
+        Lifecycle Position:
+            This method is called at STEP 12 in the test execution lifecycle::
+
+                STEP 11: Test execution completes
+                STEP 12: fire_diagnostic_capture_post_testrun (this method)
+                STEP 13: Finalization begins
+
+        Example Usage::
+
+            # Called internally during test execution
+            try:
+                self.fire_diagnostic_capture_post_testrun(tseq)
+            except Exception:
+                err_msg = traceback.format_exc()
+                self._logger.error(err_msg)
+
+        Note:
+            Errors during diagnostic capture are caught and logged but do not fail
+            the test run. This ensures that diagnostic issues do not impact test
+            results.
+
+        See Also:
+            - :meth:`fire_diagnostic_capture_pre_testrun`: Fires pre-run diagnostics
+            - :meth:`TestSequencer.diagnostic_capture_post_testrun`: Performs the capture
+        """
         tseq.diagnostic_capture_post_testrun(level)
         return
 
     def fire_diagnostic_capture_pre_testrun(self, tseq: TestSequencer, level: int=9):
+        """
+        Fires the pre-run diagnostic capture event, delegating to the TestSequencer.
+
+        This method is called after integration setup completes but before test execution
+        begins to capture diagnostic information about the initial state of the test
+        environment. It delegates the actual diagnostic capture to the TestSequencer's
+        :meth:`diagnostic_capture_pre_testrun` method.
+
+        The diagnostic capture is wrapped in error handling at the call site to ensure
+        that diagnostic failures do not cause the test run to fail.
+
+        :param tseq: The :class:`TestSequencer` instance managing the test execution.
+            The sequencer contains the registered integration couplings that will
+            perform the actual diagnostic capture.
+        :param level: The maximum diagnostic level to capture (1-9). Higher levels
+            indicate more detailed diagnostic information. Defaults to 9 (maximum detail).
+
+            * Levels 1-3: Basic diagnostic information
+            * Levels 4-6: Standard diagnostic information
+            * Levels 7-9: Detailed diagnostic information
+
+        :returns: None. Diagnostic files are written by integration couplings.
+
+        Lifecycle Position:
+            This method is called at STEP 8 in the test execution lifecycle::
+
+                STEP 7: Integration setup completes
+                STEP 8: fire_diagnostic_capture_pre_testrun (this method)
+                STEP 9: Test execution begins
+
+        Example Usage::
+
+            # Called internally during test execution
+            try:
+                self.fire_diagnostic_capture_pre_testrun(tseq)
+            except Exception:
+                err_msg = traceback.format_exc()
+                self._logger.error(err_msg)
+
+        Note:
+            Errors during diagnostic capture are caught and logged but do not fail
+            the test run. This ensures that diagnostic issues do not impact test
+            results.
+
+        See Also:
+            - :meth:`fire_diagnostic_capture_post_testrun`: Fires post-run diagnostics
+            - :meth:`TestSequencer.diagnostic_capture_pre_testrun`: Performs the capture
+        """
         tseq.diagnostic_capture_pre_testrun(level)
         return
 

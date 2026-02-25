@@ -63,11 +63,20 @@ class ProgressInfo:
         return rtnval
     
     @classmethod
-    def from_dict(data: dict) -> "ProgressInfo":
+    def from_dict(cls, data: dict) -> "ProgressInfo":
         when = datetime.fromisoformat(data["when"])
+        
+        # Convert string values to enum types
+        ptype = data["ptype"]
+        if isinstance(ptype, str):
+            ptype = ProgressType(ptype)
+        
+        status = data["status"]
+        if isinstance(status, str):
+            status = ProgressCode(status)
 
-        inst = ProgressInfo(data["id"], data["category"], data["moniker"], data["ptype"], data["range_min"],
-                            data["range_max"], data["position"], data["status"], when, data["data"])
+        inst = cls(data["id"], data["category"], data["moniker"], ptype, data["range_min"],
+                   data["range_max"], data["position"], status, when, data.get("data"))
         return inst
     
     def __repr__(self):

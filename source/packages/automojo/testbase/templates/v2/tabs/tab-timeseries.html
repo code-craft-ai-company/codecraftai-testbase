@@ -43,6 +43,8 @@
     -->
     <head>
         <title>Time Series Chart</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+        <link rel="stylesheet" href="/static/v2/styles/tabs-responsive.css" ></link>
         <style>
             .page-style {
                 margin: 0px;
@@ -60,6 +62,23 @@
             img {
                 width: 100px;
                 height: auto;
+            }
+            
+            #chart {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            #chart svg {
+                max-width: 100%;
+                height: auto;
+            }
+            
+            @media (max-width: 768px) {
+                h3 {
+                    font-size: 1.2em;
+                }
             }
         </style>
 

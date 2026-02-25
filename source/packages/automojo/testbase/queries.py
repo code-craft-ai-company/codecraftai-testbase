@@ -88,8 +88,6 @@ def collect_test_references(root, included_files, filter_package, filter_module,
             print(errmsg)
             import_errors[ifile] = (modname, ifile, errmsg)
 
-    import_errors.update(import_errors)
-
     for modname, ifile, errmsg in import_errors.values():
         logger.error("TestCase: Import error filename=%r" % ifile)
 

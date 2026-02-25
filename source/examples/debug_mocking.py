@@ -104,20 +104,69 @@ def debug_mock_instance_method():
 def debug_mock_property_access():
     print("\n--- debug_mock_property_access ---")
     obj = SomeClass()
-    # Mocking property access (getter)
-    # Again, Patch is the proper way, but this shows configuring a Mock for it.
-    mock_prop_getter = Mock(return_value="Mocked Property Value")
-
-    # To mock a property setter, you'd mock it as a callable that takes a value.
-    def prop_setter_side_effect(value):
+    
+    # Using the new PropertyMock for property getter/setter mocking
+    from automojo.testbase.mocking import PropertyMock, create_property_mock
+    
+    # Create a PropertyMock with getter return value
+    prop_mock = create_property_mock(getter_return_value="Mocked Property Value")
+    
+    # Access the property (getter)
+    print(f"Calling prop_mock.get(): {prop_mock.get()}")
+    assert prop_mock.get() == "Mocked Property Value"
+    
+    # Verify getter was called
+    prop_mock.assert_getter_called()
+    print(f"Getter call count: {prop_mock.getter_call_count}")
+    
+    # Create a PropertyMock with setter tracking
+    received_values = []
+    def on_set(value):
         print(f"Mocked property setter called with: {value}")
-    mock_prop_setter = Mock(side_effect=prop_setter_side_effect)
-
-    print(f"Original property value: {obj.instance_property}")
-    # In a real test, you'd use Patch to replace the property descriptor.
-    # For this example, we'll just call the mocks directly.
-    print(f"Calling mock_prop_getter: {mock_prop_getter()}")
-    mock_prop_setter("new val")
+        received_values.append(value)
+    
+    prop_mock_with_setter = create_property_mock(
+        getter_return_value="Initial Value",
+        setter_side_effect=on_set
+    )
+    
+    # Access getter
+    print(f"Getting value: {prop_mock_with_setter.get()}")
+    
+    # Set value (triggers setter side effect)
+    prop_mock_with_setter.set("new_value")
+    prop_mock_with_setter.set("another_value")
+    
+    # Verify setter calls
+    prop_mock_with_setter.assert_setter_called()
+    prop_mock_with_setter.assert_setter_any_call("new_value")
+    prop_mock_with_setter.assert_setter_called_with("another_value")  # Last call
+    print(f"Setter call count: {prop_mock_with_setter.setter_call_count}")
+    print(f"Received values: {received_values}")
+    
+    # Using PropertyMock with dynamic getter (side effect)
+    counter = [0]
+    def increment_counter():
+        counter[0] += 1
+        return f"Access #{counter[0]}"
+    
+    dynamic_prop = create_property_mock(getter_side_effect=increment_counter)
+    print(f"First access: {dynamic_prop.get()}")
+    print(f"Second access: {dynamic_prop.get()}")
+    print(f"Third access: {dynamic_prop.get()}")
+    
+    # Fluent configuration
+    prop = PropertyMock()
+    prop.configure_getter(return_value="configured_value").configure_setter(
+        side_effect=lambda v: print(f"Fluent setter received: {v}")
+    )
+    print(f"Fluent configured getter: {prop.get()}")
+    prop.set("fluent_value")
+    
+    # Reset and reuse
+    prop.reset()
+    print(f"After reset, getter call count: {prop.getter_call_count}")
+    print(f"After reset, setter call count: {prop.setter_call_count}")
 
 def debug_recursive_mock():
     print("\n--- debug_recursive_mock ---")

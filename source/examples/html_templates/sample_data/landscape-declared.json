@@ -1,0 +1,57 @@
+{
+    "devices": {
+        "primary-group": [
+            {
+                "name": "web-server-01",
+                "deviceType": "linux-server",
+                "host": "192.168.1.100",
+                "role": "web-server",
+                "credentials": "ssh-key-web",
+                "features": ["nginx", "ssl"],
+                "skip": false
+            },
+            {
+                "name": "db-server-01",
+                "deviceType": "linux-server",
+                "host": "192.168.1.101",
+                "role": "database",
+                "credentials": "ssh-key-db",
+                "features": ["postgresql", "replication"],
+                "skip": false
+            }
+        ],
+        "secondary-group": [
+            {
+                "name": "cache-server-01",
+                "deviceType": "linux-server",
+                "host": "192.168.1.102",
+                "role": "cache",
+                "credentials": "ssh-key-cache",
+                "features": ["redis"],
+                "skip": false
+            }
+        ]
+    },
+    "services": [
+        {
+            "name": "api-gateway",
+            "serviceType": "http-api",
+            "host": "https://api.example.com",
+            "credentials": "api-key-gateway"
+        },
+        {
+            "name": "auth-service",
+            "serviceType": "oauth2",
+            "host": "https://auth.example.com",
+            "credentials": "oauth-client-creds"
+        }
+    ],
+    "dataprofiles": [
+        {
+            "name": "test-data-profile",
+            "profileType": "json-data",
+            "host": "file:///data/test-fixtures",
+            "credentials": null
+        }
+    ]
+}

@@ -5,7 +5,7 @@
             "path": "${TMPLT:HOME}/automojo"
         },
         {
-            "name": "testbase"
+            "name": "testbase",
             "path": "../"
         }
     ],

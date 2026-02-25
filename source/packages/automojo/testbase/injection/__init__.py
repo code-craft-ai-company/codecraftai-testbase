@@ -11,3 +11,15 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
+from automojo.testbase.injection.introspection import (
+    FactoryType,
+    FactoryMetadata,
+    FactoryListResult
+)
+
+from automojo.testbase.injection.injectionregistry import (
+    InjectionRegistry,
+    injection_registry
+)
+
+

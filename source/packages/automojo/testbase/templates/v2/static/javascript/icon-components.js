@@ -5,13 +5,39 @@
     Email: myron.walker@gmail.com
 */
 
+/**
+ * @fileoverview SVG icon web components for the Mojo component library.
+ * Provides a collection of Material Design-style icons as reusable web components.
+ * @module icon-components
+ */
+
+/**
+ * Flag indicating whether icon components have been registered with customElements.
+ * @type {boolean}
+ * @private
+ */
 let iconComponentsRegistered = false;
 
+/**
+ * Base class for all icon components.
+ * Provides common functionality for initializing Shadow DOM with SVG templates.
+ * 
+ * @class IconBase
+ * @extends HTMLElement
+ */
 class IconBase extends HTMLElement {
+    /**
+     * Creates a new IconBase instance.
+     * @param {string} template - The SVG template string (unused, kept for compatibility).
+     */
     constructor(template) {
         super();
     }
 
+    /**
+     * Initializes the Shadow DOM with the provided SVG template.
+     * @param {string} template - The SVG template string to render.
+     */
     initializeShadow(template) {
         const shadowRoot = this.attachShadow({mode: 'open'})
         shadowRoot.innerHTML = template;
@@ -21,6 +47,12 @@ class IconBase extends HTMLElement {
 }
 
 
+/**
+ * Bug icon component (Material Design bug_report icon).
+ * @class IconBug
+ * @extends IconBase
+ * @example <icon-bug></icon-bug>
+ */
 class IconBug extends IconBase {
 
     static tagname = 'icon-bug'
@@ -36,6 +68,12 @@ class IconBug extends IconBase {
     }
 }
 
+/**
+ * Copy icon component (Material Design content_copy icon).
+ * @class IconCopy
+ * @extends IconBase
+ * @example <icon-copy></icon-copy>
+ */
 class IconCopy extends IconBase {
 
     static tagname = 'icon-copy'
@@ -51,6 +89,12 @@ class IconCopy extends IconBase {
     }
 }
 
+/**
+ * Device unknown icon component (Material Design device_unknown icon).
+ * @class IconDeviceUnknown
+ * @extends IconBase
+ * @example <icon-device-unknown></icon-device-unknown>
+ */
 class IconDeviceUnknown extends IconBase {
 
     static tagname = 'icon-device-unknown'
@@ -66,6 +110,12 @@ class IconDeviceUnknown extends IconBase {
     }
 }
 
+/**
+ * Error icon component (Material Design error icon).
+ * @class IconError
+ * @extends IconBase
+ * @example <icon-error></icon-error>
+ */
 class IconError extends IconBase {
 
     static tagname = 'icon-error'
@@ -81,6 +131,12 @@ class IconError extends IconBase {
     }
 }
 
+/**
+ * File icon component (Material Design description icon).
+ * @class IconFile
+ * @extends IconBase
+ * @example <icon-file></icon-file>
+ */
 class IconFile extends IconBase {
 
     static tagname = 'icon-file'
@@ -96,6 +152,12 @@ class IconFile extends IconBase {
     }
 }
 
+/**
+ * Filter icon component (Material Design filter_alt icon).
+ * @class IconFilter
+ * @extends IconBase
+ * @example <icon-filter></icon-filter>
+ */
 class IconFilter extends IconBase {
 
     static tagname = 'icon-filter'
@@ -111,6 +173,12 @@ class IconFilter extends IconBase {
     }
 }
 
+/**
+ * Folder icon component (Material Design folder icon).
+ * @class IconFolder
+ * @extends IconBase
+ * @example <icon-folder></icon-folder>
+ */
 class IconFolder extends IconBase {
 
     static tagname = 'icon-folder'
@@ -126,6 +194,12 @@ class IconFolder extends IconBase {
     }
 }
 
+/**
+ * Folder code icon component (Material Design folder_code icon).
+ * @class IconFolderCode
+ * @extends IconBase
+ * @example <icon-folder-code></icon-folder-code>
+ */
 class IconFolderCode extends IconBase {
 
     static tagname = 'icon-folder-code'
@@ -141,6 +215,12 @@ class IconFolderCode extends IconBase {
     }
 }
 
+/**
+ * Folder data icon component (Material Design folder_data icon).
+ * @class IconFolderData
+ * @extends IconBase
+ * @example <icon-folder-data></icon-folder-data>
+ */
 class IconFolderData extends IconBase {
 
     static tagname = 'icon-folder-data'
@@ -156,6 +236,12 @@ class IconFolderData extends IconBase {
     }
 }
 
+/**
+ * Folder eye icon component (Material Design folder_supervised icon).
+ * @class IconFolderEye
+ * @extends IconBase
+ * @example <icon-folder-eye></icon-folder-eye>
+ */
 class IconFolderEye extends IconBase {
 
     static tagname = 'icon-folder-eye'
@@ -171,6 +257,12 @@ class IconFolderEye extends IconBase {
     }
 }
 
+/**
+ * Folder managed icon component (Material Design folder_managed icon).
+ * @class IconFolderManaged
+ * @extends IconBase
+ * @example <icon-folder-managed></icon-folder-managed>
+ */
 class IconFolderManaged extends IconBase {
 
     static tagname = 'icon-folder-managed'
@@ -186,6 +278,12 @@ class IconFolderManaged extends IconBase {
     }
 }
 
+/**
+ * Minus sign icon component (Material Design remove icon).
+ * @class IconMinusSign
+ * @extends IconBase
+ * @example <icon-minus-sign></icon-minus-sign>
+ */
 class IconMinusSign extends IconBase {
 
     static tagname = 'icon-minus-sign'
@@ -201,6 +299,12 @@ class IconMinusSign extends IconBase {
     }
 }
 
+/**
+ * Note add icon component (Material Design note_add icon).
+ * @class IconNoteAdd
+ * @extends IconBase
+ * @example <icon-note-add></icon-note-add>
+ */
 class IconNoteAdd extends IconBase {
 
     static tagname = 'icon-note-add'
@@ -216,6 +320,12 @@ class IconNoteAdd extends IconBase {
     }
 }
 
+/**
+ * Note stack icon component (Material Design note_stack icon).
+ * @class IconNoteStack
+ * @extends IconBase
+ * @example <icon-note-stack></icon-note-stack>
+ */
 class IconNoteStack extends IconBase {
 
     static tagname = 'icon-note-stack'
@@ -231,6 +341,12 @@ class IconNoteStack extends IconBase {
     }
 }
 
+/**
+ * Plus sign icon component (Material Design add icon).
+ * @class IconPlusSign
+ * @extends IconBase
+ * @example <icon-plus-sign></icon-plus-sign>
+ */
 class IconPlusSign extends IconBase {
 
     static tagname = 'icon-plus-sign'
@@ -246,6 +362,12 @@ class IconPlusSign extends IconBase {
     }
 }
 
+/**
+ * Search icon component (Material Design search icon).
+ * @class IconSearch
+ * @extends IconBase
+ * @example <icon-search></icon-search>
+ */
 class IconSearch extends IconBase {
 
     static tagname = 'icon-search'
@@ -261,6 +383,12 @@ class IconSearch extends IconBase {
     }
 }
 
+/**
+ * Settings icon component (Material Design settings icon).
+ * @class IconSettings
+ * @extends IconBase
+ * @example <icon-settings></icon-settings>
+ */
 class IconSettings extends IconBase {
 
     static tagname = 'icon-settings'
@@ -276,6 +404,12 @@ class IconSettings extends IconBase {
     }
 }
 
+/**
+ * Tablet Android icon component (Material Design tablet_android icon).
+ * @class IconTabletAndroid
+ * @extends IconBase
+ * @example <icon-tablet-android></icon-tablet-android>
+ */
 class IconTabletAndroid extends IconBase {
 
     static tagname = 'icon-tablet-android'
@@ -291,6 +425,12 @@ class IconTabletAndroid extends IconBase {
     }
 }
 
+/**
+ * Question mark icon component (Material Design help icon).
+ * @class IconQuestionMark
+ * @extends IconBase
+ * @example <icon-question-mark></icon-question-mark>
+ */
 class IconQuestionMark extends IconBase {
 
     static tagname = 'icon-question-mark'
@@ -306,6 +446,12 @@ class IconQuestionMark extends IconBase {
     }
 }
 
+/**
+ * Warning icon component (Material Design warning icon).
+ * @class IconWarning
+ * @extends IconBase
+ * @example <icon-warning></icon-warning>
+ */
 class IconWarning extends IconBase {
 
     static tagname = 'icon-warning'
@@ -321,6 +467,18 @@ class IconWarning extends IconBase {
     }
 }
 
+/**
+ * Registers all icon components with the customElements registry.
+ * Should be called before using any icon components.
+ * Safe to call multiple times - only registers once.
+ * 
+ * @function register_icon_components
+ * @returns {void}
+ * 
+ * @example
+ * // Register icon components on page load
+ * register_icon_components();
+ */
 function register_icon_components() {
 
     if (!iconComponentsRegistered) {

@@ -1,0 +1,23 @@
+{
+    "version": "2",
+    "title": "Example Test Suite",
+    "runid": "example-run-2024-01-15-001",
+    "start": "2024-01-15T10:30:00.000000",
+    "stop": "2024-01-15T11:45:30.500000",
+    "result": "PASSED",
+    "apod": "example-automation-pod",
+    "build": {
+        "branch": "main",
+        "build": "build-12345",
+        "flavor": "release"
+    },
+    "totals": null,
+    "running": {},
+    "detail": {
+        "errors": 1,
+        "failed": 2,
+        "skipped": 5,
+        "passed": 92,
+        "total": 100
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "command": "testbase run --testroot ./tests --output ./results --parallel 4",
+    "environment": {
+        "PYTHONPATH": "/app/src:/app/tests",
+        "TEST_ENV": "staging",
+        "LOG_LEVEL": "DEBUG",
+        "DATABASE_URL": "postgresql://localhost:5432/testdb",
+        "REDIS_URL": "redis://localhost:6379/0",
+        "API_BASE_URL": "https://api.staging.example.com"
+    },
+    "packages": {
+        "automojo-testbase": "1.2.3",
+        "pytest": "7.4.0",
+        "requests": "2.31.0",
+        "sqlalchemy": "2.0.20",
+        "redis": "4.6.0",
+        "httpx": "0.24.1",
+        "pydantic": "2.3.0"
+    }
+}

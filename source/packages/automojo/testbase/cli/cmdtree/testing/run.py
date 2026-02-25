@@ -47,6 +47,9 @@ from automojo.testbase.cli.options import (
     HELP_FILE_LOG_LEVEL,
     HELP_DEBUGGER,
     HELP_BREAKPOINT,
+    HELP_DEBUG_PORT,
+    HELP_DEBUG_PORT_RANGE,
+    HELP_DEBUG_LOG_LEVEL,
     HELP_PRERUN_DIAGNOSTIC,
     HELP_POSTRUN_DIAGNOSTIC,
     HELP_INCLUDE_MARKER_EXP,
@@ -65,8 +68,9 @@ def command_testbase_testing_run(root: Optional[str], includes: Optional[List[st
                                  start: Optional[str], runid: Optional[str], branch: Optional[str], build: Optional[str], flavor: Optional[str],
                                  job_id: Optional[str], job_initiator: Optional[str], job_label: Optional[str], job_name: Optional[str],
                                  job_owner: Optional[str], console_level: Optional[str], logfile_level: Optional[str],
-                                 debugger: Optional[str], breakpoints: Optional[List[str]], prerun_diagnostic: bool, postrun_diagnostic: bool,
-                                 include_marker_exp: Optional[List[str]], exclude_marker_exp: Optional[List[str]]):
+                                 debugger: Optional[str], breakpoints: Optional[List[str]], debug_port: Optional[str],
+                                 debug_port_range: Optional[str], debug_log_level: Optional[str], prerun_diagnostic: bool, postrun_diagnostic: bool,
+                                 diagnostic_level: Optional[str], include_marker_exp: Optional[List[str]], exclude_marker_exp: Optional[List[str]]):
     """
     Command used to run collections of tests.
     """
@@ -157,24 +161,61 @@ def command_testbase_testing_run(root: Optional[str], includes: Optional[List[st
     if debugger is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_debug_debugger('debugpy')
 
+    # Handle debug port configuration
+    # Port range takes precedence over specific port
+    if debug_port_range is not None or debug_port is not None:
+        from automojo.testbase.debugports import (
+            resolve_debug_port,
+            set_configured_debug_port,
+            PortConflictError,
+            PortRangeError
+        )
+
+        try:
+            # Convert debug_port to int if provided
+            port_value = int(debug_port) if debug_port is not None else None
+            resolved_port = resolve_debug_port(port=port_value, port_range=debug_port_range)
+            set_configured_debug_port(resolved_port)
+        except PortConflictError as e:
+            raise ValueError(str(e))
+        except PortRangeError as e:
+            raise ValueError(str(e))
+
+    # Handle debug log level configuration
+    if debug_log_level is not None:
+        from automojo.testbase.debuglogging import set_debug_log_level, DEBUG_LOG_LEVEL
+
+        level_map = {
+            'debug': DEBUG_LOG_LEVEL.DEBUG,
+            'info': DEBUG_LOG_LEVEL.INFO,
+            'warning': DEBUG_LOG_LEVEL.WARNING,
+            'error': DEBUG_LOG_LEVEL.ERROR,
+            'disabled': DEBUG_LOG_LEVEL.DISABLED
+        }
+        if debug_log_level.lower() in level_map:
+            set_debug_log_level(level_map[debug_log_level.lower()])
+
     if prerun_diagnostic:
         AM_RUNTIME_OPTION_OVERRIDES.override_diagnostics_prerun({})
     
     if postrun_diagnostic:
         AM_RUNTIME_OPTION_OVERRIDES.override_diagnostics_postrun({})
 
-    if root is None:
-        if RuntimeVariables.AM_TESTROOT is not None:
-            root = RuntimeVariables.AM_TESTROOT
-        else:
-            root = "."
+    if diagnostic_level is not None:
+        # Validate and convert diagnostic level to integer
+        from automojo.testbase.diagnostic_level import set_diagnostic_level
+        try:
+            level_value = int(diagnostic_level)
+            if level_value < 1 or level_value > 9:
+                raise ValueError(f"Diagnostic level must be between 1 and 9, got: {level_value}")
+            set_diagnostic_level(level_value)
+        except ValueError as e:
+            if "invalid literal" in str(e):
+                raise ValueError(f"Diagnostic level must be an integer between 1 and 9, got: {diagnostic_level}")
+            raise
 
-    test_root = os.path.abspath(os.path.expandvars(os.path.expanduser(root)))
-    if not os.path.isdir(test_root):
-        errmsg = "The specified root folder does not exist. root=%s" % root
-        if test_root != root:
-            errmsg += " expanded=%s" % test_root
-        raise ValueError(errmsg)
+    from automojo.testbase.cli.utilities import resolve_test_root
+    test_root = resolve_test_root(root)
 
     AM_RUNTIME_OPTION_OVERRIDES.override_testroot(test_root)
 

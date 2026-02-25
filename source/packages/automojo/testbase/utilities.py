@@ -237,33 +237,227 @@ def find_included_modules_under_root(root: str, package: Union[str, None], modul
 
 def find_testmodule_root(module) -> str:
     """
-        Finds the root directory that is associated with a given test module.
+        Discovers the test root directory for a given test module.
+
+        This function walks up the directory tree from the module's location until it finds
+        a directory containing a ``__testroot__.py`` marker file. The test root directory
+        defines the boundary of the test package namespace and is essential for proper
+        module name resolution.
+
+        :param module: The test module object (typically ``sys.modules["__main__"]``) for which
+            to find the test root directory. The module must have a ``__file__`` attribute
+            pointing to its source file location.
+        :type module: ModuleType
+
+        :returns: The absolute path to the test root directory containing the
+            ``__testroot__.py`` marker file.
+        :rtype: str
+
+        :raises ConfigurationError: If no ``__testroot__.py`` marker file is found when
+            walking up the directory tree to the filesystem root. The error message indicates
+            that test files must exist inside a test root directory marked with a
+            ``__testroot__.py`` file.
+
+        Algorithm:
+            1. Start from the directory containing the module's source file
+            2. Check if ``__testroot__.py`` exists in the current directory
+            3. If found, return the current directory path
+            4. If not found, move to the parent directory
+            5. Repeat until found or filesystem root is reached
+            6. If filesystem root is reached without finding the marker, raise ConfigurationError
+
+        Example:
+            Given a test file structure::
+
+                tests/
+                ├── __testroot__.py    # Marker file
+                ├── __init__.py
+                └── package/
+                    ├── __init__.py
+                    └── test_module.py
+
+            When called with the test_module module::
+
+                import sys
+                test_module = sys.modules["__main__"]
+                root = find_testmodule_root(test_module)
+                # Returns: "/path/to/tests"
+
+        .. note::
+            The ``__testroot__.py`` marker file can be empty or contain test root configuration.
+            Its presence alone is sufficient to mark the test root boundary.
+
+        .. seealso::
+            :func:`find_testmodule_fullname` : Uses the test root to compute the full module name
     """
+    # =========================================================================
+    # TEST ROOT DISCOVERY ALGORITHM
+    # =========================================================================
+    # The test root is the directory that contains the __testroot__.py marker
+    # file. This marker defines the boundary of the test package namespace.
+    #
+    # Why we need this:
+    #   - Python modules are identified by their dotted path from a root
+    #   - Without a marker, we wouldn't know where the module namespace begins
+    #   - The marker allows test files to be organized in any directory structure
+    #
+    # Algorithm: Walk up the directory tree until we find __testroot__.py
+    #   1. Start at the directory containing the test module file
+    #   2. Check if __testroot__.py exists in current directory
+    #   3. If found, return this directory as the test root
+    #   4. If not found, move to parent directory and repeat
+    #   5. If we reach filesystem root without finding marker, raise error
+    #
+    # Example directory structure:
+    #   /project/tests/__testroot__.py  <- Test root marker
+    #   /project/tests/unit/test_auth.py <- Test module
+    #
+    # Walking up from test_auth.py:
+    #   /project/tests/unit/ -> no __testroot__.py, continue
+    #   /project/tests/ -> found __testroot__.py, return this path
+    # =========================================================================
+    
+    # Get the directory containing the module's source file
+    # This is our starting point for the upward directory walk
     mod_dir = os.path.dirname(module.__file__)
+    
     while True:
+        # Construct the path to the potential marker file in current directory
         pkg_dir_file = os.path.join(mod_dir, "__testroot__.py")
+        
         if not os.path.exists(pkg_dir_file):
+            # Marker not found in current directory, move to parent
             parent_dir = os.path.dirname(mod_dir)
+            
+            # Check if we've reached the filesystem root
+            # At root, dirname returns the same path (e.g., "/" on Unix)
             if parent_dir == mod_dir:
+                # We've walked all the way to root without finding the marker
+                # This is a configuration error - test files must be in a test root
                 errmsg = "TestBase test files must exist inside a test root directory marked with a __testroot__.py file."
                 raise ConfigurationError(errmsg)
+            
+            # Continue walking up the directory tree
             mod_dir = parent_dir
         else:
+            # Found the __testroot__.py marker file
+            # This directory is the test root
             break
 
     return mod_dir
 
 def find_testmodule_fullname(module, testroot=None) -> str:
     """
-        Finds the root directory that is associated with a given test module and
-        then uses the leaf path to a module to develop a full module name.
-    """
+        Computes the fully qualified dotted module name for a test module.
 
+        This function determines the full module name by computing the relative path from
+        the test root's parent directory to the module file, then converting path separators
+        to dots. This is essential for proper module registration in ``sys.modules`` and
+        for correct identification of test classes and functions.
+
+        :param module: The test module object (typically ``sys.modules["__main__"]``) for which
+            to compute the full module name. The module must have a ``__file__`` attribute
+            pointing to its source file location.
+        :type module: ModuleType
+
+        :param testroot: The path to the test root directory. If not provided, the function
+            will call :func:`find_testmodule_root` to discover it automatically.
+        :type testroot: Optional[str]
+
+        :returns: The fully qualified dotted module name (e.g., ``"tests.package.test_module"``).
+        :rtype: str
+
+        :raises ConfigurationError: If ``testroot`` is not provided and no ``__testroot__.py``
+            marker file is found when discovering the test root.
+
+        Algorithm:
+            1. If testroot is not provided, discover it using :func:`find_testmodule_root`
+            2. Get the absolute path to the module file (without extension)
+            3. Get the parent directory of the test root
+            4. Compute the relative path from the test root parent to the module file
+            5. Convert path separators (``/``) to dots (``.``) to form the dotted module name
+
+        Example:
+            Given a test file structure::
+
+                /home/user/project/
+                └── tests/
+                    ├── __testroot__.py
+                    ├── __init__.py
+                    └── package/
+                        ├── __init__.py
+                        └── test_module.py
+
+            When called with the test_module module::
+
+                import sys
+                test_module = sys.modules["__main__"]
+                fullname = find_testmodule_fullname(test_module)
+                # Returns: "tests.package.test_module"
+
+            With explicit testroot::
+
+                fullname = find_testmodule_fullname(test_module, testroot="/home/user/project/tests")
+                # Returns: "tests.package.test_module"
+
+        .. note::
+            The full module name is computed relative to the test root's parent directory,
+            which means the test root directory name itself becomes the first component
+            of the module name.
+
+        .. seealso::
+            :func:`find_testmodule_root` : Discovers the test root directory
+            :func:`generic_test_entrypoint` : Uses this function for module registration
+    """
+    # =========================================================================
+    # MODULE FULL NAME COMPUTATION ALGORITHM
+    # =========================================================================
+    # This function converts a file system path to a Python dotted module name.
+    # The module name is computed relative to the test root's PARENT directory,
+    # so the test root directory name becomes the first component of the module name.
+    #
+    # Why relative to parent?
+    #   - The test root directory (e.g., "tests") is itself a Python package
+    #   - We want module names like "tests.unit.test_auth", not "unit.test_auth"
+    #   - This matches how Python would import the module if it were on sys.path
+    #
+    # Algorithm:
+    #   1. Get absolute path to module file without .py extension
+    #   2. Get the parent directory of the test root
+    #   3. Strip the parent path from the module path to get relative path
+    #   4. Convert path separators to dots for dotted module name
+    #
+    # Example:
+    #   Module file: /project/tests/unit/test_auth.py
+    #   Test root:   /project/tests/
+    #   Parent:      /project/
+    #
+    #   Relative path: tests/unit/test_auth
+    #   Module name:   tests.unit.test_auth
+    # =========================================================================
+
+    # If testroot not provided, discover it by walking up the directory tree
     if testroot is None:
         testroot = find_testmodule_root(module)
 
+    # Get the absolute path to the module file without the .py extension
+    # Example: /project/tests/unit/test_auth.py -> /project/tests/unit/test_auth
     mod_filebase, _ = os.path.splitext(os.path.abspath(module.__file__))
+    
+    # Get the parent directory of the test root
+    # This is the directory from which we compute the relative module path
+    # Example: /project/tests/ -> /project/
     testroot_parent = os.path.dirname(testroot)
+    
+    # Compute the relative path from testroot_parent to the module file
+    # Then convert path separators to dots for the dotted module name
+    #
+    # Steps:
+    #   1. Strip testroot_parent prefix from mod_filebase
+    #      /project/tests/unit/test_auth -> tests/unit/test_auth
+    #   2. Strip leading slashes (in case of edge cases)
+    #   3. Replace "/" with "." to get dotted module name
+    #      tests/unit/test_auth -> tests.unit.test_auth
     testmodule_fullname = mod_filebase[len(testroot_parent):].strip("/").replace("/", ".")
 
     return testmodule_fullname

@@ -1,0 +1,227 @@
+/**
+ * Custom Branding Theme Example
+ * 
+ * This file demonstrates how to customize the HTML Report Templates
+ * appearance for your organization's branding.
+ * 
+ * Usage:
+ *   1. Copy this file to your static files directory
+ *   2. Modify the CSS custom property values to match your branding
+ *   3. Include this file after branding-theme.css in your HTML
+ * 
+ * @author Example Organization
+ * @copyright Copyright 2024, Example Organization
+ */
+
+
+/* =======================================================================
+                        RESULT STATUS COLORS
+   
+   These colors are used for test result indicators (pass, fail, error, etc.)
+   Customize these to match your organization's color scheme while
+   maintaining good contrast for accessibility.
+   =======================================================================*/
+
+@property --color-error {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #8B0000;  /* Dark red for errors */
+}
+
+@property --color-fail {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #DC143C;  /* Crimson for failures */
+}
+
+@property --color-ghost {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #A9A9A9;  /* Dark gray for zero counts */
+}
+
+@property --color-pass {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #228B22;  /* Forest green for passes */
+}
+
+@property --color-skip {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #708090;  /* Slate gray for skipped */
+}
+
+@property --color-warn {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #FF8C00;  /* Dark orange for warnings */
+}
+
+
+/* =======================================================================
+                        RESULT BACKGROUND COLORS
+   
+   Background colors for result status indicators.
+   These should be lighter versions of the status colors above.
+   =======================================================================*/
+
+@property --color-error-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #FFB6C1;  /* Light pink */
+}
+
+@property --color-fail-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #FFC0CB;  /* Pink */
+}
+
+@property --color-ghost-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #D3D3D3;  /* Light gray */
+}
+
+@property --color-pass-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #90EE90;  /* Light green */
+}
+
+@property --color-skip-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #E0E0E0;  /* Gainsboro */
+}
+
+@property --color-warn-background {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #FFE4B5;  /* Moccasin */
+}
+
+
+/* =======================================================================
+                        BANNER COLORS
+   
+   The banner appears at the top of the report and displays the test run
+   summary. Customize these to match your organization's primary branding.
+   =======================================================================*/
+
+@property --color-banner-background-color {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #1E3A5F;  /* Corporate dark blue */
+}
+
+@property --color-banner-color {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #FFFFFF;  /* White text */
+}
+
+
+/* =======================================================================
+                        SECTION HEADER COLORS
+   
+   Section headers divide the report into logical sections (Configuration,
+   Results, Artifacts, etc.). These should complement the banner colors.
+   =======================================================================*/
+
+@property --color-section-header-background-color {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #2E5A8F;  /* Corporate medium blue */
+}
+
+@property --color-section-header-color {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #FFFFFF;  /* White text */
+}
+
+@property --color-subsection-header-background-color {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #4A7AB0;  /* Corporate light blue */
+}
+
+@property --color-subsection-header-color {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #FFFFFF;  /* White text */
+}
+
+
+/* =======================================================================
+                        LOGO IMAGE
+   
+   The logo appears in the banner. Replace the URL with your organization's
+   logo. Recommended size: 200x50 pixels.
+   =======================================================================*/
+
+@property --image-logo {
+    syntax: "<url>";
+    inherits: false;
+    initial-value: url("/static/v2/images/my-organization-logo.png");
+}
+
+
+/* =======================================================================
+                        COLOR CLASSES
+   
+   These classes apply the custom property colors to elements.
+   Generally, you don't need to modify these unless you want to add
+   additional styling (like font-weight or text-decoration).
+   =======================================================================*/
+
+.color-error {
+    color: var(--color-error) !important;
+    font-weight: bold;
+}
+
+.color-fail {
+    color: var(--color-fail) !important;
+    font-weight: bold;
+}
+
+.color-ghost {
+    color: var(--color-ghost) !important;
+}
+
+.color-pass {
+    color: var(--color-pass) !important;
+}
+
+.color-skip {
+    color: var(--color-skip) !important;
+    font-style: italic;
+}
+
+.color-warn {
+    color: var(--color-warn) !important;
+}
+
+
+/* =======================================================================
+                        ADDITIONAL CUSTOMIZATIONS
+   
+   Add any additional CSS rules here to further customize the appearance.
+   =======================================================================*/
+
+/* Example: Custom font for the banner title */
+/*
+.ts-banner-title {
+    font-family: 'Your Corporate Font', Arial, sans-serif;
+}
+*/
+
+/* Example: Add a subtle border to result items */
+/*
+.ts-result-item {
+    border-left: 3px solid var(--color-section-header-background-color);
+    padding-left: 10px;
+}
+*/

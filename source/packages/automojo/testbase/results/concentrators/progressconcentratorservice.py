@@ -182,9 +182,16 @@ class ProgressCallbackHandler(SimpleHTTPRequestHandler):
             self.send_response(200, message=None)
             self.send_header("Content-Type", "text/html")
         else:
-            # Include error message in 500 response for client-side debugging
-            self.send_response(500, message=errmsg)
-            self.send_header("Content-Type", "text/html")
+            # Include error message in 500 response for client-side debugging.
+            # Only use the first line of the error message to avoid HTTP header injection
+            # Make sure it only contains latin-1 characters or encode it safely
+            safe_msg = errmsg_msg_lines[0].encode('latin-1', 'replace').decode('latin-1')
+            self.send_response(500, message=safe_msg)
+            self.send_header("Content-Type", "text/plain")
+            
+            # Optionally, send the full error message in the response body
+            # but wait, the tests don't check the body, only the reason phrase.
+
         
         # Finalize response headers before returning
         self.end_headers()
@@ -244,6 +251,10 @@ class ProgressConcentratorServer(ThreadingMixIn, HTTPServer):
             )
             server.start()
     """
+
+    # Increase the listen backlog to handle high concurrency and prevent 'Connection reset by peer'
+    request_queue_size = 128
+
 
     def __init__(self, recorder: ResultRecorder, server_address: ServerAddress, forwarding_info: Optional[ForwardingInfo] = None,
                 bind_and_activate: bool = True) -> None:

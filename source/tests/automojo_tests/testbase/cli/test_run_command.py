@@ -503,8 +503,9 @@ class RunCommandPathResolutionTests(unittest.TestCase):
         test_root = os.path.abspath(os.path.expandvars(os.path.expanduser('.')))
         self.assertTrue(os.path.isabs(test_root))
 
+    @patch('sys.exit')
     @patch('automojo.runtime.runtimevariables.RuntimeVariables')
-    def test_raises_value_error_when_path_does_not_exist(self, mock_runtime_vars):
+    def test_raises_value_error_when_path_does_not_exist(self, mock_runtime_vars, mock_exit):
         """Test that ValueError is raised when path does not exist (Requirement 21.4)."""
         mock_runtime_vars.AM_TESTROOT = None
 
@@ -523,8 +524,9 @@ class RunCommandPathResolutionTests(unittest.TestCase):
 
         self.assertIn("does not exist", str(context.exception))
 
+    @patch('sys.exit')
     @patch('automojo.runtime.runtimevariables.RuntimeVariables')
-    def test_error_message_includes_original_path(self, mock_runtime_vars):
+    def test_error_message_includes_original_path(self, mock_runtime_vars, mock_exit):
         """Test that error message includes original path (Requirement 21.5)."""
         mock_runtime_vars.AM_TESTROOT = None
 

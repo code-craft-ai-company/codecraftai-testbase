@@ -181,6 +181,7 @@ class ProgressCallbackHandler(SimpleHTTPRequestHandler):
         if not errmsg:
             self.send_response(200, message=None)
             self.send_header("Content-Type", "text/html")
+            self.end_headers()
         else:
             # Include error message in 500 response for client-side debugging.
             # Only use the first line of the error message to avoid HTTP header injection
@@ -189,12 +190,11 @@ class ProgressCallbackHandler(SimpleHTTPRequestHandler):
             self.send_response(500, message=safe_msg)
             self.send_header("Content-Type", "text/plain")
             
-            # Optionally, send the full error message in the response body
-            # but wait, the tests don't check the body, only the reason phrase.
-
-        
-        # Finalize response headers before returning
-        self.end_headers()
+            # Send the full error message in the response body
+            body_bytes = errmsg.encode('utf-8')
+            self.send_header("Content-Length", str(len(body_bytes)))
+            self.end_headers()
+            self.wfile.write(body_bytes)
 
         return
 
@@ -432,11 +432,6 @@ class ProgressConcentratorServer(ThreadingMixIn, HTTPServer):
                 summary_json = json.dumps(summary, cls=SummaryJsonEncoder)
                 requests.post(forwarding_url, data=summary_json, headers=headers)
 
-                # INTERVAL SLEEP:
-                # Wait for the configured interval before the next forward.
-                # This controls the frequency of summary updates to external services.
-                time.sleep(forwarding_interval)
-
             except Exception:
                 # ERROR HANDLING - LOG AND CONTINUE:
                 # Log the full exception traceback for debugging, but don't re-raise.
@@ -444,6 +439,13 @@ class ProgressConcentratorServer(ThreadingMixIn, HTTPServer):
                 # resumes after transient failures (network issues, service outages, etc.).
                 errmsg = traceback.format_exc()
                 self._logger.error(errmsg)
+
+            finally:
+                # INTERVAL SLEEP:
+                # Wait for the configured interval before the next forward.
+                # This controls the frequency of summary updates to external services.
+                if self._forwarding_running:
+                    time.sleep(forwarding_interval)
 
         return
 

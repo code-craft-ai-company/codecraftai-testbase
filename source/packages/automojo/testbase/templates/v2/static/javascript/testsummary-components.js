@@ -669,7 +669,7 @@ class TestSummaryConfiguration extends HTMLElement {
             environmentEl.syncData("Environment", tableEl);
 
         } else {
-            environmentEl.style.display = "None";
+            environmentEl.style.display = "none";
         }
 
         var packagesEl = this.shadowRoot.querySelector("#id-ts-configuration-packages");
@@ -681,7 +681,7 @@ class TestSummaryConfiguration extends HTMLElement {
             packagesEl.syncData("Packages", tableEl);
 
         } else {
-            packagesEl.style.display = "None";
+            packagesEl.style.display = "none";
         }
 
         var landscapeEl = this.shadowRoot.querySelector("#id-ts-configuration-landscape");
@@ -690,7 +690,7 @@ class TestSummaryConfiguration extends HTMLElement {
             landscapeEl.syncData("Landscape", this.landscape);
 
         } else {
-            landscapeEl.style.display = "None";
+            landscapeEl.style.display = "none";
         }
 
     }

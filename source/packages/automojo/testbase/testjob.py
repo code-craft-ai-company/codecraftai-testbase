@@ -247,14 +247,18 @@ class TestJob(ITestJob):
                                          stream_results_filename=self._stream_result_filename, consolidated_results_filename=self._consolidated_result_filename, static_resource_source=static_resource_source,
                                          static_resource_destination=static_resource_destination)
 
-                
-                build_info = BuildInfo(branch=self._branch, build=self._build, flavor=self._flavor,
-                                           release=self._release, url=self._build_url)
+                def _resolve_val(val):
+                    if val is None or val == "" or type(val).__name__ == "DefaultValue":
+                        return "(unknown)"
+                    return val
 
-                pipeline_info = PipelineInfo(id=self._pipeline_id, name=self._pipeline_name, instance=self._pipeline_instance)
+                build_info = BuildInfo(branch=_resolve_val(self._branch), build=_resolve_val(self._build), flavor=_resolve_val(self._flavor),
+                                       release=_resolve_val(self._release), url=_resolve_val(self._build_url))
 
-                job_info = JobInfo(id=self._job_id, name=self._job_name, type=self._job_type, owner=self._job_owner, label=self._job_label,
-                                   initiator=self._job_initiator, venue=self._job_venue, tag=self._job_tag)
+                pipeline_info = PipelineInfo(id=_resolve_val(self._pipeline_id), name=_resolve_val(self._pipeline_name), instance=_resolve_val(self._pipeline_instance))
+
+                job_info = JobInfo(id=_resolve_val(self._job_id), name=_resolve_val(self._job_name), type=_resolve_val(self._job_type), owner=_resolve_val(self._job_owner), label=_resolve_val(self._job_label),
+                                   initiator=_resolve_val(self._job_initiator), venue=_resolve_val(self._job_venue), tag=_resolve_val(self._job_tag))
                 
                 self._logger.section("Running Tests")
 

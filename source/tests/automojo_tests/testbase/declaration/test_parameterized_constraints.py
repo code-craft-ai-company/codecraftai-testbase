@@ -22,7 +22,7 @@ from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 from automojo.testbase.coupling.configurationcoupling import ConfigurationCoupling
 from automojo.testbase.coupling.validatorcoupling import ValidatorCoupling
 
-from automojo.testbase.declaration import attachments, originiations, registrations
+from automojo.testbase.declaration import attachments, originations, registrations
 from automojo.testbase.injection import injectionregistry
 from automojo.testbase.injection.injectionscope import InjectionScope
 from automojo.testbase.resourcelifespan import ResourceLifespan
@@ -257,7 +257,7 @@ class TestConstraintsPassedToGenerators(unittest.TestCase):
         
         test_constraints = {"pool_size": 5, "timeout": 60}
         
-        originiations.parameter(
+        originations.parameter(
             resource_with_constraints,
             identifier="global_constrained",
             constraints=test_constraints

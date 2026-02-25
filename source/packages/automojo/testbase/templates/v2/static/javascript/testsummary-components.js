@@ -134,7 +134,7 @@ class TestSummaryBanner extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'});
+        const shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -170,7 +170,7 @@ class TestSummaryBanner extends HTMLElement {
      * @param {number} [summary.detail.passed] - Passed count.
      * @param {number} [summary.detail.total] - Total count.
      */
-    syncData (summary) {
+    syncData(summary) {
         this.summary = summary;
 
         var result = null;
@@ -252,12 +252,12 @@ class TestSummaryLandscapeObject extends HTMLElement {
     sel_container = "#id-lscape-object-container"
 
     property_order = ['name']
-    property_label_lookup = { 'name': 'Name'}
+    property_label_lookup = { 'name': 'Name' }
 
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'});
+        const shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -293,7 +293,7 @@ class TestSummaryLandscapeObject extends HTMLElement {
      */
     formatProperty(propVal) {
         var formattedHtml = "";
-        
+
         if (typeof propVal === 'string') {
             formattedHtml = propVal;
         } else if (Array.isArray(propVal)) {
@@ -307,7 +307,7 @@ class TestSummaryLandscapeObject extends HTMLElement {
             for (var key of Object.keys(propVal)) {
                 var val = propVal[key];
                 formattedHtml += "<div class='ts-lscape-item-value-row-pair'><div class='ts-lscape-item-value-row-lbl'>" + key +
-                                 ":</div><div class='ts-lscape-item-value-row-val'>" + val + "</div></div>";
+                    ":</div><div class='ts-lscape-item-value-row-val'>" + val + "</div></div>";
             }
             formattedHtml += "</div>";
         } else {
@@ -375,7 +375,7 @@ class TestSummaryLandscapeObject extends HTMLElement {
 
         for (const prefProp of prefPropOrder) {
             if (lscapeItem.hasOwnProperty(prefProp)) {
-                propKeys = propKeys.filter( function(item) {
+                propKeys = propKeys.filter(function (item) {
                     var matches = item == prefProp;
                     return matches;
                 });
@@ -406,14 +406,14 @@ class TestSummaryLandscapeObject extends HTMLElement {
 /**
  * Component for displaying data profile configuration objects.
  * @class TestSummaryDataProfileObject
- * @extends HTMLElement
+ * @extends TestSummaryLandscapeObject
  */
-class TestSummaryDataProfileObject extends HTMLElement {
+class TestSummaryDataProfileObject extends TestSummaryLandscapeObject {
 
     static tagname = 'testsummary-dataprofileobject'
 
     property_order = ['name', 'profileType', 'host', 'credentials']
-    
+
     property_label_lookup = {
         'name': 'Name',
         'profileType': 'ProfileType',
@@ -447,7 +447,7 @@ class TestSummaryDeviceObject extends TestSummaryLandscapeObject {
     static tagname = 'testsummary-deviceobject'
 
     property_order = ['name', 'deviceType', 'host', 'role', 'credentials', 'features', 'skip']
-    
+
     property_label_lookup = {
         'name': 'Name',
         'deviceType': 'DeviceType',
@@ -498,7 +498,7 @@ class TestSummaryDeviceGroup extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'});
+        const shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -551,7 +551,7 @@ class TestSummaryServiceObject extends TestSummaryLandscapeObject {
     static tagname = 'testsummary-serviceobject'
 
     property_order = ['name', 'serviceType', 'host', 'credentials']
-    
+
     property_label_lookup = {
         'name': 'Name',
         'serviceType': 'ServiceType',
@@ -607,7 +607,7 @@ class TestSummaryConfiguration extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'});
+        const shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -634,7 +634,7 @@ class TestSummaryConfiguration extends HTMLElement {
      * @param {Object} [startup.packages] - Installed packages.
      * @param {Object} landscape - The landscape configuration object.
      */
-    syncData (startup, landscape) {
+    syncData(startup, landscape) {
 
         this.landscape = landscape;
 
@@ -657,7 +657,7 @@ class TestSummaryConfiguration extends HTMLElement {
         if (this.command != undefined) {
             var commandEl = this.shadowRoot.querySelector("#id-ts-configuration-command");
 
-            commandEl.syncData( "Command", this.command );
+            commandEl.syncData("Command", this.command);
         }
 
         var environmentEl = this.shadowRoot.querySelector("#id-ts-configuration-environment");
@@ -679,14 +679,14 @@ class TestSummaryConfiguration extends HTMLElement {
             tableEl.syncData(this.packages);
 
             packagesEl.syncData("Packages", tableEl);
-            
+
         } else {
             packagesEl.style.display = "None";
         }
 
         var landscapeEl = this.shadowRoot.querySelector("#id-ts-configuration-landscape");
         if (this.landscape != undefined) {
-            
+
             landscapeEl.syncData("Landscape", this.landscape);
 
         } else {
@@ -697,7 +697,7 @@ class TestSummaryConfiguration extends HTMLElement {
 
 }
 
-class TestSummaryConfigurationEnvironment extends HTMLElement {
+class TestSummaryConfigurationEnvironment extends MojoCollapsible {
 
     static tagname = 'testsummary-config-environment'
 
@@ -721,11 +721,13 @@ class TestSummaryConfigurationEnvironment extends HTMLElement {
         return TestSummaryConfigurationEnvironment.template;
     }
 
-    syncData (environment) {
+    syncData(environment) {
         this.environment = environment;
 
         var tableEl = this.shadowRoot.querySelector("#id-ts-configuration-environment")
         tableEl.syncData(environment);
+
+        super.syncData("Environment", undefined, false);
     }
 
 }
@@ -763,7 +765,7 @@ class TestSummaryConfigurationLandscape extends MojoCollapsible {
         return TestSummaryConfigurationLandscape.template;
     }
 
-    syncData (header, landscape) {
+    syncData(header, landscape) {
 
         this.landscape = landscape;
 
@@ -785,7 +787,7 @@ class TestSummaryConfigurationLandscape extends MojoCollapsible {
                 console.debug("Processing device group (" + device_group + ")");
 
                 var group_devices = apod[device_group];
-                
+
                 var nextDeviceGroupEl = document.createElement(TestSummaryDeviceGroup.tagname);
                 nextDeviceGroupEl.syncData(device_group, group_devices);
 
@@ -804,13 +806,13 @@ class TestSummaryConfigurationLandscape extends MojoCollapsible {
 
             var landscapeDataProfilesListEl = document.createElement("div");
             landscapeDataProfilesListEl.classList.add("ts-lscape-dataprofiles-list");
-            
+
             // TODO: Add support for displaying data profiles
 
             landscapeDataProfilesEl.syncData("Data Profiles", landscapeDataProfilesListEl, true);
-        
+
         } else {
-            
+
             landscapeDataProfilesEl.style.display = "none";
         }
 
@@ -837,17 +839,17 @@ class TestSummaryConfigurationLandscape extends MojoCollapsible {
 
                 var landscapeServicesListEl = document.createElement("div");
                 landscapeServicesListEl.classList.add("ts-lscape-services-list");
-                
+
                 for (const serviceInfo of infrastructure.services) {
                     var serviceEl = document.createElement(TestSummaryServiceObject.tagname);
                     serviceEl.syncData(serviceInfo)
 
                     landscapeServicesListEl.appendChild(serviceEl);
                 }
-                
+
                 landscapeServiceEl.syncData("Services", landscapeServicesListEl, true);
 
-            
+
             } else {
                 landscapeServiceEl.style.display = 'none';
             }
@@ -887,9 +889,9 @@ class TestSummaryConfigurationPackages extends MojoCollapsible {
         return TestSummaryConfigurationPackages.template;
     }
 
-    syncData (packages) {
+    syncData(packages) {
         this.packages = packages;
-    
+
         var tableEl = this.shadowRoot.querySelector("#id-ts-configuration-packages")
         tableEl.syncData(packages);
 
@@ -923,7 +925,7 @@ class TestSummaryResultGroup extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -933,7 +935,7 @@ class TestSummaryResultGroup extends HTMLElement {
         return TestSummaryResultGroup.template;
     }
 
-    syncData (groupName, groupInfo) {
+    syncData(groupName, groupInfo) {
 
         var grpDetailEl = this.shadowRoot.querySelector("#id-resultgroup-detail");
 
@@ -945,8 +947,8 @@ class TestSummaryResultGroup extends HTMLElement {
         var skipped = 0;
         var passed = 0;
 
-        for ( const testItem of groupInfo) {
-            
+        for (const testItem of groupInfo) {
+
             if (testItem.hasOwnProperty("detail")) {
                 var itemResult = testItem.result;
 
@@ -965,7 +967,7 @@ class TestSummaryResultGroup extends HTMLElement {
 
                 grpDetailEl.appendChild(resultItemEl);
             }
-            
+
         }
 
         var grpErrorEl = this.shadowRoot.querySelector("#id-rgs-error");
@@ -1048,7 +1050,7 @@ class TestSummaryResultItem extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -1058,7 +1060,7 @@ class TestSummaryResultItem extends HTMLElement {
         return TestSummaryResultItem.template;
     }
 
-    syncData (testItem) {
+    syncData(testItem) {
 
         var itemNameEl = this.shadowRoot.querySelector("#id-ris-name");
         itemNameEl.innerHTML = testItem.name;
@@ -1080,7 +1082,7 @@ class TestSummaryResultItem extends HTMLElement {
             itemErrorEl.classList.add("color-ghost");
         }
         itemErrorEl.innerHTML = errored.toString();
-        
+
         var itemFailureEl = this.shadowRoot.querySelector("#id-ris-failure");
         if (failed > 0) {
             itemFailureEl.classList.add("color-fail");
@@ -1123,7 +1125,7 @@ class TestSummaryResultItem extends HTMLElement {
 
         if (errored > 0) {
             var errorsCollapsibleEl = document.createElement(TestSummaryErrorsCollapsible.tagname);
-            
+
             errorsCollapsibleEl.syncData(detail.errors);
 
             itemDetailEl.appendChild(errorsCollapsibleEl);
@@ -1194,7 +1196,7 @@ class TestSummaryTaskResult extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -1204,7 +1206,7 @@ class TestSummaryTaskResult extends HTMLElement {
         return TestSummaryTaskResult.template;
     }
 
-    syncData (taskItem) {
+    syncData(taskItem) {
 
         var itemNameEl = this.shadowRoot.querySelector("#id-tris-name");
         itemNameEl.innerHTML = taskItem.name + " (" + taskItem.worker + ")";
@@ -1327,7 +1329,7 @@ class TestSummaryTaskGroup extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -1337,7 +1339,7 @@ class TestSummaryTaskGroup extends HTMLElement {
         return TestSummaryTaskGroup.template;
     }
 
-    syncData (groupInfo) {
+    syncData(groupInfo) {
         var grpDetailEl = this.shadowRoot.querySelector("#id-taskgroup-detail");
         grpDetailEl.innerHTML = "";
 
@@ -1444,7 +1446,7 @@ class TestSummaryTaskGroup extends HTMLElement {
  * resultDetail.syncData('render_by_package', resultsData);
  */
 class TestSummaryResultDetail extends HTMLElement {
-    
+
     static tagname = 'testsummary-resultdetail'
 
     static template = `
@@ -1519,7 +1521,7 @@ class TestSummaryResultDetail extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -1527,7 +1529,7 @@ class TestSummaryResultDetail extends HTMLElement {
         // Store reference to current results for re-rendering
         this._currentResults = null;
         this._currentGrouping = 'package';
-        
+
         // Filter state
         this._activeFilter = 'ALL';
         this._searchQuery = '';
@@ -1536,7 +1538,7 @@ class TestSummaryResultDetail extends HTMLElement {
 
         // Set up event listeners for display mode and grouping changes
         this._setupEventListeners();
-        
+
         // Set up filter event listeners
         this._setupFilterEventListeners();
     }
@@ -1553,7 +1555,7 @@ class TestSummaryResultDetail extends HTMLElement {
         var self = this;
 
         var displayModeSelect = this.shadowRoot.querySelector("#id-display-mode");
-        displayModeSelect.addEventListener("change", function(event) {
+        displayModeSelect.addEventListener("change", function (event) {
             var newMode = event.target.value;
             self._updateGroupingVisibility(newMode);
             if (self._currentResults) {
@@ -1562,7 +1564,7 @@ class TestSummaryResultDetail extends HTMLElement {
         });
 
         var groupingSelect = this.shadowRoot.querySelector("#id-grouping-option");
-        groupingSelect.addEventListener("change", function(event) {
+        groupingSelect.addEventListener("change", function (event) {
             var newGrouping = event.target.value;
             self._currentGrouping = newGrouping;
             var currentMode = self.shadowRoot.querySelector("#id-display-mode").value;
@@ -1581,7 +1583,7 @@ class TestSummaryResultDetail extends HTMLElement {
     _updateGroupingVisibility(displayMode) {
         var groupingLabel = this.shadowRoot.querySelector(".ts-grouping-label");
         var groupingSelect = this.shadowRoot.querySelector("#id-grouping-option");
-        
+
         if (displayMode === "render_as_timeline") {
             groupingLabel.style.display = "none";
             groupingSelect.style.display = "none";
@@ -1600,8 +1602,8 @@ class TestSummaryResultDetail extends HTMLElement {
 
         // Filter button click handlers
         var filterButtons = this.shadowRoot.querySelectorAll(".ts-filter-btn");
-        filterButtons.forEach(function(btn) {
-            btn.addEventListener("click", function(event) {
+        filterButtons.forEach(function (btn) {
+            btn.addEventListener("click", function (event) {
                 var filterValue = event.currentTarget.getAttribute("data-filter");
                 self._setActiveFilter(filterValue);
                 self._applyFilters();
@@ -1611,9 +1613,9 @@ class TestSummaryResultDetail extends HTMLElement {
         // Search input handler with debounce
         var searchInput = this.shadowRoot.querySelector("#id-search-input");
         var searchTimeout = null;
-        searchInput.addEventListener("input", function(event) {
+        searchInput.addEventListener("input", function (event) {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(function() {
+            searchTimeout = setTimeout(function () {
                 self._searchQuery = event.target.value.trim().toLowerCase();
                 self._applyFilters();
             }, 300); // 300ms debounce
@@ -1621,7 +1623,7 @@ class TestSummaryResultDetail extends HTMLElement {
 
         // Search clear button
         var searchClear = this.shadowRoot.querySelector("#id-search-clear");
-        searchClear.addEventListener("click", function() {
+        searchClear.addEventListener("click", function () {
             searchInput.value = "";
             self._searchQuery = "";
             self._applyFilters();
@@ -1629,20 +1631,20 @@ class TestSummaryResultDetail extends HTMLElement {
 
         // Date range filter handlers
         var dateStart = this.shadowRoot.querySelector("#id-date-start");
-        dateStart.addEventListener("change", function(event) {
+        dateStart.addEventListener("change", function (event) {
             self._dateStart = event.target.value ? new Date(event.target.value) : null;
             self._applyFilters();
         });
 
         var dateEnd = this.shadowRoot.querySelector("#id-date-end");
-        dateEnd.addEventListener("change", function(event) {
+        dateEnd.addEventListener("change", function (event) {
             self._dateEnd = event.target.value ? new Date(event.target.value) : null;
             self._applyFilters();
         });
 
         // Date clear button
         var dateClear = this.shadowRoot.querySelector("#id-date-clear");
-        dateClear.addEventListener("click", function() {
+        dateClear.addEventListener("click", function () {
             dateStart.value = "";
             dateEnd.value = "";
             self._dateStart = null;
@@ -1652,12 +1654,12 @@ class TestSummaryResultDetail extends HTMLElement {
 
         // Export button handlers
         var exportCsvBtn = this.shadowRoot.querySelector("#id-export-csv");
-        exportCsvBtn.addEventListener("click", function() {
+        exportCsvBtn.addEventListener("click", function () {
             self._exportToCSV();
         });
 
         var exportPdfBtn = this.shadowRoot.querySelector("#id-export-pdf");
-        exportPdfBtn.addEventListener("click", function() {
+        exportPdfBtn.addEventListener("click", function () {
             self._exportToPDF();
         });
     }
@@ -1672,7 +1674,7 @@ class TestSummaryResultDetail extends HTMLElement {
 
         // Update button active states
         var filterButtons = this.shadowRoot.querySelectorAll(".ts-filter-btn");
-        filterButtons.forEach(function(btn) {
+        filterButtons.forEach(function (btn) {
             var btnFilter = btn.getAttribute("data-filter");
             if (btnFilter === filterValue) {
                 btn.classList.add("ts-filter-btn-active");
@@ -1692,7 +1694,7 @@ class TestSummaryResultDetail extends HTMLElement {
         }
 
         var filteredResults = this._filterResults(this._currentResults);
-        
+
         // Update filter summary
         this._updateFilterSummary(filteredResults);
 
@@ -1730,7 +1732,7 @@ class TestSummaryResultDetail extends HTMLElement {
         for (var pkgName in resultsDetail) {
             if (resultsDetail.hasOwnProperty(pkgName)) {
                 var tests = resultsDetail[pkgName];
-                var filteredTests = tests.filter(function(test) {
+                var filteredTests = tests.filter(function (test) {
                     return self._testMatchesFilters(test, pkgName);
                 });
 
@@ -1771,7 +1773,7 @@ class TestSummaryResultDetail extends HTMLElement {
         // Check date range
         if (this._dateStart || this._dateEnd) {
             var testStart = test.start ? new Date(test.start) : null;
-            
+
             if (testStart) {
                 if (this._dateStart && testStart < this._dateStart) {
                     return false;
@@ -1837,17 +1839,17 @@ class TestSummaryResultDetail extends HTMLElement {
         }
 
         var summaryEl = this.shadowRoot.querySelector("#id-filter-summary");
-        
+
         var summaryParts = [];
-        
+
         if (this._activeFilter !== 'ALL') {
             summaryParts.push(this._activeFilter.toLowerCase() + " tests");
         }
-        
+
         if (this._searchQuery) {
             summaryParts.push('matching "' + this._searchQuery + '"');
         }
-        
+
         if (this._dateStart || this._dateEnd) {
             summaryParts.push("in date range");
         }
@@ -1872,13 +1874,13 @@ class TestSummaryResultDetail extends HTMLElement {
 
         // Get filtered results
         var filteredResults = this._filterResults(this._currentResults);
-        
+
         // Build CSV content
         var csvRows = [];
-        
+
         // Header row
         csvRows.push(["Test Name", "Package", "Status", "Start Time", "Stop Time", "Errors", "Failures"].join(","));
-        
+
         // Data rows
         for (var pkgName in filteredResults) {
             if (filteredResults.hasOwnProperty(pkgName)) {
@@ -1888,23 +1890,23 @@ class TestSummaryResultDetail extends HTMLElement {
                     var status = this._getTestStatus(test);
                     var errorCount = (test.detail && test.detail.errors) ? test.detail.errors.length : 0;
                     var failureCount = (test.detail && test.detail.failures) ? test.detail.failures.length : 0;
-                    
+
                     // Escape CSV values
                     var testName = this._escapeCSVValue(test.name || "");
                     var packageName = this._escapeCSVValue(pkgName || "");
                     var startTime = this._escapeCSVValue(test.start || "");
                     var stopTime = this._escapeCSVValue(test.stop || "");
-                    
+
                     csvRows.push([testName, packageName, status, startTime, stopTime, errorCount, failureCount].join(","));
                 }
             }
         }
-        
+
         // Create and download file
         var csvContent = csvRows.join("\n");
         var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
         var url = URL.createObjectURL(blob);
-        
+
         var link = document.createElement("a");
         link.setAttribute("href", url);
         link.setAttribute("download", "test_results_" + this._getExportTimestamp() + ".csv");
@@ -1912,7 +1914,7 @@ class TestSummaryResultDetail extends HTMLElement {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         // Clean up the URL object
         URL.revokeObjectURL(url);
     }
@@ -1964,17 +1966,17 @@ class TestSummaryResultDetail extends HTMLElement {
 
         // Get filtered results
         var filteredResults = this._filterResults(this._currentResults);
-        
+
         // Build HTML content for print
         var htmlContent = this._buildPrintableHTML(filteredResults);
-        
+
         // Open print window
         var printWindow = window.open("", "_blank", "width=800,height=600");
         printWindow.document.write(htmlContent);
         printWindow.document.close();
-        
+
         // Wait for content to load then trigger print
-        printWindow.onload = function() {
+        printWindow.onload = function () {
             printWindow.focus();
             printWindow.print();
         };
@@ -2027,11 +2029,11 @@ class TestSummaryResultDetail extends HTMLElement {
         html += '.package-header { background-color: #e0e0e0; font-weight: bold; }';
         html += '@media print { .no-print { display: none; } }';
         html += '</style></head><body>';
-        
+
         // Header
         html += '<h1>Test Results Report</h1>';
         html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
-        
+
         // Summary section
         html += '<div class="summary">';
         html += '<div class="summary-item"><span class="summary-label">Total Tests:</span> ' + totalTests + '</div>';
@@ -2040,7 +2042,7 @@ class TestSummaryResultDetail extends HTMLElement {
         html += '<div class="summary-item"><span class="summary-label error">Errors:</span> ' + errorCount + '</div>';
         html += '<div class="summary-item"><span class="summary-label skip">Skipped:</span> ' + skippedCount + '</div>';
         html += '</div>';
-        
+
         // Filter info
         if (this._activeFilter !== 'ALL' || this._searchQuery || this._dateStart || this._dateEnd) {
             html += '<p><em>Filters applied: ';
@@ -2050,18 +2052,18 @@ class TestSummaryResultDetail extends HTMLElement {
             if (this._dateStart || this._dateEnd) filters.push('Date range filter');
             html += filters.join(', ') + '</em></p>';
         }
-        
+
         // Results table
         html += '<h2>Test Results</h2>';
         html += '<table>';
         html += '<thead><tr><th>Test Name</th><th>Status</th><th>Start Time</th><th>Errors</th><th>Failures</th></tr></thead>';
         html += '<tbody>';
-        
+
         for (var pkgName in filteredResults) {
             if (filteredResults.hasOwnProperty(pkgName)) {
                 // Package header row
                 html += '<tr class="package-header"><td colspan="5">' + this._escapeHTML(pkgName) + '</td></tr>';
-                
+
                 var tests = filteredResults[pkgName];
                 for (var i = 0; i < tests.length; i++) {
                     var test = tests[i];
@@ -2069,7 +2071,7 @@ class TestSummaryResultDetail extends HTMLElement {
                     var statusClass = status.toLowerCase();
                     var errCount = (test.detail && test.detail.errors) ? test.detail.errors.length : 0;
                     var failCount = (test.detail && test.detail.failures) ? test.detail.failures.length : 0;
-                    
+
                     html += '<tr>';
                     html += '<td>' + this._escapeHTML(test.name || "") + '</td>';
                     html += '<td class="' + statusClass + '">' + status + '</td>';
@@ -2080,10 +2082,10 @@ class TestSummaryResultDetail extends HTMLElement {
                 }
             }
         }
-        
+
         html += '</tbody></table>';
         html += '</body></html>';
-        
+
         return html;
     }
 
@@ -2111,8 +2113,8 @@ class TestSummaryResultDetail extends HTMLElement {
      * @param {Object} resultsDetail - The results data to render.
      * @param {string} [groupingOption='package'] - The grouping option for grouped/tree views.
      */
-    syncData (renderFormat, resultsDetail, groupingOption = 'package') {
-        
+    syncData(renderFormat, resultsDetail, groupingOption = 'package') {
+
         // Store results for potential re-rendering
         this._currentResults = resultsDetail;
         this._currentGrouping = groupingOption;
@@ -2131,7 +2133,7 @@ class TestSummaryResultDetail extends HTMLElement {
         // Update grouping selector
         var groupingSelect = this.shadowRoot.querySelector("#id-grouping-option");
         groupingSelect.value = groupingOption;
-        
+
         if (renderFormat == "render_by_package") {
             this._renderStandardHeader(gridResultsHeaderEl);
             this.renderTestsGroupedByPackage(gridResultsItemsEl, resultsDetail, groupingOption);
@@ -2237,7 +2239,7 @@ class TestSummaryResultDetail extends HTMLElement {
     renderTestsAsTree(gridResultsEl, resultsDetail, groupingOption) {
         // Build tree structure from package names
         var treeRoot = this._buildTreeStructure(resultsDetail, groupingOption);
-        
+
         // Render tree recursively
         this._renderTreeNode(gridResultsEl, treeRoot, 0);
     }
@@ -2250,7 +2252,7 @@ class TestSummaryResultDetail extends HTMLElement {
     renderTestsAsTimeline(gridResultsEl, resultsDetail) {
         // Flatten all results and sort by start time
         var allTests = this._flattenResults(resultsDetail);
-        allTests.sort(function(a, b) {
+        allTests.sort(function (a, b) {
             return new Date(a.start) - new Date(b.start);
         });
 
@@ -2285,11 +2287,11 @@ class TestSummaryResultDetail extends HTMLElement {
         }
 
         var grouped = {};
-        
+
         for (const [pkgName, tests] of Object.entries(resultsDetail)) {
             for (const test of tests) {
                 var groupKey;
-                
+
                 if (groupingOption === 'result') {
                     // Group by result status
                     groupKey = test.result || 'UNKNOWN';
@@ -2386,7 +2388,7 @@ class TestSummaryResultDetail extends HTMLElement {
 
             var summaryEl = document.createElement("summary");
             summaryEl.classList.add("ts-tree-node-header");
-            
+
             var iconEl = document.createElement("span");
             iconEl.classList.add("ts-tree-icon");
             iconEl.innerHTML = "📁";
@@ -2559,13 +2561,13 @@ class TestSummaryResultDetail extends HTMLElement {
         // Duration bar column
         var durationEl = document.createElement("div");
         durationEl.classList.add("ts-timeline-item-duration");
-        
+
         var barContainer = document.createElement("div");
         barContainer.classList.add("ts-timeline-bar-container");
 
         var bar = document.createElement("div");
         bar.classList.add("ts-timeline-bar");
-        
+
         // Calculate bar position and width
         var offsetPercent = 0;
         var widthPercent = 100;
@@ -2573,7 +2575,7 @@ class TestSummaryResultDetail extends HTMLElement {
             offsetPercent = ((testStart - timeRange.start) / timeRange.duration) * 100;
             widthPercent = Math.max(1, (testDuration / timeRange.duration) * 100);
         }
-        
+
         bar.style.left = offsetPercent + "%";
         bar.style.width = widthPercent + "%";
 
@@ -2589,7 +2591,7 @@ class TestSummaryResultDetail extends HTMLElement {
         }
 
         barContainer.appendChild(bar);
-        
+
         // Add duration text
         var durationText = document.createElement("span");
         durationText.classList.add("ts-timeline-duration-text");
@@ -2756,7 +2758,7 @@ class TestSummaryExceptionTrace extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -2766,7 +2768,7 @@ class TestSummaryExceptionTrace extends HTMLElement {
         return TestSummaryExceptionTrace.template;
     }
 
-    syncData (exargs, extype, trace_lines) {
+    syncData(exargs, extype, trace_lines) {
 
         var contentEl = this.shadowRoot.querySelector(this.sel_exception_content);
 
@@ -2777,7 +2779,7 @@ class TestSummaryExceptionTrace extends HTMLElement {
 
         var traces_len = trace_lines.length;
 
-        for (var tidx=0; tidx < traces_len; tidx++) {
+        for (var tidx = 0; tidx < traces_len; tidx++) {
             var traceInfo = trace_lines[tidx];
             var traceEl = this.createTraceElement(traceInfo);
             contentEl.appendChild(traceEl);
@@ -2786,32 +2788,32 @@ class TestSummaryExceptionTrace extends HTMLElement {
 
     createTraceElement(traceInfo) {
         var outerDivEl = document.createElement('div');
-        
+
         var origin = traceInfo.origin;
-        
+
         var nxtPreEl = document.createElement('pre');
         nxtPreEl.classList.add("code-font-lt");
         nxtPreEl.innerHTML = "  File " + origin.file + ", line " + origin.lineno + ", in " + origin.scope;
         outerDivEl.appendChild(nxtPreEl);
-    
+
         nxtPreEl = document.createElement('pre');
         nxtPreEl.classList.add("margin-lg");
         nxtPreEl.classList.add("code-font-dk");
         nxtPreEl.innerHTML = entity_escape(traceInfo.call);
         outerDivEl.appendChild(nxtPreEl);
-    
+
         if ((traceInfo.code != undefined) && (traceInfo.code.length > 0)) {
             var nxtPreEl = document.createElement('pre');
             nxtPreEl.classList.add("margin-lg");
-    
+
             var codeEl = document.createElement('code');
             codeEl.classList.add("language-python");
             codeEl.innerHTML = "\n" + traceInfo.code.join("\n");
             nxtPreEl.appendChild(codeEl);
         }
-    
+
         outerDivEl.appendChild(nxtPreEl);
-    
+
         return outerDivEl;
     }
 }
@@ -2889,7 +2891,7 @@ class TestSummaryImportFailureItem extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -2899,7 +2901,7 @@ class TestSummaryImportFailureItem extends HTMLElement {
         return TestSummaryImportFailureItem.template;
     }
 
-    syncData (importError) {
+    syncData(importError) {
 
         var traceProps = {
             "Filename": importError.filename,
@@ -2952,7 +2954,7 @@ class TestSummaryArtifacts extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -2962,7 +2964,7 @@ class TestSummaryArtifacts extends HTMLElement {
         return TestSummaryArtifacts.template;
     }
 
-    syncData (artifacts_catalog, artifacts_folder_catalogs) {
+    syncData(artifacts_catalog, artifacts_folder_catalogs) {
 
         if ((artifacts_catalog != undefined) && (artifacts_catalog.folders != undefined)) {
 
@@ -2978,12 +2980,12 @@ class TestSummaryArtifacts extends HTMLElement {
                     if (afolder_catalog["files"] != undefined) {
                         if (afolder_catalog["files"].includes("tab.html")) {
                             var tabURL = "artifacts/" + afolder + "/tab.html";
-                        
+
                             var iframeEl = document.createElement("iframe");
                             iframeEl.classList.add("ts-artifact-tab-iframe");
                             iframeEl.setAttribute("src", tabURL);
                             iframeEl.setAttribute("title", afolder);
-                            
+
                             var tab = new MojoTabPage(afolder, afolder, iframeEl);
                             tabsList.push(tab);
                         }
@@ -3022,7 +3024,7 @@ class TestSummaryImportFailures extends HTMLElement {
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -3032,16 +3034,16 @@ class TestSummaryImportFailures extends HTMLElement {
         return TestSummaryImportFailures.template;
     }
 
-    syncData (importFailures) {
+    syncData(importFailures) {
         var failuresListEl = this.shadowRoot.querySelector(this.sel_import_failures_list);
         failuresListEl.innerHTML = "";
 
         for (var idx in importFailures) {
             var failItem = importFailures[idx];
-            
+
             var failItemEl = document.createElement(TestSummaryImportFailureItem.tagname);
             failItemEl.syncData(failItem);
-            
+
             failuresListEl.appendChild(failItemEl);
         }
     }
@@ -3071,11 +3073,11 @@ class TestSummaryFilesAndFolders extends HTMLElement {
 
     sel_files = "#id-files-list"
     sel_folders = "#id-folders-list"
-    
+
     constructor() {
         super();
 
-        const shadowRoot = this.attachShadow({mode: 'open'})
+        const shadowRoot = this.attachShadow({ mode: 'open' })
         shadowRoot.innerHTML = this.getTemplate();
 
         addGlobalStylesToShadowRoot(shadowRoot);
@@ -3097,11 +3099,11 @@ class TestSummaryFilesAndFolders extends HTMLElement {
         return folderEl;
     }
 
-    syncData (files, folders) {
+    syncData(files, folders) {
 
         var folderListEl = this.shadowRoot.querySelector(this.sel_folders);
         folderListEl.innerHTML = "";
-        
+
         var folderEl = this.createFolderElement("Parent", "..");
         folderListEl.appendChild(folderEl);
 

@@ -355,15 +355,18 @@ class MetadataCapturingJob(TestJob):
     def execute(self):
         """Override execute to test metadata object creation without full execution flow."""
         # Create metadata objects using the same logic as the real execute method
-        build_info = BuildInfo(branch=self._branch, build=self._build, flavor=self._flavor,
-                               release=self._release, url=self._build_url)
+        def _resolve_val(val):
+            if val is None or val == "" or type(val).__name__ == "DefaultValue":
+                return "(unknown)"
+            return val
 
-        pipeline_info = None
-        if self._pipeline_id is not None:
-            pipeline_info = PipelineInfo(id=self._pipeline_id, name=self._pipeline_name, instance=self._pipeline_instance)
+        build_info = BuildInfo(branch=_resolve_val(self._branch), build=_resolve_val(self._build), flavor=_resolve_val(self._flavor),
+                               release=_resolve_val(self._release), url=_resolve_val(self._build_url))
 
-        job_info = JobInfo(id=self._job_id, name=self._job_name, type=self._job_type, owner=self._job_owner, label=self._job_label,
-                           initiator=self._job_initiator, venue=self._job_venue, tag=self._job_tag)
+        pipeline_info = PipelineInfo(id=_resolve_val(self._pipeline_id), name=_resolve_val(self._pipeline_name), instance=_resolve_val(self._pipeline_instance))
+
+        job_info = JobInfo(id=_resolve_val(self._job_id), name=_resolve_val(self._job_name), type=_resolve_val(self._job_type), owner=_resolve_val(self._job_owner), label=_resolve_val(self._job_label),
+                           initiator=_resolve_val(self._job_initiator), venue=_resolve_val(self._job_venue), tag=_resolve_val(self._job_tag))
 
         # Capture the metadata objects for testing
         self.captured_build_info = build_info
@@ -458,8 +461,9 @@ class TestJobMetadataObjectCreationTests(unittest.TestCase):
         job.begin()
         job.execute()
 
-        # Verify PipelineInfo was not created
-        self.assertIsNone(job.captured_pipeline_info)
+        # Verify PipelineInfo was created with unknown values
+        self.assertIsNotNone(job.captured_pipeline_info)
+        self.assertEqual(job.captured_pipeline_info.id, "(unknown)")
 
     def test_jobinfo_creation_with_all_fields(self):
         """Test JobInfo creation with all collected job metadata (Requirement 8.3)."""
@@ -575,7 +579,7 @@ class TestJobGracefulDegradationTests(unittest.TestCase):
         # Should not raise any exception
         job = TestJob(logger=DummyLogger(), testroot="root")
 
-        # Verify job was created and pipeline metadata is None
+        # Verify job was created and pipeline metadata is unknown
         self.assertIsNotNone(job)
         self.assertIsNone(job._pipeline_id)
         self.assertIsNone(job._pipeline_name)
@@ -725,27 +729,31 @@ class TestJobGracefulDegradationTests(unittest.TestCase):
         job.begin()
         job.execute()
 
-        # Verify BuildInfo was created with None values
+        # Verify BuildInfo was created with unknown values
         self.assertIsNotNone(job.captured_build_info)
         self.assertIsInstance(job.captured_build_info, BuildInfo)
-        self.assertIsNone(job.captured_build_info.branch)
-        self.assertIsNone(job.captured_build_info.build)
-        self.assertIsNone(job.captured_build_info.flavor)
-        self.assertIsNone(job.captured_build_info.release)
-        self.assertIsNone(job.captured_build_info.url)
+        self.assertEqual(job.captured_build_info.branch, "(unknown)")
+        self.assertEqual(job.captured_build_info.build, "(unknown)")
+        self.assertEqual(job.captured_build_info.flavor, "(unknown)")
+        self.assertEqual(job.captured_build_info.release, "(unknown)")
+        self.assertEqual(job.captured_build_info.url, "(unknown)")
 
-        # Verify PipelineInfo was not created (pipeline_id is None)
-        self.assertIsNone(job.captured_pipeline_info)
+        # Verify PipelineInfo was created with unknown values
+        self.assertIsNotNone(job.captured_pipeline_info)
+        self.assertIsInstance(job.captured_pipeline_info, PipelineInfo)
+        self.assertEqual(job.captured_pipeline_info.id, "(unknown)")
+        self.assertEqual(job.captured_pipeline_info.name, "(unknown)")
+        self.assertEqual(job.captured_pipeline_info.instance, "(unknown)")
 
-        # Verify JobInfo was created with None values
+        # Verify JobInfo was created with unknown values
         self.assertIsNotNone(job.captured_job_info)
         self.assertIsInstance(job.captured_job_info, JobInfo)
-        self.assertIsNone(job.captured_job_info.id)
-        self.assertIsNone(job.captured_job_info.owner)
-        self.assertIsNone(job.captured_job_info.label)
-        self.assertIsNone(job.captured_job_info.initiator)
-        self.assertIsNone(job.captured_job_info.venue)
-        self.assertIsNone(job.captured_job_info.tag)
+        self.assertEqual(job.captured_job_info.id, "(unknown)")
+        self.assertEqual(job.captured_job_info.owner, "(unknown)")
+        self.assertEqual(job.captured_job_info.label, "(unknown)")
+        self.assertEqual(job.captured_job_info.initiator, "(unknown)")
+        self.assertEqual(job.captured_job_info.venue, "(unknown)")
+        self.assertEqual(job.captured_job_info.tag, "(unknown)")
 
     def test_metadata_object_creation_with_partial_environment_variables(self):
         """Test metadata object creation in execute method with partial environment variables set."""
@@ -778,23 +786,23 @@ class TestJobGracefulDegradationTests(unittest.TestCase):
         # Verify BuildInfo was created with partial values
         self.assertIsNotNone(job.captured_build_info)
         self.assertEqual(job.captured_build_info.branch, "develop")
-        self.assertIsNone(job.captured_build_info.build)
-        self.assertIsNone(job.captured_build_info.flavor)
+        self.assertEqual(job.captured_build_info.build, "(unknown)")
+        self.assertEqual(job.captured_build_info.flavor, "(unknown)")
         self.assertEqual(job.captured_build_info.release, "2.0.0-beta")
-        self.assertIsNone(job.captured_build_info.url)
+        self.assertEqual(job.captured_build_info.url, "(unknown)")
 
         # Verify PipelineInfo was created (pipeline_id is set)
         self.assertIsNotNone(job.captured_pipeline_info)
         self.assertEqual(job.captured_pipeline_info.id, "partial-pipeline")
-        self.assertIsNone(job.captured_pipeline_info.name)
-        self.assertIsNone(job.captured_pipeline_info.instance)
+        self.assertEqual(job.captured_pipeline_info.name, "(unknown)")
+        self.assertEqual(job.captured_pipeline_info.instance, "(unknown)")
 
         # Verify JobInfo was created with partial values
         self.assertIsNotNone(job.captured_job_info)
         self.assertEqual(job.captured_job_info.id, "partial-job")
         self.assertEqual(job.captured_job_info.name, "Partial Test Job")
-        self.assertIsNone(job.captured_job_info.owner)
-        self.assertIsNone(job.captured_job_info.label)
+        self.assertEqual(job.captured_job_info.owner, "(unknown)")
+        self.assertEqual(job.captured_job_info.label, "(unknown)")
 
     def test_no_exceptions_raised_for_missing_variables(self):
         """Test that no exceptions are raised due to missing CI/CD environment variables (Requirement 11.4)."""

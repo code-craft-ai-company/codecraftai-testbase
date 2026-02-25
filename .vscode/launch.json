@@ -14,6 +14,20 @@
             "envFile": "${workspaceFolder}/.env"
         },
         {
+            "name": "Python: Internal UnitTest Tests - run",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "unittest",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "discover",
+                "-s",
+                "source/tests"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "Python: Internal Tests - Run",
             "type": "debugpy",
             "request": "launch",

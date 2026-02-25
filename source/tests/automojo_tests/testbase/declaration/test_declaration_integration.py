@@ -15,7 +15,7 @@ from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 from automojo.testbase.coupling.configurationcoupling import ConfigurationCoupling
 from automojo.testbase.coupling.validatorcoupling import ValidatorCoupling
 
-from automojo.testbase.declaration import attachments, originiations, registrations
+from automojo.testbase.declaration import attachments, originations, registrations
 from automojo.testbase.injection import injectionregistry
 from automojo.testbase.injection.injectionscope import InjectionScope
 from automojo.testbase.injection.injectionmoment import InjectionMoment
@@ -124,8 +124,8 @@ class TestScopeTreeConstruction(unittest.TestCase):
             return "test"
 
         # Create parameter origins at different scopes
-        originiations.parameter(resource_a, identifier="param_a")
-        originiations.parameter(resource_b, identifier="param_b")
+        originations.parameter(resource_a, identifier="param_a")
+        originations.parameter(resource_b, identifier="param_b")
 
         # Verify both parameters are registered in the scope tree
         module_name = __name__
@@ -260,7 +260,7 @@ class TestEndToEndRegistrationFlow(unittest.TestCase):
         self.assertEqual(source.resource_type, TestIntegration)
 
         # Step 3: Create origin using the source
-        originiations.parameter(integration_factory_func, identifier="test_integration")
+        originations.parameter(integration_factory_func, identifier="test_integration")
 
         # Step 4: Verify origin is in scope tree (session scope for integrations)
         self.assertTrue(self.registry._scope_tree_root.has_descendent_resource("<session>", "test_integration"))
@@ -279,7 +279,7 @@ class TestEndToEndRegistrationFlow(unittest.TestCase):
         self.assertEqual(source.resource_type, str)
 
         # Step 3: Create origin using the source
-        originiations.parameter(resource_factory_func, identifier="test_resource")
+        originations.parameter(resource_factory_func, identifier="test_resource")
 
         # Step 4: Verify origin is in scope tree (package scope for resources)
         module_name = __name__
@@ -357,9 +357,9 @@ class TestMultipleRegistrationsScoping(unittest.TestCase):
             return 3.0
 
         # Register all at package scope
-        originiations.parameter(resource_one, identifier="res_one")
-        originiations.parameter(resource_two, identifier="res_two")
-        originiations.parameter(resource_three, identifier="res_three")
+        originations.parameter(resource_one, identifier="res_one")
+        originations.parameter(resource_two, identifier="res_two")
+        originations.parameter(resource_three, identifier="res_three")
 
         # Verify all are in scope tree
         module_name = __name__
@@ -388,10 +388,10 @@ class TestMultipleRegistrationsScoping(unittest.TestCase):
             return "test"
 
         # Register at session scope (integration)
-        originiations.parameter(session_resource, identifier="session_param")
+        originations.parameter(session_resource, identifier="session_param")
 
         # Register at package scope
-        originiations.parameter(package_resource, identifier="package_param")
+        originations.parameter(package_resource, identifier="package_param")
 
         # Register at test scope via attachment
         @attachments.parameter(test_resource, identifier="test_param")
@@ -433,11 +433,11 @@ class TestDuplicateIdentifierValidation(unittest.TestCase):
             return 2
 
         # Register first resource with identifier "duplicate_id"
-        originiations.parameter(resource_a, identifier="duplicate_id")
+        originations.parameter(resource_a, identifier="duplicate_id")
 
         # Attempt to register second resource with same identifier in same scope
         with self.assertRaises(SemanticError) as context:
-            originiations.parameter(resource_b, identifier="duplicate_id")
+            originations.parameter(resource_b, identifier="duplicate_id")
 
         # Verify error message contains relevant information
         error_msg = str(context.exception)
@@ -457,7 +457,7 @@ class TestDuplicateIdentifierValidation(unittest.TestCase):
             return 2
 
         # Register at package scope
-        originiations.parameter(resource_a, identifier="shared_id")
+        originations.parameter(resource_a, identifier="shared_id")
 
         # Register at test scope (different scope) - should succeed
         @attachments.parameter(resource_b, identifier="shared_id")
@@ -565,11 +565,11 @@ class TestDuplicateIdentifierValidation(unittest.TestCase):
                 yield TestIntegration()
 
         # Register first integration at session scope
-        originiations.parameter(integration_a, identifier="session_dup")
+        originations.parameter(integration_a, identifier="session_dup")
 
         # Attempt to register second integration with same identifier at session scope
         with self.assertRaises(SemanticError) as context:
-            originiations.parameter(integration_b, identifier="session_dup")
+            originations.parameter(integration_b, identifier="session_dup")
 
         # Verify error message contains relevant information
         error_msg = str(context.exception)
@@ -589,11 +589,11 @@ class TestDuplicateIdentifierValidation(unittest.TestCase):
             return 2
 
         # Register first resource
-        originiations.parameter(resource_a, identifier="test_dup_scope")
+        originations.parameter(resource_a, identifier="test_dup_scope")
 
         # Attempt to register duplicate
         with self.assertRaises(SemanticError) as context:
-            originiations.parameter(resource_b, identifier="test_dup_scope")
+            originations.parameter(resource_b, identifier="test_dup_scope")
 
         # Verify error message contains both identifier and scope
         error_msg = str(context.exception)

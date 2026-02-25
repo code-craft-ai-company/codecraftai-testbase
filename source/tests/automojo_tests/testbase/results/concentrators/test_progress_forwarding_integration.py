@@ -180,6 +180,11 @@ class ProgressForwardingIntegrationTestBase(unittest.TestCase):
                 self.concentrator_server._forwarding_running = False
                 self.concentrator_server.shutdown()
                 self.concentrator_server.server_close()
+                if hasattr(self.concentrator_server, '_forward_thread') and self.concentrator_server._forward_thread is not None:
+                    try:
+                        self.concentrator_server._forward_thread.join(timeout=2.0)
+                    except Exception:
+                        pass
             except Exception:
                 pass
         

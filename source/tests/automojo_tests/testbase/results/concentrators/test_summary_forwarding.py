@@ -101,6 +101,11 @@ class SummaryForwardingLoopTests(unittest.TestCase):
                 server._forwarding_running = False
                 server.shutdown()
                 server.server_close()
+                if hasattr(server, '_forward_thread') and server._forward_thread is not None:
+                    try:
+                        server._forward_thread.join(timeout=2.0)
+                    except Exception:
+                        pass
             except Exception:
                 pass
         
@@ -307,6 +312,11 @@ class SummaryForwardingHeaderTests(unittest.TestCase):
                 server._forwarding_running = False
                 server.shutdown()
                 server.server_close()
+                if hasattr(server, '_forward_thread') and server._forward_thread is not None:
+                    try:
+                        server._forward_thread.join(timeout=2.0)
+                    except Exception:
+                        pass
             except Exception:
                 pass
         
@@ -500,6 +510,11 @@ class SummaryForwardingErrorHandlingTests(unittest.TestCase):
                 server._forwarding_running = False
                 server.shutdown()
                 server.server_close()
+                if hasattr(server, '_forward_thread') and server._forward_thread is not None:
+                    try:
+                        server._forward_thread.join(timeout=2.0)
+                    except Exception:
+                        pass
             except Exception:
                 pass
         

@@ -836,12 +836,12 @@ class CIMetadataPartialEnvironmentTests(unittest.TestCase):
         self.assertEqual(summary["job"]["id"], "partial-job-id")
         self.assertEqual(summary["job"]["name"], "Partial Job Name")
         self.assertEqual(summary["job"]["type"], "TestRun")
-        self.assertIsNone(summary["job"]["owner"])
-        self.assertIsNone(summary["job"]["label"])
-        self.assertIsNone(summary["job"]["initiator"])
-        self.assertIsNone(summary["job"]["venue"])
-        self.assertIsNone(summary["job"]["seed"])
-        self.assertIsNone(summary["job"]["tag"])
+        self.assertEqual(summary["job"]["owner"], "(unknown)")
+        self.assertEqual(summary["job"]["label"], "(unknown)")
+        self.assertEqual(summary["job"]["initiator"], "(unknown)")
+        self.assertEqual(summary["job"]["venue"], "(unknown)")
+        self.assertEqual(summary["job"]["seed"], "(unknown)")
+        self.assertEqual(summary["job"]["tag"], "(unknown)")
 
 
 if __name__ == "__main__":

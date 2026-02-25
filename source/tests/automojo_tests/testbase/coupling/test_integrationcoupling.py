@@ -216,7 +216,7 @@ class IntegrationCouplingTests(unittest.TestCase):
 
     def test_sort_integration_couplings_by_precedence(self):
         unordered = [SampleIntegrationB, SampleIntegration]
-        ordered = sort_integration_couplings_by_precedence(None, unordered)
+        ordered = sort_integration_couplings_by_precedence(unordered)
         self.assertEqual(ordered, [SampleIntegration, SampleIntegrationB])
 
     def test_get_integration_key_with_none_components(self):
@@ -239,7 +239,7 @@ class IntegrationCouplingTests(unittest.TestCase):
             SampleIntegrationPrecedence20,
             SampleIntegrationPrecedence10C,
         ]
-        ordered = sort_integration_couplings_by_precedence(None, unordered)
+        ordered = sort_integration_couplings_by_precedence(unordered)
 
         # Verify the list is ordered by precedence (lowest to highest)
         self.assertEqual(len(ordered), 5)
@@ -263,7 +263,7 @@ class IntegrationCouplingTests(unittest.TestCase):
             SampleIntegrationPrecedence10B,
             SampleIntegrationPrecedence10C,
         ]
-        ordered = sort_integration_couplings_by_precedence(None, unordered)
+        ordered = sort_integration_couplings_by_precedence(unordered)
 
         # All should be present in the output
         self.assertEqual(len(ordered), 3)

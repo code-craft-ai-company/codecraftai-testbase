@@ -18,6 +18,7 @@
 """
 
 import unittest
+import warnings
 from typing import List
 
 from automojo.testbase.injection.injectionregistry import InjectionRegistry
@@ -195,7 +196,9 @@ class FinalizeStartupScopeCreationTests(unittest.TestCase):
             inj_mom_a.name: inj_mom_a,
         }
         
-        self.registry.finalize_startup(inj_moments)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", InjectionRegistry.UnusedSourceWarning)
+            self.registry.finalize_startup(inj_moments)
         
         # Verify the unreferenced scope was pruned
         unreferenced_scope = self.registry.lookup_resource_scope(
@@ -282,7 +285,9 @@ class FinalizeStartupParameterResolutionTests(unittest.TestCase):
             inj_mom_a.name: inj_mom_a,
         }
         
-        self.registry.finalize_startup(inj_moments)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", InjectionRegistry.UnusedSourceWarning)
+            self.registry.finalize_startup(inj_moments)
         
         # Verify unknown parameters were tracked
         unknown_params = self.registry.unknown_parameters
@@ -593,7 +598,9 @@ class FinalizeStartupMultipleMomentsTests(unittest.TestCase):
         # Finalize with empty injection moments
         inj_moments = {}
         
-        self.registry.finalize_startup(inj_moments)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", InjectionRegistry.UnusedSourceWarning)
+            self.registry.finalize_startup(inj_moments)
         
         # Verify the orphan scope was pruned
         orphan_scope = self.registry.lookup_resource_scope(

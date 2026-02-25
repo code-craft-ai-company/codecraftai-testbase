@@ -2169,6 +2169,7 @@ class TestSequencer:
 
         # Get the resource scope for the session level to access parameter originations
         this_scope = root_node.get_resource_scope()
+        this_parameter_originations = this_scope.parameter_originations if this_scope is not None else {}
 
         # --------------------------------------------------------------------
         # SESSION-SCOPED PARAMETER FACTORY IMPORTS
@@ -2180,7 +2181,7 @@ class TestSequencer:
         # We skip 'implied' parameters (like 'sequencer') which are provided by
         # the framework rather than created by factory functions.
         # --------------------------------------------------------------------
-        for _, porigin in this_scope.parameter_originations.items():
+        for _, porigin in this_parameter_originations.items():
             if not porigin.implied:
                 method_lines.append('{}from {} import {}'.format(current_indent, porigin.source_module_name, porigin.source_function.__name__))
         method_lines.append('')
@@ -2204,7 +2205,7 @@ class TestSequencer:
         # Each parameter is added to child_call_args so it can be passed to
         # child scope functions.
         # --------------------------------------------------------------------
-        for pname, porigin in this_scope.parameter_originations.items():
+        for pname, porigin in this_parameter_originations.items():
             if not porigin.implied:
                 # Generate the factory function call (may include constraints)
                 source_func_call = porigin.generate_call()
@@ -2357,6 +2358,7 @@ class TestSequencer:
 
         # Get the resource scope for this module to access parameter originations
         resource_scope = scope_node.get_resource_scope()
+        resource_parameter_originations = resource_scope.parameter_originations if resource_scope is not None else {}
 
         # --------------------------------------------------------------------
         # MODULE-SCOPED FACTORY IMPORT COLLECTION
@@ -2381,7 +2383,7 @@ class TestSequencer:
         # Import format: "from {source_module_name} import {source_function_name}"
         # Example: "from mypackage.factories import create_database_connection"
         # --------------------------------------------------------------------
-        for _, porigin in resource_scope.parameter_originations.items():
+        for _, porigin in resource_parameter_originations.items():
             factory_imports.add('from {} import {}'.format(porigin.source_module_name, porigin.source_function.__name__))
 
         # --------------------------------------------------------------------
@@ -2399,7 +2401,7 @@ class TestSequencer:
         #   for module_param in create_module_resource(constraints=constraints):
         #       # ... test execution code ...
         # --------------------------------------------------------------------
-        for pname, porigin in resource_scope.parameter_originations.items():
+        for pname, porigin in resource_parameter_originations.items():
 
             # Get the parameter names from the factory function signature
             sp_parameter_names = [pn for pn in porigin.source_signature.parameters.keys()]
@@ -2488,7 +2490,7 @@ class TestSequencer:
                     # If the test parameter is of test_scope origin
                     # then we need to add it to test_local_args so we
                     # can create an import for it.
-                    if param_name in test_scope.parameter_originations:
+                    if test_scope is not None and param_name in test_scope.parameter_originations:
                         param_obj = test_scope.parameter_originations[param_name]
                         test_local_args.append((param_name, param_obj))
 
@@ -2639,7 +2641,7 @@ class TestSequencer:
                 #   - Finalization: Validators are finalized in original order
                 #   - This ensures proper nesting for validators that depend on each other
                 # ------------------------------------------------------------
-                validator_originations = [vo for vo in test_scope.validator_originations.values()]
+                validator_originations = [vo for vo in test_scope.validator_originations.values()] if test_scope is not None else []
 
                 val_indent = ""
                 # Write the validator construction calls (Phase 1 & 2)

@@ -17,8 +17,9 @@ def resolve_test_root(root: Optional[str]) -> str:
     Raises ValueError if the directory does not exist.
     """
     if root is None:
-        if RuntimeVariables.AM_TESTROOT is not None:
-            root = RuntimeVariables.AM_TESTROOT
+        import automojo.runtime.runtimevariables as rv
+        if rv.RuntimeVariables.AM_TESTROOT is not None:
+            root = rv.RuntimeVariables.AM_TESTROOT
         else:
             root = "."
 

@@ -414,13 +414,13 @@ class HTMLReportMetadataIntegrationTests(unittest.TestCase):
         self.assertEqual(job_section["name"], "Minimal Job")
         self.assertEqual(job_section["type"], "TestRun")
 
-        # Verify optional fields are None/null
-        self.assertIsNone(job_section["owner"])
-        self.assertIsNone(job_section["label"])
-        self.assertIsNone(job_section["initiator"])
-        self.assertIsNone(job_section["venue"])
-        self.assertIsNone(job_section["seed"])
-        self.assertIsNone(job_section["tag"])
+        # Verify optional fields are "(unknown)"
+        self.assertEqual(job_section["owner"], "(unknown)")
+        self.assertEqual(job_section["label"], "(unknown)")
+        self.assertEqual(job_section["initiator"], "(unknown)")
+        self.assertEqual(job_section["venue"], "(unknown)")
+        self.assertEqual(job_section["seed"], "(unknown)")
+        self.assertEqual(job_section["tag"], "(unknown)")
 
     def test_html_report_summary_json_structure_for_javascript(self):
         """

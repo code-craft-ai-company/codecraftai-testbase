@@ -432,9 +432,15 @@ class ProgressConcentratorServer(ThreadingMixIn, HTTPServer):
                 summary_json = json.dumps(summary, cls=SummaryJsonEncoder)
                 requests.post(forwarding_url, data=summary_json, headers=headers)
 
+            except (requests.exceptions.ConnectionError, requests.exceptions.RetryError) as err:
+                # ERROR HANDLING - LOG AND CONTINUE:
+                # Log connection errors as warnings without full tracebacks to avoid spamming
+                # the console, particularly during integration tests that simulate failures.
+                self._logger.warning(f"Connection error while forwarding progress: {err}")
+                
             except Exception:
                 # ERROR HANDLING - LOG AND CONTINUE:
-                # Log the full exception traceback for debugging, but don't re-raise.
+                # Log the full exception traceback for debugging other types of errors, but don't re-raise.
                 # The loop continues to the next iteration, ensuring forwarding
                 # resumes after transient failures (network issues, service outages, etc.).
                 errmsg = traceback.format_exc()

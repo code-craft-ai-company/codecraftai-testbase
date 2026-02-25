@@ -464,13 +464,13 @@ class NetworkFailureResilienceTests(ErrorRecoveryIntegrationTestBase):
         
         # Capture logged errors
         logged_errors = []
-        original_error = self.server._logger.error
+        original_warning = self.server._logger.warning
         
-        def capture_error(msg):
+        def capture_warning(msg):
             logged_errors.append(msg)
-            original_error(msg)
+            original_warning(msg)
         
-        self.server._logger.error = capture_error
+        self.server._logger.warning = capture_warning
         
         try:
             # Wait for forwarding attempts
@@ -480,7 +480,7 @@ class NetworkFailureResilienceTests(ErrorRecoveryIntegrationTestBase):
             self.assertGreater(len(logged_errors), 0, 
                 "Forwarding errors should be logged")
         finally:
-            self.server._logger.error = original_error
+            self.server._logger.warning = original_warning
 
     def test_server_accepts_requests_during_forwarding_failures(self):
         """Test that server accepts progress requests during forwarding failures."""

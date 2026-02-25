@@ -13,6 +13,7 @@ import shutil
 import threading
 import time
 import json
+import requests # Added import
 
 from datetime import datetime
 
@@ -122,7 +123,7 @@ class SummaryForwardingLoopTests(unittest.TestCase):
         
         with create_module_patch(pcs_module.requests, "post", recursive=True) as mock_post:
             mock_response = Mock()
-            mock_response.configure(return_value=None)
+            mock_response.configure(return_value=mock_response)
             mock_post.configure(return_value=mock_response)
             
             server = ProgressConcentratorServer(
@@ -533,7 +534,7 @@ class SummaryForwardingErrorHandlingTests(unittest.TestCase):
         
         def raise_exception(url, data=None, headers=None):
             exception_raised.set()
-            raise ConnectionError("Network error")
+            raise requests.exceptions.ConnectionError("Network error")
         
         with create_module_patch(pcs_module.requests, "post", recursive=True) as mock_post:
             mock_post.configure(side_effect=raise_exception)
@@ -566,7 +567,7 @@ class SummaryForwardingErrorHandlingTests(unittest.TestCase):
             logged_errors.append(msg)
         
         def raise_exception(url, data=None, headers=None):
-            raise ConnectionError("Network error")
+            raise requests.exceptions.ConnectionError("Network error")
         
         with create_module_patch(pcs_module.requests, "post", recursive=True) as mock_post:
             mock_post.configure(side_effect=raise_exception)
@@ -578,8 +579,8 @@ class SummaryForwardingErrorHandlingTests(unittest.TestCase):
             )
             self.servers_to_cleanup.append(server)
             
-            original_error = server._logger.error
-            server._logger.error = capture_error
+            original_warning = server._logger.warning
+            server._logger.warning = capture_error
             
             try:
                 server.start()
@@ -588,9 +589,9 @@ class SummaryForwardingErrorHandlingTests(unittest.TestCase):
                 
                 self.assertGreater(len(logged_errors), 0)
                 
-                self.assertTrue(any("ConnectionError" in err for err in logged_errors))
+                self.assertTrue(any("Connection error" in err for err in logged_errors))
             finally:
-                server._logger.error = original_error
+                server._logger.warning = original_warning
 
     def test_forwarding_continues_after_exception(self):
         """Test that forwarding loop continues after catching exception (Requirement 10.3)."""
@@ -605,7 +606,7 @@ class SummaryForwardingErrorHandlingTests(unittest.TestCase):
         def count_calls(url, data=None, headers=None):
             call_count[0] += 1
             if call_count[0] <= 2:
-                raise ConnectionError("Network error")
+                raise requests.exceptions.ConnectionError("Network error")
             mock_response = Mock()
             return mock_response
         
@@ -634,7 +635,7 @@ class SummaryForwardingErrorHandlingTests(unittest.TestCase):
         )
         
         def raise_exception(url, data=None, headers=None):
-            raise ConnectionError("Network error")
+            raise requests.exceptions.ConnectionError("Network error")
         
         with create_module_patch(pcs_module.requests, "post", recursive=True) as mock_post:
             mock_post.configure(side_effect=raise_exception)

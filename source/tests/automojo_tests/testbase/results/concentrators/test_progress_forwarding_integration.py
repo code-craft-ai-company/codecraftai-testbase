@@ -631,12 +631,12 @@ class ForwardingErrorRecoveryTests(ProgressForwardingIntegrationTestBase):
         
         # Capture logged errors
         logged_errors = []
-        original_error = self.concentrator_server._logger.error
+        original_warning = self.concentrator_server._logger.warning
         
         def capture_error(msg):
             logged_errors.append(msg)
         
-        self.concentrator_server._logger.error = capture_error
+        self.concentrator_server._logger.warning = capture_error
         
         try:
             self.concentrator_server.start()
@@ -648,7 +648,7 @@ class ForwardingErrorRecoveryTests(ProgressForwardingIntegrationTestBase):
             self.assertGreater(len(logged_errors), 0,
                 "Forwarding errors should be logged")
         finally:
-            self.concentrator_server._logger.error = original_error
+            self.concentrator_server._logger.warning = original_warning
 
     def test_progress_reception_unaffected_by_forwarding_errors(self):
         """Test that progress reception continues during forwarding errors.

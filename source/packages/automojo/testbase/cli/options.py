@@ -52,6 +52,8 @@ HELP_JOB_INITIATOR = "The name of the initiator of the job."
 HELP_JOB_LABEL = "The label associated with the job."
 HELP_JOB_NAME = "The name of the job."
 HELP_JOB_OWNER = "The ownerid and possibly appended ';(display name)' of the test run result owner."
+HELP_JOB_SEED = "A seed value to associate with the job for reproducibility."
+HELP_JOB_TAG = "A correlation tag to associate with the job."
 HELP_RUNID = "A uuid to use for the run id for the testrun."
 HELP_CONSOLE_LOG_LEVEL = "The logging level for console output."
 HELP_FILE_LOG_LEVEL = "The logging level for logfile output."
@@ -137,6 +139,8 @@ class JobOptionGroup(OptionGroup):
         job_label (OptionField): The ``--job-label`` option for job categorization.
         job_name (OptionField): The ``--job-name`` option for human-readable job name.
         job_owner (OptionField): The ``--job-owner`` option for job ownership.
+        job_seed (OptionField): The ``--job-seed`` option for job reproducibility seed.
+        job_tag (OptionField): The ``--job-tag`` option for job correlation tag.
     """
     name = "job"
     job_id = OptionField("--job-id", default=None, required=False, help=HELP_JOB_ID)
@@ -144,6 +148,8 @@ class JobOptionGroup(OptionGroup):
     job_label = OptionField("--job-label", default=None, required=False, help=HELP_JOB_LABEL)
     job_name = OptionField("--job-name", default=None, required=False, help=HELP_JOB_NAME)
     job_owner = OptionField("--job-owner", default=None, required=False, help=HELP_JOB_OWNER)
+    job_seed = OptionField("--job-seed", default=None, required=False, help=HELP_JOB_SEED)
+    job_tag = OptionField("--job-tag", default=None, required=False, help=HELP_JOB_TAG)
 
 
 class LoggingOptionGroup(OptionGroup):

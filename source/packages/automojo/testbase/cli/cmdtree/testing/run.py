@@ -42,6 +42,8 @@ from automojo.testbase.cli.options import (
     HELP_JOB_LABEL,
     HELP_JOB_NAME,
     HELP_JOB_OWNER,
+    HELP_JOB_SEED,
+    HELP_JOB_TAG,
     HELP_RUNID,
     HELP_CONSOLE_LOG_LEVEL,
     HELP_FILE_LOG_LEVEL,
@@ -67,7 +69,8 @@ from automojo.testbase.cli.options import (
 def command_testbase_testing_run(root: Optional[str], includes: Optional[List[str]], excludes: Optional[List[str]], output: Optional[str],
                                  start: Optional[str], runid: Optional[str], branch: Optional[str], build: Optional[str], flavor: Optional[str],
                                  job_id: Optional[str], job_initiator: Optional[str], job_label: Optional[str], job_name: Optional[str],
-                                 job_owner: Optional[str], console_level: Optional[str], logfile_level: Optional[str],
+                                 job_owner: Optional[str], job_seed: Optional[str], job_tag: Optional[str],
+                                 console_level: Optional[str], logfile_level: Optional[str],
                                  debugger: Optional[str], breakpoints: Optional[List[str]], debug_port: Optional[str],
                                  debug_port_range: Optional[str], debug_log_level: Optional[str], prerun_diagnostic: bool, postrun_diagnostic: bool,
                                  diagnostic_level: Optional[str], include_marker_exp: Optional[List[str]], exclude_marker_exp: Optional[List[str]]):
@@ -128,6 +131,12 @@ def command_testbase_testing_run(root: Optional[str], includes: Optional[List[st
 
     if job_owner is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_job_owner(job_owner)
+
+    if job_seed is not None:
+        AM_RUNTIME_OPTION_OVERRIDES.override_job_seed(job_seed)
+
+    if job_tag is not None:
+        AM_RUNTIME_OPTION_OVERRIDES.override_job_tag(job_tag)
 
     if console_level is not None:
         AM_RUNTIME_OPTION_OVERRIDES.override_loglevel_console(console_level)

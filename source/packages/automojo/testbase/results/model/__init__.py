@@ -12,6 +12,7 @@ __credits__ = []
 
 
 from automojo.testbase.results.model.jobinfo import MissingOptionalFieldWarning
+from automojo.testbase.results.model.checkresult import CheckResult
 from automojo.testbase.results.model.streaminginfo import (
     StreamingInfo,
     StreamingProtocol,
@@ -21,6 +22,7 @@ from automojo.testbase.results.model.nestedprogressinfo import NestedProgressInf
 from automojo.testbase.results.model.progressaggregator import ProgressAggregator
 
 __all__ = [
+    "CheckResult",
     "MissingOptionalFieldWarning",
     "NestedProgressInfo",
     "ProgressAggregator",

@@ -258,7 +258,7 @@ function finalize_test_result_item(ritem, counters, results_table) {
             counters.passed += 1;
         }
     }
-    
+
     // =========================================================================
     // RESULT PROCESSING ALGORITHM - Step 5: Group by Package Name
     // =========================================================================
@@ -478,14 +478,14 @@ async function load_results_from_stream(counters) {
                     // TASKING_GROUP and TASKING records that arrive between
                     // the preview and final records.
 
-                    if (! parent_lookup.hasOwnProperty(ritem_instance)) {
+                    if (!parent_lookup.hasOwnProperty(ritem_instance)) {
                         // First occurrence - this is the preview record
                         // Initialize tasking_groups array to collect child records
                         ritem.tasking_groups = [];
                         if (ritem.stop.length == 0) {
                             // Preview record - store in lookup for child linking
                             parent_lookup[ritem_instance] = ritem;
-                        }  else {
+                        } else {
                             // Final record with no preview - process immediately
                             // (This can happen if test has no tasking groups)
                             finalize_test_result_item(ritem, counters, g_results);
@@ -512,7 +512,7 @@ async function load_results_from_stream(counters) {
                     if (parent_lookup.hasOwnProperty(ritem_parentid)) {
                         // Parent TEST exists in lookup - we can link this group
 
-                        if (! parent_lookup.hasOwnProperty(ritem_instance)) {
+                        if (!parent_lookup.hasOwnProperty(ritem_instance)) {
                             // First occurrence - preview record for tasking group
                             // Initialize tracking arrays and counters
                             parent_item = parent_lookup[ritem_parentid];
@@ -520,10 +520,10 @@ async function load_results_from_stream(counters) {
                             ritem.passed = 0;     // Counter for passed taskings
                             ritem.failed = 0;     // Counter for failed taskings
                             ritem.errored = 0;    // Counter for errored taskings
-                            
+
                             // Link to parent TEST's tasking_groups array
                             parent_item.tasking_groups.push(ritem);
-                            
+
                             // Store in lookup so TASKING records can find this group
                             parent_lookup[ritem_instance] = ritem;
 
@@ -535,7 +535,7 @@ async function load_results_from_stream(counters) {
                         }
 
                     }
-                
+
                 } else if (ritem.rtype == "TASKING") {
                     // =========================================================
                     // TASKING RECORD PROCESSING
@@ -543,7 +543,7 @@ async function load_results_from_stream(counters) {
                     // Individual taskings are the actual distributed work units.
                     // They are linked to their parent TASKING_GROUP and their
                     // results update the group's pass/fail/error counters.
-                    
+
                     if (parent_lookup.hasOwnProperty(ritem_parentid)) {
                         // Parent TASKING_GROUP exists - link this tasking
                         var parent_item = parent_lookup[ritem_parentid];
@@ -559,6 +559,37 @@ async function load_results_from_stream(counters) {
                         }
                         else {
                             parent_item.passed += 1;
+                        }
+                    }
+
+                } else if (ritem.rtype == "CHECK") {
+                    // =========================================================
+                    // CHECK RECORD PROCESSING
+                    // =========================================================
+                    // Individual check results from property tests.
+                    // They are linked to their parent TEST's checks array.
+                    // CHECK records are NOT counted in top-level counters.
+
+                    if (parent_lookup.hasOwnProperty(ritem_parentid)) {
+                        var parent_item = parent_lookup[ritem_parentid];
+
+                        // Initialize checks tracking if not yet present
+                        if (!parent_item.checks) {
+                            parent_item.checks = [];
+                            parent_item.checks_passed = 0;
+                            parent_item.checks_failed = 0;
+                            parent_item.checks_errored = 0;
+                        }
+
+                        parent_item.checks.push(ritem);
+
+                        // Update check counters based on check result
+                        if (ritem.result == "PASSED") {
+                            parent_item.checks_passed += 1;
+                        } else if (ritem.result == "FAILED") {
+                            parent_item.checks_failed += 1;
+                        } else if (ritem.result == "ERRORED") {
+                            parent_item.checks_errored += 1;
                         }
                     }
                 }
@@ -618,7 +649,7 @@ async function load_results() {
         failed: 0,
         skipped: 0
     }
-    
+
     // Because we dont necessarily display the results in a maching result tree, for now we probably should just
     // load the results from the results stream
     await load_results_from_stream(counters)
@@ -732,7 +763,7 @@ function adjust_index_identifier(path, name, value) {
  * // Returns 'Tom &amp; Jerry'
  */
 function entity_escape(tgtstr) {
-    return tgtstr.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return tgtstr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 
@@ -770,7 +801,7 @@ function refresh_catalog() {
     var filesAndFoldersEl = document.getElementById("testsummary-filesandfolders");
 
     filesAndFoldersEl.syncData(g_catalog.files, g_catalog.folders);
-    
+
 }
 
 /**
@@ -798,7 +829,7 @@ function refresh_startup_environment() {
     try {
         var startupNodeElement = create_startup_environment_panels("startup", g_startup_configuration["startup"]);
         configurationBodyElement.appendChild(startupNodeElement);
-    } catch(e) {
+    } catch (e) {
     }
 }
 
@@ -816,7 +847,7 @@ function refresh_startup_landscape() {
     try {
         var landscapeNodeElement = create_startup_landscape_panels("landscape", g_startup_configuration["landscape"]);
         configurationBodyElement.appendChild(landscapeNodeElement);
-    } catch(e) {
+    } catch (e) {
     }
 }
 
@@ -1059,7 +1090,7 @@ async function refresh_page() {
             window.Prism.manual = true;
             // Highlight all code blocks in the document
             Prism.highlightAll();
-        } catch(error) {
+        } catch (error) {
             // Log but don't fail if Prism is unavailable
             console.warn(error)
         }

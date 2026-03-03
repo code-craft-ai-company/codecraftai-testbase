@@ -138,6 +138,23 @@ class TestJob(ITestJob):
     def import_errors(self):
         return self._import_errors
 
+    @property
+    def job_seed(self) -> str:
+        """
+            Returns the job-level seed for reproducible property testing.
+
+            The seed is a string (typically a UUID) read from ``AM_JOB_SEED``.
+            If no seed was set, a random UUID is generated on first access
+            and cached for the duration of the job.
+
+            :returns: A string seed value (UUID).
+        """
+        import uuid
+
+        if self._job_seed is None or self._job_seed == DefaultValue.NotSet:
+            self._job_seed = str(uuid.uuid4())
+        return str(self._job_seed)
+
     def begin(self):
         """
             Called at the beginning of a test job in order to setup the recording of test results.
@@ -564,7 +581,7 @@ class TestJob(ITestJob):
             Simple hook function to make it possible to overload the type of the TestSequencer that is created
             for jobs.
         """
-        inst = TestSequencer(self._title, self._testroot, includes=self.includes, excludes=self.excludes, metafilters=self.metafilters)
+        inst = TestSequencer(self._title, self._testroot, includes=self.includes, excludes=self.excludes, metafilters=self.metafilters, job_seed=self.job_seed)
         return inst
 
 

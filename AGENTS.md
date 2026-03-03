@@ -279,7 +279,7 @@ There is also a more detailed machine processable JSOS stream file in the output
 
 "*outputfolder*/testrun_results_stream.jsos"
 
-JSOS (JSON Object Stream) consists of a stream of JSON objects seperated by the the ASCII record seperator character.  When a
+JSOS (JSON Object Stream) consists of a stream of JSON objects seperated by the the ASCII record seperator character (\x1e).  When a
 test starts it writes a preview to the stream.  The test preview has a 'result' equal to 'UNSET'.  Example Preview:
 
 ```

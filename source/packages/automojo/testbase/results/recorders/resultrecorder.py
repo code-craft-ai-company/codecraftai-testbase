@@ -691,10 +691,12 @@ class ResultRecorder:
                     parent_node_items: list = parent_node["items"]
                     parent_node_items.append(ritem)
                     
-                    # Initialize tasking_groups list if not present
+                    # Initialize tasking_groups and checks lists if not present
                     # (may already exist from preview record)
                     if "tasking_groups" not in ritem:
                         ritem["tasking_groups"] = []
+                    if "checks" not in ritem:
+                        ritem["checks"] = []
 
                     # PREVIEW/FINAL RECORD MERGING:
                     # If a preview record exists in the lookup, merge the final
@@ -747,6 +749,25 @@ class ResultRecorder:
 
                     else:
                         # This must be an injected failure that does not have a preview
+                        node_lookup[ritem_inst] = ritem
+
+                # CASE: CHECK RECORD
+                # --------------------
+                # CheckResults represent individual property test check outcomes
+                # with generated values, example index, and seed.
+                elif ritem_type == ResultType.CHECK.name:
+                    # Add to parent's checks list (parent is TestResult)
+                    if "checks" not in parent_node:
+                        parent_node["checks"] = []
+                    parent_node_checks: list = parent_node["checks"]
+                    parent_node_checks.append(ritem)
+
+                    # PREVIEW/FINAL RECORD MERGING (same pattern as TEST)
+                    if ritem_inst in node_lookup:
+                        preview_info: dict = node_lookup[ritem_inst]
+                        preview_info.update(ritem)
+
+                    else:
                         node_lookup[ritem_inst] = ritem
 
         # STEP 3: WRITE CONSOLIDATED RESULTS

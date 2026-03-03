@@ -43,7 +43,8 @@ class SequencerTestScope:
         Context manager for executing a single test function.
     """
 
-    def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, test_name: str, notables: OrderedDict[str, Any]={}):
+    def __init__(self, sequencer: "TestSequencer", recorder: ResultRecorder, test_name: str,
+                 notables: OrderedDict[str, Any]={}, expected_failure: dict = None):
         super().__init__()
 
         self._sequencer = sequencer
@@ -54,6 +55,7 @@ class SequencerTestScope:
         self._result = None
         self._scope_node = self._sequencer.find_treenode_for_scope(test_name)
         self._notables = notables
+        self._expected_failure = expected_failure
         self._monikers, self._pivots = self._get_monikers_and_pivots()
         self._context_identifier = "{}:{}".format(self._test_name, ",".join(self._monikers))
 
@@ -136,7 +138,43 @@ class SequencerTestScope:
     def __exit__(self, ex_type: Type, ex_inst: BaseException, ex_tb: TracebackType) -> bool:
         handled = True
 
-        if ex_type is not None:
+        if self._expected_failure is not None:
+            # Expected failure handling: the @expect_exception decorator set
+            # metadata indicating this test should raise a specific exception.
+            expected_type = self._expected_failure.get("exception_type", AssertionError)
+            reason = self._expected_failure.get("reason", "")
+
+            if ex_type is not None and issubclass(ex_type, expected_type):
+                # The expected exception was raised — test passes.
+                # Individual check results (e.g., from PropertyRunner) are
+                # already recorded and may show as FAILED at the check level.
+                self._result.mark_passed()
+                if reason:
+                    logger.info("EXPECTED EXCEPTION ({}): {}".format(expected_type.__name__, reason))
+            elif ex_type is None:
+                # No exception raised but one was expected — test fails.
+                msg = "Expected {} to be raised".format(expected_type.__name__)
+                if reason:
+                    msg += " ({})".format(reason)
+                try:
+                    raise AssertionError(msg)
+                except AssertionError as synth_err:
+                    fail_detail = create_traceback_detail(synth_err)
+                self._result.add_failure(fail_detail)
+                logger.error(msg)
+            else:
+                # A different exception type was raised — test fails.
+                msg = "Expected {} but got {}: {}".format(
+                    expected_type.__name__, ex_type.__name__, str(ex_inst))
+                try:
+                    raise AssertionError(msg) from ex_inst
+                except AssertionError as synth_err:
+                    fail_detail = create_traceback_detail(synth_err)
+                self._result.add_failure(fail_detail)
+                logger.error(msg)
+
+            handled = True
+        elif ex_type is not None:
 
             if issubclass(ex_type, SkipError):
                 self._result.mark_skip(ex_inst.reason, ex_inst.bug)

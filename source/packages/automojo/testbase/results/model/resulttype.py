@@ -31,3 +31,4 @@ class ResultType(IntEnum):
     STEP = 8
     TASKING_GROUP = 9
     TASKING = 10
+    CHECK = 11

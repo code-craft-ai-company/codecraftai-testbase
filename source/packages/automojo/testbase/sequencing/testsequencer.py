@@ -189,7 +189,7 @@ class TestSequencer:
             - :class:`SequencerTestScope`: Test-level scope context manager
     """
 
-    def __init__(self, jobtitle: str, root: str, includes: Sequence[str], excludes: Sequence[str], metafilters: List[MetaFilter]):
+    def __init__(self, jobtitle: str, root: str, includes: Sequence[str], excludes: Sequence[str], metafilters: List[MetaFilter], job_seed: int = None):
         """
             Creates a :class:`TestSequencer` object which is used to discover tests and control the
             flow of a test run through its various phases.
@@ -254,6 +254,7 @@ class TestSequencer:
         self._recorder = None
         self._root_result = None
         self._scope_stack = []
+        self._job_seed = job_seed
         return
 
     def __enter__(self):
@@ -1118,7 +1119,8 @@ class TestSequencer:
         context = SequencerSessionScope(self, self._recorder, self._root_result)
         return context
 
-    def enter_test_scope_context(self, test_name, notables: Optional[Sequence] = None) -> SequencerTestScope:
+    def enter_test_scope_context(self, test_name, notables: Optional[Sequence] = None,
+                                     expected_failure: dict = None) -> SequencerTestScope:
         """
             Creates and returns a :class:`SequencerTestScope` context manager for entering
             a test-level scope during test execution.
@@ -1132,6 +1134,10 @@ class TestSequencer:
                 tests. These values are used to generate monikers (string identifiers) and
                 pivots (actual values) that distinguish different parameter combinations.
                 Defaults to ``None`` (empty list).
+            :param expected_failure: Optional dictionary from the ``@expect_exception`` decorator
+                containing ``exception_type`` and ``reason``. When provided, the scope exit
+                will mark the test as PASSED if the expected exception is raised, or FAILED
+                if no exception occurs.
 
             :returns: A :class:`SequencerTestScope` context manager instance.
 
@@ -1150,6 +1156,7 @@ class TestSequencer:
                    - SkipError: ``mark_skip()``
                    - AssertionError: ``add_failure()``
                    - Other exception: ``add_error()``
+                   - Expected exception (via ``@expect_exception``): ``mark_passed()``
                 2. The result is finalized and recorded
                 3. The scope is popped from the stack
 
@@ -1173,7 +1180,8 @@ class TestSequencer:
         if notables is None:
             notables = []
 
-        context = SequencerTestScope(self, self._recorder, test_name, notables=notables)
+        context = SequencerTestScope(self, self._recorder, test_name, notables=notables,
+                                     expected_failure=expected_failure)
         return context
 
     def enter_test_setup_context(self, test_name) -> SequencerTestSetupScope:
@@ -1860,6 +1868,59 @@ class TestSequencer:
                 available throughout the test execution.
         """
         return self._recorder
+
+    @property
+    def job_seed(self) -> str:
+        """
+            Returns the job-level seed for reproducible property testing.
+
+            The seed is set by the :class:`TestJob` that creates this sequencer.
+            If no seed was provided, a random UUID is generated on first access.
+
+            :returns: A string seed value (UUID).
+        """
+        if self._job_seed is None:
+            import uuid
+            self._job_seed = str(uuid.uuid4())
+        return self._job_seed
+
+    def run_property_test(self, test_func: 'Callable', test_name: str,
+                          recorder: 'Any', parent_inst: str,
+                          injected_args: 'Dict[str, Any]') -> 'Dict[str, Any]':
+        """
+            Runs a property test function using the :class:`PropertyRunner`.
+
+            This method encapsulates the full property test execution lifecycle:
+            extracting metadata from the ``@given`` decorator, separating strategy
+            parameters from injected parameters, constructing a :class:`PropertyRunner`,
+            and invoking it.
+
+            :param test_func: The ``@given``-decorated test function to run.
+            :param test_name: The fully qualified test name (e.g., ``"pkg.module#test_func"``).
+            :param recorder: The result recorder for writing check results.
+            :param parent_inst: The instance ID of the parent test result.
+            :param injected_args: Dictionary of all injection-resolved parameter values.
+                Strategy-generated parameters are automatically filtered out.
+            :returns: A dictionary containing property test metadata from the runner.
+        """
+        from automojo.testbase.properties.propertyrunner import PropertyRunner
+
+        prop_meta = test_func._property_
+        strategies = prop_meta['strategies']
+        settings = prop_meta['settings']
+
+        # Filter out strategy params from injected args
+        filtered_injected = {k: v for k, v in injected_args.items() if k not in strategies}
+
+        runner = PropertyRunner(
+            settings=settings,
+            job_seed=self.job_seed,
+            test_name=test_name,
+            recorder=recorder,
+            parent_inst=parent_inst
+        )
+
+        return runner.run(test_func, strategies, filtered_injected)
 
     def get_top_scope_id(self) -> str:
         """
@@ -2598,7 +2659,20 @@ class TestSequencer:
                 #   - Handles exceptions and marks results appropriately
                 #   - Records the final result on exit
                 # ------------------------------------------------------------
-                method_lines.append('{}with sequencer.enter_test_scope_context(test_scope_name{}) as tscope:'.format(current_indent, notables_args))
+                # Detect @expect_exception at code-gen time and build the expected_failure arg
+                expect_exception_meta = getattr(child_node._inj_function, '_expect_exception_', None)
+                expected_failure_args = ""
+                if expect_exception_meta is not None:
+                    ex_type = expect_exception_meta['exception_type']
+                    ex_reason = expect_exception_meta.get('reason', '')
+                    # Import the exception class into the generated code
+                    ex_module = ex_type.__module__
+                    ex_name = ex_type.__qualname__
+                    if ex_module != 'builtins':
+                        factory_imports.add("from {} import {}".format(ex_module, ex_name))
+                    expected_failure_args = ", expected_failure={{'exception_type': {}, 'reason': {}}}".format(ex_name, repr(ex_reason))
+
+                method_lines.append('{}with sequencer.enter_test_scope_context(test_scope_name{}{}) as tscope:'.format(current_indent, notables_args, expected_failure_args))
                 current_indent += indent_space
 
                 # ------------------------------------------------------------
@@ -2687,6 +2761,13 @@ class TestSequencer:
                 # ------------------------------------------------------------
                 # Import the test function from its module and call it with
                 # all the accumulated parameters (session, module, and test-local).
+                #
+                # PROPERTY TEST DETECTION (compile-time):
+                # At code-gen time, the test function is already available via
+                # child_node._inj_function (imported during discovery). If the
+                # function has a _property_ attribute (set by the @given
+                # decorator), we generate PropertyRunner invocation code.
+                # Otherwise we generate a direct function call.
                 # ------------------------------------------------------------
                 test_args = []
                 for param_name in test_parameters:
@@ -2694,10 +2775,33 @@ class TestSequencer:
 
                 # Import the test function (done inside the scope for lazy loading)
                 method_lines.append("{}{}from {} import {}".format(current_indent, val_indent, child_node.module_name, child_node.base_name))
+                method_lines.append('')
 
-                # Call the test function with all parameters
-                call_line = '{}{}{}({})'.format(current_indent, val_indent, child_node.base_name, ", ".join(test_args))
-                method_lines.append(call_line)
+                # Detect property tests at code-gen time
+                is_property_test = hasattr(child_node._inj_function, '_property_')
+
+                if is_property_test:
+                    # PROPERTY TEST: delegate to sequencer.run_property_test()
+                    prop_indent = current_indent + val_indent
+                    test_qualified_name = "{}#{}".format(child_node.module_name, child_node.base_name)
+
+                    # Exclude strategy params — they don't exist as variables in the
+                    # generated scope; PropertyRunner generates them at runtime.
+                    strategy_names = set(child_node._inj_function._property_['strategies'].keys())
+                    injected_only = [a for a in test_args if a not in strategy_names]
+
+                    if len(injected_only) > 0:
+                        args_dict = ", ".join(["'{}': {}".format(a, a) for a in injected_only])
+                        method_lines.append("{}sequencer.run_property_test({}, '{}', tscope.recorder, tscope.scope_id, {{{}}})".format(
+                            prop_indent, child_node.base_name, test_qualified_name, args_dict))
+                    else:
+                        method_lines.append("{}sequencer.run_property_test({}, '{}', tscope.recorder, tscope.scope_id, {{}})".format(
+                            prop_indent, child_node.base_name, test_qualified_name))
+                else:
+                    # REGULAR TEST: direct function call (existing behavior)
+                    call_line = '{}{}{}({})'.format(current_indent, val_indent, child_node.base_name, ", ".join(test_args))
+                    method_lines.append(call_line)
+
                 method_lines.append('')
 
                 # ------------------------------------------------------------

@@ -1,9 +1,13 @@
 
 import automojo.testbase as testbase
 
+from automojo.testbase.properties import expect_exception
+
+@expect_exception(Exception, reason="Intentional error for error formatting verification")
 def test_intentional_error():
     raise Exception("Intentional error.")
 
+@expect_exception(AssertionError, reason="Intentional failure for error formatting verification")
 def test_intentional_failure():
     testbase.assert_equal(False, True, "Intentional failure.")
     return

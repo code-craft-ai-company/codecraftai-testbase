@@ -1145,6 +1145,16 @@ class TestSummaryResultItem extends HTMLElement {
                 itemDetailEl.appendChild(taskGroupEl);
             }
         }
+        if ("checks" in testItem && testItem.checks.length > 0) {
+            var checkGroupEl = document.createElement(TestSummaryCheckGroup.tagname);
+            checkGroupEl.syncData(testItem);
+            itemDetailEl.appendChild(checkGroupEl);
+        }
+        if ("property_metadata" in testItem) {
+            var propMetaEl = document.createElement(TestSummaryPropertyMetadata.tagname);
+            propMetaEl.syncData(testItem.property_metadata);
+            itemDetailEl.appendChild(propMetaEl);
+        }
     }
 }
 
@@ -1430,6 +1440,323 @@ class TestSummaryTaskGroup extends HTMLElement {
         }
         grpPassEl.innerHTML = passed.toString();
 
+    }
+}
+
+
+/**
+ * Individual check result component for property test examples.
+ * Displays the generated values, result status, timing, and error/failure details
+ * for a single property test example.
+ */
+class TestSummaryCheckResult extends HTMLElement {
+
+    static tagname = 'testsummary-checkresult'
+
+    static template = `
+        <details>
+            <summary>
+                <div class="ts-results-items-grid">
+                    <span id="id-cris-start" class="ts-results-item-start"></span>
+                    <span id="id-cris-name" class="ts-results-item-name"></span>
+                    <span id="id-cris-error" class="ts-results-item-score"></span>
+                    <span id="id-cris-failure" class="ts-results-item-score"></span>
+                    <span id="id-cris-skip" class="ts-results-item-score"></span>
+                    <span id="id-cris-pass" class="ts-results-item-score"></span>
+                </div>
+            </summary>
+            <div id="id-checkresult-detail">
+                <div class="ts-results-item-detail">
+                    <div class="ts-results-item-prop-row">
+                        <div class="ts-results-item-prop-pair">
+                            <div class="ts-results-item-prop-label">Example</div>
+                            <div id="id-crip-index-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                        <div class="ts-results-item-prop-pair">
+                            <div class="ts-results-item-prop-label">Seed</div>
+                            <div id="id-crip-seed-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                        <div class="ts-results-item-prop-pair">
+                            <div class="ts-results-item-prop-label">Start</div>
+                            <div id="id-crip-start-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                        <div class="ts-results-item-prop-pair">
+                            <div class="ts-results-item-prop-label">Stop</div>
+                            <div id="id-crip-stop-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                        <div class="ts-results-item-prop-pair">
+                            <div class="ts-results-item-prop-label">Elapsed</div>
+                            <div id="id-crip-elapsed-value" class="ts-results-item-prop-value"></div>
+                        </div>
+                    </div>
+                    <div id="id-crip-generated-values" class="ts-results-item-prop-row"></div>
+                </div>
+            </div>
+        </details>
+    `
+
+    constructor() {
+        super();
+        const shadowRoot = this.attachShadow({ mode: 'open' })
+        shadowRoot.innerHTML = this.getTemplate();
+        addGlobalStylesToShadowRoot(shadowRoot);
+    }
+
+    getTemplate() {
+        return TestSummaryCheckResult.template;
+    }
+
+    syncData(checkItem) {
+        var genVals = checkItem.generated_values || {};
+        var genValsStr = Object.keys(genVals).map(function (k) { return k + "=" + JSON.stringify(genVals[k]); }).join(", ");
+
+        var itemNameEl = this.shadowRoot.querySelector("#id-cris-name");
+        itemNameEl.innerHTML = checkItem.name + " (" + genValsStr + ")";
+
+        var itemStartEl = this.shadowRoot.querySelector("#id-cris-start");
+        itemStartEl.innerHTML = checkItem.start;
+
+        var errored = checkItem.result == "ERRORED" ? 1 : 0;
+        var failed = checkItem.result == "FAILED" ? 1 : 0;
+        var skipped = checkItem.result == "SKIPPED" ? 1 : 0;
+        var passed = checkItem.result == "PASSED" ? 1 : 0;
+
+        var detailsEl = this.shadowRoot.querySelector("details");
+        var summaryEl = this.shadowRoot.querySelector("summary");
+        var statusOutlineColor = "var(--color-ghost)";
+        var statusBackgroundColor = "var(--color-ghost-background)";
+        if (errored > 0) {
+            statusOutlineColor = "var(--color-error)";
+            statusBackgroundColor = "var(--color-error-background)";
+        } else if (failed > 0) {
+            statusOutlineColor = "var(--color-fail)";
+            statusBackgroundColor = "var(--color-fail-background)";
+        } else if (passed > 0) {
+            statusOutlineColor = "var(--color-pass)";
+            statusBackgroundColor = "var(--color-pass-background)";
+        }
+        summaryEl.style.backgroundColor = statusBackgroundColor;
+        detailsEl.style.border = "1px solid " + statusOutlineColor;
+
+        var itemErrorEl = this.shadowRoot.querySelector("#id-cris-error");
+        itemErrorEl.classList.add(errored > 0 ? "color-error" : "color-ghost");
+        itemErrorEl.innerHTML = errored.toString();
+
+        var itemFailureEl = this.shadowRoot.querySelector("#id-cris-failure");
+        itemFailureEl.classList.add(failed > 0 ? "color-fail" : "color-ghost");
+        itemFailureEl.innerHTML = failed.toString();
+
+        var itemSkipEl = this.shadowRoot.querySelector("#id-cris-skip");
+        itemSkipEl.classList.add(skipped > 0 ? "color-skip" : "color-ghost");
+        itemSkipEl.innerHTML = skipped.toString();
+
+        var itemPassEl = this.shadowRoot.querySelector("#id-cris-pass");
+        itemPassEl.classList.add(passed > 0 ? "color-pass" : "color-ghost");
+        itemPassEl.innerHTML = passed.toString();
+
+        // Detail values
+        var indexValEl = this.shadowRoot.querySelector("#id-crip-index-value");
+        indexValEl.innerHTML = (checkItem.example_index !== undefined) ? checkItem.example_index.toString() : "";
+
+        var seedValEl = this.shadowRoot.querySelector("#id-crip-seed-value");
+        seedValEl.innerHTML = (checkItem.seed !== undefined) ? checkItem.seed.toString() : "";
+
+        var startValEl = this.shadowRoot.querySelector("#id-crip-start-value");
+        startValEl.innerHTML = checkItem.start;
+
+        var stopValEl = this.shadowRoot.querySelector("#id-crip-stop-value");
+        stopValEl.innerHTML = checkItem.stop;
+
+        var elapsed = get_time_difference(checkItem.start, checkItem.stop);
+        var elapsedValEl = this.shadowRoot.querySelector("#id-crip-elapsed-value");
+        elapsedValEl.innerHTML = elapsed;
+
+        // Generated values
+        var genValsEl = this.shadowRoot.querySelector("#id-crip-generated-values");
+        for (var key of Object.keys(genVals)) {
+            var pairEl = document.createElement("div");
+            pairEl.classList.add("ts-results-item-prop-pair");
+            pairEl.innerHTML = '<div class="ts-results-item-prop-label">' + key +
+                '</div><div class="ts-results-item-prop-value">' +
+                JSON.stringify(genVals[key]) + '</div>';
+            genValsEl.appendChild(pairEl);
+        }
+
+        // Error/failure detail
+        var detailEl = this.shadowRoot.querySelector("#id-checkresult-detail");
+        if (checkItem.detail && checkItem.detail.errors && checkItem.detail.errors.length > 0) {
+            var errorsCollapsibleEl = document.createElement(TestSummaryErrorsCollapsible.tagname);
+            errorsCollapsibleEl.syncData(checkItem.detail.errors);
+            detailEl.appendChild(errorsCollapsibleEl);
+        }
+        if (checkItem.detail && checkItem.detail.failures && checkItem.detail.failures.length > 0) {
+            var failsCollapsibleEl = document.createElement(TestSummaryFailuresCollapsible.tagname);
+            failsCollapsibleEl.syncData(checkItem.detail.failures);
+            detailEl.appendChild(failsCollapsibleEl);
+        }
+    }
+}
+
+
+/**
+ * Check group component that aggregates multiple check results from a property test.
+ * Displays pass/fail/error counters and contains individual TestSummaryCheckResult elements.
+ */
+class TestSummaryCheckGroup extends HTMLElement {
+
+    static tagname = 'testsummary-checkgroup'
+
+    static template = `
+        <details>
+            <summary id="id-cgrp-summary">
+                <div class="ts-results-grp-grid">
+                    <span id="id-cgs-name" class="ts-results-grp-name"></span>
+                    <span id="id-cgs-error" class="ts-results-grp-score"></span>
+                    <span id="id-cgs-failure" class="ts-results-grp-score"></span>
+                    <span id="id-cgs-skip" class="ts-results-grp-score"></span>
+                    <span id="id-cgs-pass" class="ts-results-grp-score"></span>
+                </div>
+            </summary>
+            <div id="id-checkgroup-detail" style="margin-left: 20px;">
+            </div>
+        </details>
+    `
+
+    constructor() {
+        super();
+        const shadowRoot = this.attachShadow({ mode: 'open' })
+        shadowRoot.innerHTML = this.getTemplate();
+        addGlobalStylesToShadowRoot(shadowRoot);
+    }
+
+    getTemplate() {
+        return TestSummaryCheckGroup.template;
+    }
+
+    syncData(testItem) {
+        var grpDetailEl = this.shadowRoot.querySelector("#id-checkgroup-detail");
+        grpDetailEl.innerHTML = "";
+
+        var grpNameEl = this.shadowRoot.querySelector("#id-cgs-name");
+        grpNameEl.innerHTML = "Property Checks";
+
+        var errored = testItem.checks_errored || 0;
+        var failed = testItem.checks_failed || 0;
+        var passed = testItem.checks_passed || 0;
+
+        if (testItem.checks) {
+            for (const checkItem of testItem.checks) {
+                var checkItemEl = document.createElement(TestSummaryCheckResult.tagname);
+                checkItemEl.syncData(checkItem);
+                grpDetailEl.appendChild(checkItemEl);
+            }
+        }
+
+        var grpSummaryEl = this.shadowRoot.querySelector("#id-cgrp-summary");
+        var grpDetailsEl = this.shadowRoot.querySelector("details");
+        var grpStatusColor = "var(--color-pass)";
+        var grpStatusBackground = "var(--color-pass-background)";
+        if (errored > 0) {
+            grpStatusColor = "var(--color-error)";
+            grpStatusBackground = "var(--color-error-background)";
+        } else if (failed > 0) {
+            grpStatusColor = "var(--color-fail)";
+            grpStatusBackground = "var(--color-fail-background)";
+        } else if (passed === 0) {
+            grpStatusColor = "var(--color-ghost)";
+            grpStatusBackground = "var(--color-ghost-background)";
+        }
+        grpSummaryEl.style.backgroundColor = grpStatusBackground;
+        grpDetailsEl.style.border = "1px solid " + grpStatusColor;
+
+        var grpErrorEl = this.shadowRoot.querySelector("#id-cgs-error");
+        grpErrorEl.classList.add(errored > 0 ? "color-error" : "color-ghost");
+        grpErrorEl.innerHTML = errored.toString();
+
+        var grpFailEl = this.shadowRoot.querySelector("#id-cgs-failure");
+        grpFailEl.classList.add(failed > 0 ? "color-fail" : "color-ghost");
+        grpFailEl.innerHTML = failed.toString();
+
+        var grpSkipEl = this.shadowRoot.querySelector("#id-cgs-skip");
+        grpSkipEl.classList.add("color-ghost");
+        grpSkipEl.innerHTML = "0";
+
+        var grpPassEl = this.shadowRoot.querySelector("#id-cgs-pass");
+        grpPassEl.classList.add(passed > 0 ? "color-pass" : "color-ghost");
+        grpPassEl.innerHTML = passed.toString();
+    }
+}
+
+
+/**
+ * Property metadata component displaying seed, examples, strategies, and counterexample
+ * information for a property test. Extends MojoCollapsible for expandable UI.
+ */
+class TestSummaryPropertyMetadata extends MojoCollapsible {
+
+    static tagname = 'testsummary-property-metadata'
+
+    static template = `
+        <div id="id-collapsible-container" class="mojo-collapsible">
+            <div id="id-collapsible-button" class="mojo-collapsible-button">
+                <div id="id-header-text" class="mojo-collapsible-header"></div>
+                <div id="id-header-icon" class="mojo-collapsible-icon">+</div>
+            </div>
+            <div id="id-collapsible-content" class="ts-collapsible-content">
+                <div id="id-prop-meta-detail" class="ts-results-item-detail"></div>
+            </div>
+        </div>
+    `
+
+    constructor() {
+        super();
+    }
+
+    getTemplate() {
+        return TestSummaryPropertyMetadata.template;
+    }
+
+    syncData(propMeta) {
+        var detailEl = this.shadowRoot.querySelector("#id-prop-meta-detail");
+        detailEl.innerHTML = "";
+
+        if (propMeta.seed !== undefined) {
+            detailEl.innerHTML += '<div class="ts-results-item-prop-row"><div class="ts-results-item-prop-pair">' +
+                '<div class="ts-results-item-prop-label">Seed</div>' +
+                '<div class="ts-results-item-prop-value">' + propMeta.seed + '</div></div></div>';
+        }
+        if (propMeta.job_seed !== undefined) {
+            detailEl.innerHTML += '<div class="ts-results-item-prop-row"><div class="ts-results-item-prop-pair">' +
+                '<div class="ts-results-item-prop-label">Job Seed</div>' +
+                '<div class="ts-results-item-prop-value">' + propMeta.job_seed + '</div></div></div>';
+        }
+        if (propMeta.examples_run !== undefined) {
+            detailEl.innerHTML += '<div class="ts-results-item-prop-row"><div class="ts-results-item-prop-pair">' +
+                '<div class="ts-results-item-prop-label">Examples Run</div>' +
+                '<div class="ts-results-item-prop-value">' + propMeta.examples_run + ' / ' + propMeta.max_examples + '</div></div></div>';
+        }
+        if (propMeta.strategy_descriptions) {
+            var stratRow = '<div class="ts-results-item-prop-row">';
+            for (var key of Object.keys(propMeta.strategy_descriptions)) {
+                stratRow += '<div class="ts-results-item-prop-pair">' +
+                    '<div class="ts-results-item-prop-label">' + key + '</div>' +
+                    '<div class="ts-results-item-prop-value">' + propMeta.strategy_descriptions[key] + '</div></div>';
+            }
+            stratRow += '</div>';
+            detailEl.innerHTML += stratRow;
+        }
+        if (propMeta.counterexample) {
+            var ceRow = '<div class="ts-results-item-prop-row">';
+            for (var key of Object.keys(propMeta.counterexample)) {
+                ceRow += '<div class="ts-results-item-prop-pair">' +
+                    '<div class="ts-results-item-prop-label">counterexample.' + key + '</div>' +
+                    '<div class="ts-results-item-prop-value">' + JSON.stringify(propMeta.counterexample[key]) + '</div></div>';
+            }
+            ceRow += '</div>';
+            detailEl.innerHTML += ceRow;
+        }
+
+        super.syncData("Property Metadata", undefined, false);
     }
 }
 
@@ -3162,6 +3489,9 @@ function register_testsummary_components() {
     customElements.define(TestSummaryImportFailureTrace.tagname, TestSummaryImportFailureTrace);
     customElements.define(TestSummaryTaskGroup.tagname, TestSummaryTaskGroup);
     customElements.define(TestSummaryTaskResult.tagname, TestSummaryTaskResult);
+    customElements.define(TestSummaryCheckGroup.tagname, TestSummaryCheckGroup);
+    customElements.define(TestSummaryCheckResult.tagname, TestSummaryCheckResult);
+    customElements.define(TestSummaryPropertyMetadata.tagname, TestSummaryPropertyMetadata);
     customElements.define(TestSummaryResultGroup.tagname, TestSummaryResultGroup);
     customElements.define(TestSummaryResultItem.tagname, TestSummaryResultItem);
     customElements.define(TestSummaryResultDetail.tagname, TestSummaryResultDetail);

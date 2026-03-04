@@ -67,9 +67,9 @@ class AssertionFunctionTests(unittest.TestCase):
         # correct type should not raise
         assert_type(3, int, api='T')
 
-    def test_assert_not_equal_bug(self):
-        """Ensure current buggy behaviour raises NameError when values match."""
-        with self.assertRaises(NameError):
+    def test_assert_not_equal_raises_on_equal_values(self):
+        """Ensure assert_not_equal raises AssertionError when values match."""
+        with self.assertRaises(AssertionError):
             assert_not_equal(1, 1)
 
 

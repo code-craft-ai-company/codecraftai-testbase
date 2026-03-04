@@ -191,6 +191,13 @@ class TestbaseRootCommandRuntimeInitializationTests(unittest.TestCase):
 class TestbaseRootCommandGroupRegistrationTests(unittest.TestCase):
     """Tests for command group registration (Requirements 2.1-2.3)."""
 
+    def test_agents_group_is_registered(self):
+        """Test that agents group is registered to root command."""
+        from automojo.testbase.cli.testbase_command import testbase_root_command
+
+        command_nodes = testbase_root_command._command_nodes
+        self.assertIn("agents", command_nodes)
+
     def test_services_group_is_registered(self):
         """Test that services group is registered to root command (Requirement 2.1)."""
         from automojo.testbase.cli.testbase_command import testbase_root_command
@@ -212,12 +219,12 @@ class TestbaseRootCommandGroupRegistrationTests(unittest.TestCase):
         command_nodes = testbase_root_command._command_nodes
         self.assertIn("utilities", command_nodes)
 
-    def test_has_three_command_groups(self):
-        """Test that root command has exactly three command groups."""
+    def test_has_four_command_groups(self):
+        """Test that root command has exactly four command groups."""
         from automojo.testbase.cli.testbase_command import testbase_root_command
 
         command_nodes = testbase_root_command._command_nodes
-        self.assertEqual(len(command_nodes), 3)
+        self.assertEqual(len(command_nodes), 4)
 
 
 if __name__ == '__main__':

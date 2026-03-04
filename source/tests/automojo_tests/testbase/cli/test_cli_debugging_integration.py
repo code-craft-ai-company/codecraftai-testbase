@@ -67,7 +67,7 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger='pdb', breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
                 include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
@@ -101,7 +101,7 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger='debugpy', breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
                 include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
@@ -135,7 +135,7 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=['test-discovery'], debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
                 include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
@@ -169,7 +169,7 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=['testrun-start'], debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
                 include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
@@ -203,7 +203,7 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger='debugpy', breakpoints=['test-discovery', 'testrun-start'],
                 debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
@@ -239,7 +239,7 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=['testrun-start'], debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
                 include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
@@ -274,7 +274,7 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
                 include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None

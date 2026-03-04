@@ -18,7 +18,7 @@
 
 import unittest
 
-from hypothesis import given, settings, assume
+from hypothesis import given, settings, assume, HealthCheck
 from hypothesis import strategies as st
 
 from automojo.testbase.injection.injectionscope import InjectionScope
@@ -168,7 +168,7 @@ class InjectionScopePropertyTests(unittest.TestCase):
         )
 
     @given(multiple_origins_strategy())
-    @settings(max_examples=100)
+    @settings(max_examples=100, suppress_health_check=[HealthCheck.too_slow])
     def test_property_all_registered_origins_are_retrievable(self, origins):
         """
         **Feature: dependencies, Property 1: Registered origins retrievable**

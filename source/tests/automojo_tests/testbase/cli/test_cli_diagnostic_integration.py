@@ -73,7 +73,7 @@ class CLIDiagnosticIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=True, postrun_diagnostic=False,
                 diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
@@ -114,7 +114,7 @@ class CLIDiagnosticIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=True,
                 diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
@@ -153,7 +153,7 @@ class CLIDiagnosticIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=True, postrun_diagnostic=True,
                 diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
@@ -194,7 +194,7 @@ class CLIDiagnosticIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
                 diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
@@ -257,7 +257,7 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
                 diagnostic_level="5", include_marker_exp=None, exclude_marker_exp=None
@@ -294,7 +294,7 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
                 diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
@@ -333,7 +333,7 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                     root=tmpdir, includes=None, excludes=None, output=None,
                     start=None, runid=None, branch=None, build=None, flavor=None,
                     job_id=None, job_initiator=None, job_label=None, job_name=None,
-                    job_owner=None, console_level=None, logfile_level=None,
+                    job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                     debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                     debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
                     diagnostic_level="10", include_marker_exp=None, exclude_marker_exp=None
@@ -371,7 +371,7 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                     root=tmpdir, includes=None, excludes=None, output=None,
                     start=None, runid=None, branch=None, build=None, flavor=None,
                     job_id=None, job_initiator=None, job_label=None, job_name=None,
-                    job_owner=None, console_level=None, logfile_level=None,
+                    job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                     debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                     debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
                     diagnostic_level="abc", include_marker_exp=None, exclude_marker_exp=None
@@ -408,7 +408,7 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                 root=tmpdir, includes=None, excludes=None, output=None,
                 start=None, runid=None, branch=None, build=None, flavor=None,
                 job_id=None, job_initiator=None, job_label=None, job_name=None,
-                job_owner=None, console_level=None, logfile_level=None,
+                job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=True, postrun_diagnostic=False,
                 diagnostic_level="3", include_marker_exp=None, exclude_marker_exp=None

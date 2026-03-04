@@ -242,8 +242,8 @@ def command_testbase_testing_run(root: Optional[str], includes: Optional[List[st
 
     for exmexp in exclude_marker_exp:
         exmexp = exmexp.strip("\"")
-        imexp = imexp.strip("'")
-        mfilter = parse_marker_expression("-" + imexp)
+        exmexp = exmexp.strip("'")
+        mfilter = parse_marker_expression("-" + exmexp)
         metafilters.append(mfilter)
 
 

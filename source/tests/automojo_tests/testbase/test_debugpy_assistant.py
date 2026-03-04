@@ -28,6 +28,17 @@ class DebugPyAssistantTests(unittest.TestCase):
         self.mock_debugpy.wait_for_client = MagicMock(side_effect=InterruptedError)
         self.mock_debugpy.breakpoint = MagicMock()
         self.mock_debugpy.is_client_connected = MagicMock(return_value=False)
+        self._assistant = None
+
+    def tearDown(self):
+        """
+        Ensure any DebugPyAssistant daemon threads are stopped and joined.
+        """
+        if self._assistant is not None:
+            self._assistant._running = False
+            if self._assistant.thread.is_alive():
+                self._assistant.thread.join(timeout=2)
+            self._assistant = None
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_initialization_creates_thread(self):
@@ -42,13 +53,10 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
-        self.assertIsNotNone(assistant.thread)
-        self.assertIsInstance(assistant.thread, threading.Thread)
-        
-        # Clean up - stop the thread
-        assistant._running = False
+        self.assertIsNotNone(self._assistant.thread)
+        self.assertIsInstance(self._assistant.thread, threading.Thread)
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_thread_is_daemon(self):
@@ -63,12 +71,9 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
-        self.assertTrue(assistant.thread.daemon)
-        
-        # Clean up
-        assistant._running = False
+        self.assertTrue(self._assistant.thread.daemon)
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_default_endpoint(self):
@@ -83,13 +88,10 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant, PORT_DEBUGPY_ASSISTANT
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
-        self.assertEqual(assistant.endpoint, ("0.0.0.0", PORT_DEBUGPY_ASSISTANT))
-        self.assertEqual(assistant.endpoint, ("0.0.0.0", 5679))
-        
-        # Clean up
-        assistant._running = False
+        self.assertEqual(self._assistant.endpoint, ("0.0.0.0", PORT_DEBUGPY_ASSISTANT))
+        self.assertEqual(self._assistant.endpoint, ("0.0.0.0", 5679))
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_custom_endpoint(self):
@@ -105,12 +107,9 @@ class DebugPyAssistantTests(unittest.TestCase):
         from automojo.xmodules.debugging import DebugPyAssistant
         
         custom_endpoint = ("127.0.0.1", 9999)
-        assistant = DebugPyAssistant(endpoint=custom_endpoint)
+        self._assistant = DebugPyAssistant(endpoint=custom_endpoint)
         
-        self.assertEqual(assistant.endpoint, custom_endpoint)
-        
-        # Clean up
-        assistant._running = False
+        self.assertEqual(self._assistant.endpoint, custom_endpoint)
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_default_thread_name(self):
@@ -125,12 +124,9 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
-        self.assertEqual(assistant.thread.name, "DebugPyAssistant")
-        
-        # Clean up
-        assistant._running = False
+        self.assertEqual(self._assistant.thread.name, "DebugPyAssistant")
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_custom_thread_name(self):
@@ -146,12 +142,9 @@ class DebugPyAssistantTests(unittest.TestCase):
         from automojo.xmodules.debugging import DebugPyAssistant
         
         custom_name = "CustomDebugAssistant"
-        assistant = DebugPyAssistant(name=custom_name)
+        self._assistant = DebugPyAssistant(name=custom_name)
         
-        self.assertEqual(assistant.thread.name, custom_name)
-        
-        # Clean up
-        assistant._running = False
+        self.assertEqual(self._assistant.thread.name, custom_name)
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_endpoint_property_returns_tuple(self):
@@ -166,16 +159,13 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
-        endpoint = assistant.endpoint
+        endpoint = self._assistant.endpoint
         self.assertIsInstance(endpoint, tuple)
         self.assertEqual(len(endpoint), 2)
         self.assertIsInstance(endpoint[0], str)
         self.assertIsInstance(endpoint[1], int)
-        
-        # Clean up
-        assistant._running = False
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_thread_property_returns_thread_object(self):
@@ -190,12 +180,9 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
-        self.assertIsInstance(assistant.thread, threading.Thread)
-        
-        # Clean up
-        assistant._running = False
+        self.assertIsInstance(self._assistant.thread, threading.Thread)
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_thread_is_started_on_init(self):
@@ -210,15 +197,12 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
         # Thread should be alive after initialization
         # Note: It may have already terminated due to the mock raising InterruptedError
         # but it should have been started
-        self.assertTrue(assistant.thread.is_alive() or not assistant.thread.is_alive())
-        
-        # Clean up
-        assistant._running = False
+        self.assertTrue(self._assistant.thread.is_alive() or not self._assistant.thread.is_alive())
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_endpoint_property_is_read_only(self):
@@ -233,14 +217,11 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
         # Attempting to set endpoint should raise AttributeError
         with self.assertRaises(AttributeError):
-            assistant.endpoint = ("localhost", 1234)
-        
-        # Clean up
-        assistant._running = False
+            self._assistant.endpoint = ("localhost", 1234)
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_thread_property_is_read_only(self):
@@ -255,14 +236,11 @@ class DebugPyAssistantTests(unittest.TestCase):
         
         from automojo.xmodules.debugging import DebugPyAssistant
         
-        assistant = DebugPyAssistant()
+        self._assistant = DebugPyAssistant()
         
         # Attempting to set thread should raise AttributeError
         with self.assertRaises(AttributeError):
-            assistant.thread = threading.Thread()
-        
-        # Clean up
-        assistant._running = False
+            self._assistant.thread = threading.Thread()
 
 
 if __name__ == "__main__":

@@ -33,6 +33,7 @@ from automojo.errors.xtraceback import (
     create_traceback_detail
 )
 
+from automojo.testbase.properties.assumptions import UnsatisfiedAssumption
 from automojo.testbase.properties.propertysettings import PropertySettings
 from automojo.testbase.properties.strategies import Strategy
 
@@ -143,6 +144,8 @@ class PropertyRunner:
         """
         max_examples = self._settings.max_examples
         examples_run = 0
+        assumptions_rejected = 0
+        max_rejections = 50 * max_examples
         counterexample = None
         first_failure_error = None
         first_failure_traceback = None
@@ -151,14 +154,23 @@ class PropertyRunner:
             name: strategy.describe() for name, strategy in strategies.items()
         }
 
-        for i in range(max_examples):
+        example_index = 0
+
+        while examples_run < max_examples:
+            # Check for too many assumption rejections
+            if assumptions_rejected >= max_rejections:
+                raise RuntimeError(
+                    f"Too many assumption rejections ({assumptions_rejected}) "
+                    f"after {examples_run} successful examples. This usually "
+                    f"means the preconditions in assume() are too restrictive "
+                    f"for the strategies being used."
+                )
+
             # Generate values for this example
             generated_values = {
                 name: strategy.generate(self._rng)
                 for name, strategy in strategies.items()
             }
-
-            examples_run += 1
 
             # Merge injected and generated args
             all_args = {}
@@ -167,14 +179,14 @@ class PropertyRunner:
 
             # Create a check result for this example
             check_inst_id = str(uuid.uuid4())
-            check_name = f"check_{i:04d}"
+            check_name = f"check_{example_index:04d}"
 
             check_result = CheckResult(
                 inst_id=check_inst_id,
                 name=check_name,
                 parent_inst=self._parent_inst,
                 generated_values=generated_values,
-                example_index=i,
+                example_index=example_index,
                 seed=self._test_seed,
                 result_code=ResultCode.UNSET
             )
@@ -188,6 +200,14 @@ class PropertyRunner:
                 # Example passed — mark and record
                 check_result.finalize()
                 self._recorder.record(check_result)
+                examples_run += 1
+                example_index += 1
+
+            except UnsatisfiedAssumption:
+                # Precondition not met — skip this example entirely
+                assumptions_rejected += 1
+                example_index += 1
+                continue
 
             except AssertionError as ae:
                 # Property assertion failure
@@ -196,6 +216,7 @@ class PropertyRunner:
                 check_result.add_failure(tb_detail)
                 check_result.finalize()
                 self._recorder.record(check_result)
+                examples_run += 1
 
                 # Store first failure for shrinking
                 counterexample = generated_values
@@ -224,11 +245,12 @@ class PropertyRunner:
                     "max_examples": max_examples,
                     "seed": self._test_seed,
                     "job_seed": self._job_seed,
+                    "assumptions_rejected": assumptions_rejected,
                     "strategy_descriptions": strategy_descriptions,
                 }
 
                 raise RuntimeError(
-                    f"Property test errored on example {i}: {ex!r}"
+                    f"Property test errored on example {example_index}: {ex!r}"
                 ) from ex
 
         # Build property metadata
@@ -238,6 +260,7 @@ class PropertyRunner:
             "max_examples": max_examples,
             "seed": self._test_seed,
             "job_seed": self._job_seed,
+            "assumptions_rejected": assumptions_rejected,
             "strategy_descriptions": strategy_descriptions,
         }
 

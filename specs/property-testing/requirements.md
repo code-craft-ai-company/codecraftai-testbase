@@ -223,3 +223,51 @@ for tasking-based tests.
 6. THE check results section SHALL display summary counters (passed, failed, errored) following the same visual pattern used by `TestSummaryTaskGroup`
 7. WHEN a property test result includes `property_metadata`, THE `TestSummaryResultItem` component SHALL display seed, examples_run, max_examples, and strategy descriptions in the test detail area
 8. THE `ResultRecorder.consolidate_results()` method SHALL handle `ResultType.CHECK` records by attaching them to their parent TEST node's `checks` list
+
+### Requirement 15: Strategy Combinators
+
+**User Story:** As a test author, I want to transform, filter, and chain strategies, so that I can adapt built-in strategies to my domain without writing full composite strategies for simple cases.
+
+#### Acceptance Criteria
+
+1. THE `Strategy` base class SHALL provide a `.map(fn)` method that returns a new strategy which applies the function `fn` to each generated value
+2. THE mapped strategy SHALL preserve deterministic generation — the same seed SHALL produce the same mapped output
+3. THE `Strategy` base class SHALL provide a `.filter(predicate)` method that returns a new strategy which only yields values satisfying the predicate
+4. THE filtered strategy SHALL retry generation up to a configurable maximum number of attempts (default: 100) before raising an error
+5. WHEN the filter exhausts its maximum retries without finding a satisfying value, THE strategy SHALL raise an `UnsatisfiedAssumption` exception
+6. THE `Strategy` base class SHALL provide a `.flatmap(fn)` method that returns a new strategy which generates a value, passes it to `fn` to obtain a second strategy, and then generates from that second strategy
+7. ALL combinator methods SHALL return `Strategy` instances that support `generate()`, `shrink()`, and `describe()`
+8. THE `describe()` output for combinator strategies SHALL include the source strategy description (e.g., `integers().filter(...)`)
+
+### Requirement 16: Additional Built-in Strategies
+
+**User Story:** As a test author, I want strategies for commonly used Python types beyond the initial set, so that I can generate bytes, sets, frozensets, fixed-schema dictionaries, and object instances without custom boilerplate.
+
+#### Acceptance Criteria
+
+1. THE `strategies` module SHALL provide a `none()` function that returns a strategy always generating `None`
+2. THE `strategies` module SHALL provide a `binary(min_size, max_size)` function that returns a strategy generating `bytes` objects with lengths in the specified range
+3. THE `binary` strategy SHALL support shrinking toward empty bytes, then shorter byte sequences
+4. THE `strategies` module SHALL provide a `sets(element, min_size, max_size)` function that returns a strategy generating `set` objects with elements from the given element strategy
+5. THE `sets` strategy SHALL support shrinking by removing elements
+6. THE `strategies` module SHALL provide a `frozensets(element, min_size, max_size)` function that returns a strategy generating `frozenset` objects
+7. THE `strategies` module SHALL provide a `fixed_dictionaries(mapping)` function that accepts a dictionary mapping string keys to `Strategy` instances and generates dictionaries with exactly those keys, each value drawn from its corresponding strategy
+8. THE `fixed_dictionaries` strategy SHALL shrink by shrinking individual values
+9. THE `strategies` module SHALL provide a `builds(target, *args, **kwargs)` function that accepts a callable and strategies for its arguments, and generates instances by calling the target with generated values
+10. ALL new strategies SHALL use only Python standard library modules
+11. ALL new strategies SHALL provide `describe()` methods returning human-readable descriptions
+12. ALL new strategies SHALL support deterministic generation via `random.Random` instances
+
+### Requirement 17: Assume Function
+
+**User Story:** As a test author, I want to discard invalid generated examples mid-test without counting them as failures, so that I can express preconditions on generated data that are difficult to encode purely in strategy filters.
+
+#### Acceptance Criteria
+
+1. THE `automojo.testbase.properties` module SHALL provide an `assume(condition)` function
+2. WHEN `assume()` is called with a falsy condition, THE function SHALL raise an `UnsatisfiedAssumption` exception
+3. WHEN `assume()` is called with a truthy condition, THE function SHALL return without side effects
+4. THE `PropertyRunner` SHALL catch `UnsatisfiedAssumption` exceptions during example execution and skip that example without recording a failure
+5. WHEN an example is skipped due to `assume()`, THE `PropertyRunner` SHALL NOT count it toward `examples_run` and SHALL NOT create a `CheckResult` for it
+6. THE `PropertyRunner` SHALL track the number of rejected assumptions in the property test metadata as `assumptions_rejected`
+7. WHEN the number of consecutive rejected assumptions exceeds a threshold (default: 50 × `max_examples`), THE `PropertyRunner` SHALL abort the test with an error indicating too many rejected examples

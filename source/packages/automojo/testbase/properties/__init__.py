@@ -33,6 +33,8 @@ from automojo.testbase.properties.decorators import (
     expect_exception
 )
 
+from automojo.testbase.properties.assumptions import assume
+
 from automojo.testbase.properties import strategies
 from automojo.testbase.properties import strategies as st
 

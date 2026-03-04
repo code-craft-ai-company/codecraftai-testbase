@@ -12,6 +12,7 @@ import random
 from automojo.testbase.properties.propertyrunner import PropertyRunner, derive_test_seed
 from automojo.testbase.properties.propertysettings import PropertySettings
 from automojo.testbase.properties.strategies import integers, text, booleans
+from automojo.testbase.properties.assumptions import assume, UnsatisfiedAssumption
 
 from automojo.testbase.results.model.checkresult import CheckResult
 from automojo.testbase.results.model.resultcode import ResultCode
@@ -334,6 +335,94 @@ class PropertyRunnerReproducibilityTests(unittest.TestCase):
         runner2.run(make_test(captured2), strategies, {})
 
         self.assertNotEqual(captured1, captured2)
+
+
+class PropertyRunnerAssumeTests(unittest.TestCase):
+    """Tests for assume() integration with PropertyRunner."""
+
+    def test_assume_skips_invalid_examples(self):
+        """Test that assume(False) causes the example to be skipped."""
+        ps = PropertySettings(max_examples=10, seed=42)
+        recorder = MockRecorder()
+        runner = PropertyRunner(ps, 42, "test_assume", recorder, "parent-001")
+
+        call_count = [0]
+
+        def test_func(x):
+            assume(x > 50)  # Skip roughly half the examples
+            call_count[0] += 1
+
+        strategies = {"x": integers(0, 100)}
+        metadata = runner.run(test_func, strategies, {})
+
+        # Should have run exactly 10 passing examples
+        self.assertEqual(metadata["examples_run"], 10)
+        # Some assumptions should have been rejected
+        self.assertGreater(metadata["assumptions_rejected"], 0)
+
+    def test_assume_true_is_noop(self):
+        """Test that assume(True) has no effect."""
+        ps = PropertySettings(max_examples=5, seed=42)
+        recorder = MockRecorder()
+        runner = PropertyRunner(ps, 42, "test_assume_true", recorder, "parent-001")
+
+        def test_func(x):
+            assume(True)
+
+        strategies = {"x": integers(0, 10)}
+        metadata = runner.run(test_func, strategies, {})
+
+        self.assertEqual(metadata["examples_run"], 5)
+        self.assertEqual(metadata["assumptions_rejected"], 0)
+
+    def test_assume_no_check_result_for_skipped(self):
+        """Test that skipped examples don't produce CheckResults."""
+        ps = PropertySettings(max_examples=5, seed=42)
+        recorder = MockRecorder()
+        runner = PropertyRunner(ps, 42, "test_no_check", recorder, "parent-001")
+
+        def test_func(x):
+            assume(x > 50)
+
+        strategies = {"x": integers(0, 100)}
+        metadata = runner.run(test_func, strategies, {})
+
+        # Only passing examples should have CheckResults
+        passed_checks = [cr for cr in recorder.recorded
+                         if cr.result_code == ResultCode.PASSED]
+        self.assertEqual(len(passed_checks), 5)
+        self.assertEqual(metadata["examples_run"], 5)
+
+    def test_assume_too_many_rejections_aborts(self):
+        """Test that too many assumption rejections cause an error."""
+        ps = PropertySettings(max_examples=2, seed=42)
+        recorder = MockRecorder()
+        runner = PropertyRunner(ps, 42, "test_abort", recorder, "parent-001")
+
+        def test_func(x):
+            assume(False)  # Always reject
+
+        strategies = {"x": integers(0, 10)}
+
+        with self.assertRaises(RuntimeError) as ctx:
+            runner.run(test_func, strategies, {})
+
+        self.assertIn("too many assumption rejections", str(ctx.exception).lower())
+
+    def test_assume_metadata_includes_rejection_count(self):
+        """Test that assumptions_rejected appears in metadata."""
+        ps = PropertySettings(max_examples=10, seed=42)
+        recorder = MockRecorder()
+        runner = PropertyRunner(ps, 42, "test_meta", recorder, "parent-001")
+
+        def test_func(x):
+            assume(x % 2 == 0)
+
+        strategies = {"x": integers(0, 100)}
+        metadata = runner.run(test_func, strategies, {})
+
+        self.assertIn("assumptions_rejected", metadata)
+        self.assertIsInstance(metadata["assumptions_rejected"], int)
 
 
 if __name__ == '__main__':

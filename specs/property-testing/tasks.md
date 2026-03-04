@@ -256,6 +256,56 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
   - Test no job seed → auto-generated seed → recorded
   - _Requirements: 13.1–13.10_
 
+#### Phase 10: Strategy Combinators, Additional Strategies, and Assume
+
+- [ ] Add `.map(fn)`, `.filter(predicate)`, `.flatmap(fn)` to Strategy base class (`properties/strategies.py`)
+  - `MappedStrategy` — wraps source, applies `fn` to generated values, shrinks via source then re-maps
+  - `FilteredStrategy` — wraps source, retries up to `max_tries`, shrinks keeping only satisfying values
+  - `FlatMappedStrategy` — wraps source, calls `fn(value)` to get second strategy, generates from it
+  - _Requirements: 15.1–15.8_
+
+- [ ] Add additional built-in strategies (`properties/strategies.py`)
+  - `NoneStrategy` / `none()` — always returns `None`
+  - `BinaryStrategy` / `binary(min_size, max_size)` — generates `bytes`, shrinks toward empty
+  - `SetStrategy` / `sets(element, min_size, max_size)` — generates `set`, shrinks by removing elements
+  - `FrozenSetStrategy` / `frozensets(element, min_size, max_size)` — generates `frozenset`
+  - `FixedDictionaryStrategy` / `fixed_dictionaries(mapping)` — fixed keys, per-key strategies, shrinks values
+  - `BuildsStrategy` / `builds(target, *args, **kwargs)` — constructs instances from strategies
+  - _Requirements: 16.1–16.12_
+
+- [ ] Create `assume()` function and `UnsatisfiedAssumption` (`properties/assumptions.py`)
+  - `UnsatisfiedAssumption` sentinel exception
+  - `assume(condition)` raises `UnsatisfiedAssumption` when falsy
+  - _Requirements: 17.1–17.3_
+
+- [ ] Update `PropertyRunner` to handle `UnsatisfiedAssumption` (`properties/propertyrunner.py`)
+  - Catch `UnsatisfiedAssumption` in example loop — skip example, no CheckResult
+  - Track `assumptions_rejected` counter in metadata
+  - Abort if too many consecutive rejections (50 × max_examples)
+  - _Requirements: 17.4–17.7_
+
+- [ ] Update `properties/__init__.py` to export `assume`
+  - _Requirements: 17.1_
+
+- [ ] Add unit tests for strategy combinators (`test_strategies.py`)
+  - `MappedStrategyTests` — map transforms values, describe output
+  - `FilteredStrategyTests` — filter rejects, raises on exhaustion, describe output
+  - `FlatMappedStrategyTests` — dependent generation
+  - Determinism tests for all combinators
+  - _Requirements: 15.1–15.8_
+
+- [ ] Add unit tests for additional strategies (`test_strategies.py`)
+  - `NoneStrategyTests`, `BinaryStrategyTests`, `SetStrategyTests`
+  - `FrozenSetStrategyTests`, `FixedDictionaryStrategyTests`, `BuildsStrategyTests`
+  - Shrinking, describe, determinism for each
+  - _Requirements: 16.1–16.12_
+
+- [ ] Add unit tests for assume() integration (`test_propertyrunner.py`)
+  - Assumed examples are skipped without failure
+  - `assumptions_rejected` appears in metadata
+  - Test abort on too many rejections
+  - _Requirements: 17.4–17.7_
+
 ---
 
 ## Requirements Traceability

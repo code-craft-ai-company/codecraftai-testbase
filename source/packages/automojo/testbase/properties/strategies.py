@@ -19,7 +19,7 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-from typing import Any, Callable, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 import functools
 import random
@@ -77,6 +77,53 @@ class Strategy:
             :returns: A string description of the strategy configuration.
         """
         return self.__class__.__name__
+
+    def map(self, fn: Callable) -> 'MappedStrategy':
+        """
+            Returns a new strategy that applies ``fn`` to each generated value.
+
+            Example::
+
+                st.integers(0, 100).map(lambda x: x * 2)
+
+            :param fn: A callable to transform generated values.
+            :returns: A ``MappedStrategy`` wrapping this strategy.
+        """
+        return MappedStrategy(self, fn)
+
+    def filter(self, predicate: Callable, max_tries: int = 100) -> 'FilteredStrategy':
+        """
+            Returns a new strategy that only yields values satisfying
+            the given predicate.
+
+            If the predicate is not satisfied after ``max_tries`` attempts,
+            an ``UnsatisfiedAssumption`` exception is raised.
+
+            Example::
+
+                st.integers(-100, 100).filter(lambda x: x != 0)
+
+            :param predicate: A callable returning truthy for acceptable values.
+            :param max_tries: Maximum generation attempts before giving up.
+            :returns: A ``FilteredStrategy`` wrapping this strategy.
+        """
+        return FilteredStrategy(self, predicate, max_tries)
+
+    def flatmap(self, fn: Callable) -> 'FlatMappedStrategy':
+        """
+            Returns a new strategy that generates a value from this strategy,
+            passes it to ``fn`` to obtain a second strategy, and then generates
+            from that second strategy.
+
+            Example::
+
+                st.integers(1, 5).flatmap(lambda n: st.text(min_size=n, max_size=n))
+
+            :param fn: A callable that accepts a generated value and returns
+                a ``Strategy`` instance.
+            :returns: A ``FlatMappedStrategy`` wrapping this strategy.
+        """
+        return FlatMappedStrategy(self, fn)
 
 
 class IntegerStrategy(Strategy):
@@ -558,6 +605,329 @@ class ExplicitStrategy(Strategy):
 
 
 # =============================================================================
+# Strategy Combinators
+# =============================================================================
+
+
+class MappedStrategy(Strategy):
+    """
+        Strategy that applies a transformation function to values generated
+        by a source strategy.
+
+        Created by :meth:`Strategy.map`.
+
+        :param source: The underlying strategy to generate values from.
+        :param fn: A callable applied to each generated value.
+    """
+
+    def __init__(self, source: Strategy, fn: Callable):
+        self._source = source
+        self._fn = fn
+
+    def generate(self, rng: random.Random) -> Any:
+        return self._fn(self._source.generate(rng))
+
+    def shrink(self, value: Any) -> Iterator[Any]:
+        # We cannot invert the map, so we try shrinking the source
+        # and re-mapping. This requires knowing the original pre-map
+        # value, which we don't have — so no shrinking for mapped.
+        return iter([])
+
+    def describe(self) -> str:
+        return f"{self._source.describe()}.map(...)"
+
+
+class FilteredStrategy(Strategy):
+    """
+        Strategy that only yields values from a source strategy that
+        satisfy a given predicate.
+
+        Created by :meth:`Strategy.filter`.
+
+        :param source: The underlying strategy to generate values from.
+        :param predicate: A callable that returns truthy for acceptable values.
+        :param max_tries: Maximum generation attempts before raising.
+    """
+
+    def __init__(self, source: Strategy, predicate: Callable,
+                 max_tries: int = 100):
+        self._source = source
+        self._predicate = predicate
+        self._max_tries = max_tries
+
+    def generate(self, rng: random.Random) -> Any:
+        from automojo.testbase.properties.assumptions import UnsatisfiedAssumption
+
+        for _ in range(self._max_tries):
+            value = self._source.generate(rng)
+            if self._predicate(value):
+                return value
+
+        raise UnsatisfiedAssumption(
+            f"Could not satisfy filter after {self._max_tries} attempts "
+            f"on strategy {self._source.describe()}"
+        )
+
+    def shrink(self, value: Any) -> Iterator[Any]:
+        for shrunk in self._source.shrink(value):
+            if self._predicate(shrunk):
+                yield shrunk
+
+    def describe(self) -> str:
+        return f"{self._source.describe()}.filter(...)"
+
+
+class FlatMappedStrategy(Strategy):
+    """
+        Strategy that generates a value from a source strategy, passes it
+        to a function to obtain a second strategy, and generates from that.
+
+        Created by :meth:`Strategy.flatmap`.
+
+        :param source: The underlying strategy to generate the initial value.
+        :param fn: A callable that accepts the generated value and returns
+            a ``Strategy`` instance.
+    """
+
+    def __init__(self, source: Strategy, fn: Callable):
+        self._source = source
+        self._fn = fn
+
+    def generate(self, rng: random.Random) -> Any:
+        first = self._source.generate(rng)
+        second_strategy = self._fn(first)
+        return second_strategy.generate(rng)
+
+    def describe(self) -> str:
+        return f"{self._source.describe()}.flatmap(...)"
+
+
+# =============================================================================
+# Additional Built-in Strategies
+# =============================================================================
+
+
+class NoneStrategy(Strategy):
+    """
+        Strategy that always generates ``None``.
+
+        No shrinking is performed since the value is constant.
+    """
+
+    def generate(self, rng: random.Random) -> None:
+        return None
+
+    def describe(self) -> str:
+        return "none()"
+
+
+class BinaryStrategy(Strategy):
+    """
+        Strategy that generates random ``bytes`` objects.
+
+        Shrinking first yields empty bytes, then the first half,
+        then removes single bytes.
+
+        :param min_size: Minimum byte sequence length. Default is 0.
+        :param max_size: Maximum byte sequence length. Default is 100.
+    """
+
+    def __init__(self, min_size: int = 0, max_size: int = 100):
+        self._min_size = min_size
+        self._max_size = max_size
+
+    def generate(self, rng: random.Random) -> bytes:
+        length = rng.randint(self._min_size, self._max_size)
+        return bytes(rng.randint(0, 255) for _ in range(length))
+
+    def shrink(self, value: bytes) -> Iterator[bytes]:
+        if len(value) <= self._min_size:
+            return
+
+        # Try empty bytes
+        if self._min_size == 0:
+            yield b""
+
+        # Try first half
+        half = len(value) // 2
+        if half >= self._min_size and half > 0:
+            yield value[:half]
+
+        # Try removing single bytes
+        for i in range(len(value)):
+            shrunk = value[:i] + value[i + 1:]
+            if len(shrunk) >= self._min_size:
+                yield shrunk
+
+    def describe(self) -> str:
+        parts = []
+        if self._min_size != 0:
+            parts.append(f"min_size={self._min_size}")
+        if self._max_size != 100:
+            parts.append(f"max_size={self._max_size}")
+        args = ", ".join(parts)
+        return f"binary({args})"
+
+
+class SetStrategy(Strategy):
+    """
+        Strategy that generates random ``set`` objects.
+
+        Each element is generated using the provided element strategy.
+        Due to set uniqueness constraints, the actual size may be smaller
+        than requested if the element strategy produces duplicates.
+
+        Shrinking first yields the empty set, then the first half,
+        then tries removing single elements.
+
+        :param element: A ``Strategy`` for generating individual set elements.
+        :param min_size: Minimum set size. Default is 0.
+        :param max_size: Maximum set size. Default is 50.
+    """
+
+    def __init__(self, element: Strategy, min_size: int = 0, max_size: int = 50):
+        self._element = element
+        self._min_size = min_size
+        self._max_size = max_size
+
+    def generate(self, rng: random.Random) -> set:
+        target_length = rng.randint(self._min_size, self._max_size)
+        result = set()
+        # Allow extra attempts for uniqueness
+        for _ in range(target_length * 3):
+            if len(result) >= target_length:
+                break
+            result.add(self._element.generate(rng))
+        return result
+
+    def shrink(self, value: set) -> Iterator[set]:
+        if len(value) <= self._min_size:
+            return
+
+        # Try empty set
+        if self._min_size == 0:
+            yield set()
+
+        # Try first half
+        items = list(value)
+        half = len(items) // 2
+        if half >= self._min_size and half > 0:
+            yield set(items[:half])
+
+        # Try removing single elements
+        for item in items:
+            shrunk = value - {item}
+            if len(shrunk) >= self._min_size:
+                yield shrunk
+
+    def describe(self) -> str:
+        parts = [self._element.describe()]
+        if self._min_size != 0:
+            parts.append(f"min_size={self._min_size}")
+        if self._max_size != 50:
+            parts.append(f"max_size={self._max_size}")
+        return f"sets({', '.join(parts)})"
+
+
+class FrozenSetStrategy(Strategy):
+    """
+        Strategy that generates random ``frozenset`` objects.
+
+        Delegates to :class:`SetStrategy` for generation and converts
+        the result to a frozenset.
+
+        :param element: A ``Strategy`` for generating individual elements.
+        :param min_size: Minimum size. Default is 0.
+        :param max_size: Maximum size. Default is 50.
+    """
+
+    def __init__(self, element: Strategy, min_size: int = 0, max_size: int = 50):
+        self._inner = SetStrategy(element, min_size, max_size)
+        self._min_size = min_size
+
+    def generate(self, rng: random.Random) -> frozenset:
+        return frozenset(self._inner.generate(rng))
+
+    def shrink(self, value: frozenset) -> Iterator[frozenset]:
+        for shrunk_set in self._inner.shrink(set(value)):
+            yield frozenset(shrunk_set)
+
+    def describe(self) -> str:
+        inner_desc = self._inner.describe()
+        # Replace "sets(" with "frozensets("
+        return "frozen" + inner_desc
+
+
+class FixedDictionaryStrategy(Strategy):
+    """
+        Strategy that generates dictionaries with a fixed set of keys,
+        where each key's value is drawn from a corresponding strategy.
+
+        Shrinking attempts to shrink individual values.
+
+        :param mapping: A dictionary mapping keys to ``Strategy`` instances.
+    """
+
+    def __init__(self, mapping: Dict[str, Strategy]):
+        self._mapping = mapping
+
+    def generate(self, rng: random.Random) -> dict:
+        return {
+            key: strategy.generate(rng)
+            for key, strategy in self._mapping.items()
+        }
+
+    def shrink(self, value: dict) -> Iterator[dict]:
+        # Try shrinking each value individually
+        for key, strategy in self._mapping.items():
+            if key in value:
+                for shrunk_val in strategy.shrink(value[key]):
+                    result = dict(value)
+                    result[key] = shrunk_val
+                    yield result
+
+    def describe(self) -> str:
+        inner = ", ".join(
+            f"{k!r}: {v.describe()}" for k, v in self._mapping.items()
+        )
+        return f"fixed_dictionaries({{{inner}}})"
+
+
+class BuildsStrategy(Strategy):
+    """
+        Strategy that constructs instances of a callable (typically a class)
+        by generating values for its arguments from strategies.
+
+        :param target: The callable to invoke with generated arguments.
+        :param arg_strategies: Positional argument strategies.
+        :param kwarg_strategies: Keyword argument strategies.
+    """
+
+    def __init__(self, target: Callable, arg_strategies: Tuple[Strategy, ...] = (),
+                 kwarg_strategies: Optional[Dict[str, Strategy]] = None):
+        self._target = target
+        self._arg_strategies = arg_strategies
+        self._kwarg_strategies = kwarg_strategies or {}
+
+    def generate(self, rng: random.Random) -> Any:
+        args = tuple(s.generate(rng) for s in self._arg_strategies)
+        kwargs = {
+            k: s.generate(rng) for k, s in self._kwarg_strategies.items()
+        }
+        return self._target(*args, **kwargs)
+
+    def describe(self) -> str:
+        parts = []
+        for s in self._arg_strategies:
+            parts.append(s.describe())
+        for k, s in self._kwarg_strategies.items():
+            parts.append(f"{k}={s.describe()}")
+        args = ", ".join(parts)
+        name = getattr(self._target, '__name__', repr(self._target))
+        return f"builds({name}, {args})"
+
+
+# =============================================================================
 # Composite Decorator
 # =============================================================================
 
@@ -738,6 +1108,86 @@ def explicit(values: Sequence) -> ExplicitStrategy:
                 ...
 
         :param values: A non-empty sequence of values to yield.
-        :returns: An ``ExplicitStrategy`` instance.
+    :returns: An ``ExplicitStrategy`` instance.
     """
     return ExplicitStrategy(values=values)
+
+
+def none() -> NoneStrategy:
+    """
+        Creates a strategy that always generates ``None``.
+
+        :returns: A ``NoneStrategy`` instance.
+    """
+    return NoneStrategy()
+
+
+def binary(min_size: int = 0, max_size: int = 100) -> BinaryStrategy:
+    """
+        Creates a strategy that generates random ``bytes`` objects.
+
+        :param min_size: Minimum byte sequence length. Default is 0.
+        :param max_size: Maximum byte sequence length. Default is 100.
+        :returns: A ``BinaryStrategy`` instance.
+    """
+    return BinaryStrategy(min_size=min_size, max_size=max_size)
+
+
+def sets(element: Strategy, min_size: int = 0, max_size: int = 50) -> SetStrategy:
+    """
+        Creates a strategy that generates random ``set`` objects.
+
+        :param element: A strategy for generating individual set elements.
+        :param min_size: Minimum set size. Default is 0.
+        :param max_size: Maximum set size. Default is 50.
+        :returns: A ``SetStrategy`` instance.
+    """
+    return SetStrategy(element=element, min_size=min_size, max_size=max_size)
+
+
+def frozensets(element: Strategy, min_size: int = 0, max_size: int = 50) -> FrozenSetStrategy:
+    """
+        Creates a strategy that generates random ``frozenset`` objects.
+
+        :param element: A strategy for generating individual elements.
+        :param min_size: Minimum size. Default is 0.
+        :param max_size: Maximum size. Default is 50.
+        :returns: A ``FrozenSetStrategy`` instance.
+    """
+    return FrozenSetStrategy(element=element, min_size=min_size, max_size=max_size)
+
+
+def fixed_dictionaries(mapping: Dict[str, Strategy]) -> FixedDictionaryStrategy:
+    """
+        Creates a strategy that generates dictionaries with a fixed set of keys.
+
+        Each key's value is drawn from its corresponding strategy.
+
+        :param mapping: A dictionary mapping keys to ``Strategy`` instances.
+        :returns: A ``FixedDictionaryStrategy`` instance.
+    """
+    return FixedDictionaryStrategy(mapping=mapping)
+
+
+def builds(target: Callable, *arg_strategies: Strategy,
+           **kwarg_strategies: Strategy) -> BuildsStrategy:
+    """
+        Creates a strategy that constructs instances by calling ``target``
+        with values generated from the provided strategies.
+
+        Example::
+
+            @dataclass
+            class Point:
+                x: int
+                y: int
+
+            point_strategy = builds(Point, x=st.integers(), y=st.integers())
+
+        :param target: The callable to invoke with generated values.
+        :param arg_strategies: Strategies for positional arguments.
+        :param kwarg_strategies: Strategies for keyword arguments.
+        :returns: A ``BuildsStrategy`` instance.
+    """
+    return BuildsStrategy(target=target, arg_strategies=arg_strategies,
+                          kwarg_strategies=kwarg_strategies)

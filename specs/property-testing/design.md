@@ -645,3 +645,155 @@ source/tests/automojo_tests/testbase/properties/
 ├── test_decorators.py
 └── test_seed_derivation.py
 ```
+
+## Strategy Combinators
+
+### Combinator Class Hierarchy
+
+```mermaid
+classDiagram
+    class Strategy {
+        <<abstract>>
+        +generate(rng: Random) Any
+        +shrink(value: Any) Iterator[Any]
+        +describe() str
+        +map(fn: Callable) MappedStrategy
+        +filter(predicate: Callable) FilteredStrategy
+        +flatmap(fn: Callable) FlatMappedStrategy
+    }
+
+    class MappedStrategy {
+        -source: Strategy
+        -fn: Callable
+        +generate(rng) Any
+        +describe() str
+    }
+
+    class FilteredStrategy {
+        -source: Strategy
+        -predicate: Callable
+        -max_tries: int
+        +generate(rng) Any
+        +shrink(value) Iterator[Any]
+        +describe() str
+    }
+
+    class FlatMappedStrategy {
+        -source: Strategy
+        -fn: Callable
+        +generate(rng) Any
+        +describe() str
+    }
+
+    Strategy <|-- MappedStrategy
+    Strategy <|-- FilteredStrategy
+    Strategy <|-- FlatMappedStrategy
+```
+
+**Combinator semantics:**
+
+| Method | Behavior | Shrinking |
+|--------|----------|-----------|
+| `.map(fn)` | Apply `fn` to each generated value | Delegates to source, then re-maps |
+| `.filter(pred)` | Retry until `pred(value)` is truthy | Delegates to source, keeps only satisfying |
+| `.flatmap(fn)` | Generate value, call `fn(value)` → strategy, generate from it | No shrinking (complex) |
+
+### Additional Strategy Classes
+
+```mermaid
+classDiagram
+    class NoneStrategy {
+        +generate(rng) None
+        +describe() str
+    }
+
+    class BinaryStrategy {
+        -min_size: int
+        -max_size: int
+        +generate(rng) bytes
+        +shrink(value) Iterator[bytes]
+        +describe() str
+    }
+
+    class SetStrategy {
+        -element: Strategy
+        -min_size: int
+        -max_size: int
+        +generate(rng) set
+        +shrink(value) Iterator[set]
+        +describe() str
+    }
+
+    class FrozenSetStrategy {
+        -element: Strategy
+        -min_size: int
+        -max_size: int
+        +generate(rng) frozenset
+        +shrink(value) Iterator[frozenset]
+        +describe() str
+    }
+
+    class FixedDictionaryStrategy {
+        -mapping: Dict[str, Strategy]
+        +generate(rng) dict
+        +shrink(value) Iterator[dict]
+        +describe() str
+    }
+
+    class BuildsStrategy {
+        -target: Callable
+        -arg_strategies: tuple
+        -kwarg_strategies: dict
+        +generate(rng) Any
+        +describe() str
+    }
+
+    Strategy <|-- NoneStrategy
+    Strategy <|-- BinaryStrategy
+    Strategy <|-- SetStrategy
+    Strategy <|-- FrozenSetStrategy
+    Strategy <|-- FixedDictionaryStrategy
+    Strategy <|-- BuildsStrategy
+```
+
+### Assume Function
+
+The `assume()` function provides mid-test precondition filtering. It works by raising a sentinel
+exception (`UnsatisfiedAssumption`) that the `PropertyRunner` catches and treats as "skip this example."
+
+```mermaid
+sequenceDiagram
+    participant TF as Test Function
+    participant PR as PropertyRunner
+    participant ST as Strategy
+
+    loop For each example
+        PR->>ST: strategy.generate(rng)
+        ST-->>PR: generated_values
+        PR->>TF: test_func(**all_args)
+
+        alt assume() fails
+            TF->>TF: assume(False) → raise UnsatisfiedAssumption
+            TF-->>PR: UnsatisfiedAssumption
+            PR->>PR: Skip example, increment assumptions_rejected
+            Note over PR: Do NOT create CheckResult
+        else assume() passes
+            TF->>TF: assume(True) → no-op
+            TF-->>PR: Returns normally
+            PR->>PR: Record CheckResult(PASSED)
+        end
+    end
+```
+
+**Module structure:** `properties/assumptions.py`
+
+```python
+class UnsatisfiedAssumption(Exception):
+    """Sentinel exception raised when assume() receives a falsy condition."""
+    pass
+
+def assume(condition: bool) -> None:
+    """Skip the current example if the condition is not met."""
+    if not condition:
+        raise UnsatisfiedAssumption()
+```

@@ -261,10 +261,6 @@ def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
     from automojo.testbase.initialize import initialize_testbase_runtime, initialize_testbase_results
     initialize_testbase_runtime()
 
-    from automojo.runtime.activation import activate_profile_job, JobType
-
-    activate_profile_job(job_type=JobType.TestRun)
-
     initialize_testbase_results()
 
     # We must exit with a result code, initialize it to 0 here

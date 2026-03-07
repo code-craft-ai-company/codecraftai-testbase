@@ -174,9 +174,8 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_custom_job_type_is_instantiated(self, mock_init_runtime, mock_activate_profile,
+    def test_custom_job_type_is_instantiated(self, mock_init_runtime,
                                               mock_init_results, mock_get_path, mock_get_logger,
                                               mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
@@ -214,9 +213,8 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_custom_job_type_execute_is_called(self, mock_init_runtime, mock_activate_profile,
+    def test_custom_job_type_execute_is_called(self, mock_init_runtime,
                                                 mock_init_results, mock_get_path, mock_get_logger,
                                                 mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
@@ -254,9 +252,8 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_custom_job_receives_testroot_parameter(self, mock_init_runtime, mock_activate_profile,
+    def test_custom_job_receives_testroot_parameter(self, mock_init_runtime,
                                                      mock_init_results, mock_get_path, mock_get_logger,
                                                      mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
@@ -295,9 +292,8 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_custom_job_receives_include_patterns(self, mock_init_runtime, mock_activate_profile,
+    def test_custom_job_receives_include_patterns(self, mock_init_runtime,
                                                    mock_init_results, mock_get_path, mock_get_logger,
                                                    mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
@@ -336,9 +332,8 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_custom_job_receives_exclude_patterns(self, mock_init_runtime, mock_activate_profile,
+    def test_custom_job_receives_exclude_patterns(self, mock_init_runtime,
                                                    mock_init_results, mock_get_path, mock_get_logger,
                                                    mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
@@ -377,9 +372,8 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_custom_job_receives_test_module(self, mock_init_runtime, mock_activate_profile,
+    def test_custom_job_receives_test_module(self, mock_init_runtime,
                                               mock_init_results, mock_get_path, mock_get_logger,
                                               mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
@@ -418,9 +412,8 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_custom_job_result_code_passed_to_exit(self, mock_init_runtime, mock_activate_profile,
+    def test_custom_job_result_code_passed_to_exit(self, mock_init_runtime,
                                                     mock_init_results, mock_get_path, mock_get_logger,
                                                     mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
@@ -457,9 +450,8 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_failing_custom_job_result_code_propagated(self, mock_init_runtime, mock_activate_profile,
+    def test_failing_custom_job_result_code_propagated(self, mock_init_runtime,
                                                         mock_init_results, mock_get_path, mock_get_logger,
                                                         mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """

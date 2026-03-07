@@ -92,9 +92,8 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_runtime_initialization_is_called(self, mock_init_runtime, mock_activate_profile, 
+    def test_runtime_initialization_is_called(self, mock_init_runtime,
                                                mock_init_results, mock_get_path, mock_get_logger,
                                                mock_find_fullname, mock_find_root, mock_exit):
         """Test that initialize_testbase_runtime is called (Requirement 1.3)."""
@@ -122,7 +121,7 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.find_testmodule_fullname')
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
-    @patch('automojo.runtime.activation.activate_profile_job')
+    @patch('automojo.testbase.initialize.activate_profile_job')
     def test_profile_activation_is_called(self, mock_activate_profile, mock_get_path, mock_get_logger,
                                           mock_find_fullname, mock_find_root, mock_exit):
         """Test that activate_profile_job is called with JobType.TestRun (Requirement 1.4)."""
@@ -150,7 +149,7 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.find_testmodule_fullname')
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
-    @patch('automojo.runtime.activation.activate_profile_job')
+    @patch('automojo.testbase.initialize.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
     def test_results_initialization_is_called(self, mock_init_results, mock_activate_profile,
                                                mock_get_path, mock_get_logger,
@@ -181,10 +180,9 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
-    def test_initialization_order(self, mock_init_runtime, mock_activate_profile,
-                                   mock_init_results, mock_get_path, mock_get_logger,
+    def test_initialization_order(self, mock_init_runtime, mock_init_results,
+                                   mock_get_path, mock_get_logger,
                                    mock_find_fullname, mock_find_root, mock_exit):
         """Test that initialization functions are called in correct order."""
         # Setup mocks
@@ -196,7 +194,6 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
         # Track call order
         call_order = []
         mock_init_runtime.side_effect = lambda: call_order.append('runtime')
-        mock_activate_profile.side_effect = lambda job_type: call_order.append('profile')
         mock_init_results.side_effect = lambda: call_order.append('results')
         
         # Create a mock test module
@@ -209,8 +206,8 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
                 from automojo.testbase.entrypoints import generic_test_entrypoint
                 generic_test_entrypoint(job_type=DummyTestJob)
         
-        # Verify order: runtime -> profile -> results
-        self.assertEqual(call_order, ['runtime', 'profile', 'results'])
+        # Verify order: runtime -> results
+        self.assertEqual(call_order, ['runtime', 'results'])
 
 
 class TestGenericTestEntrypointArgumentParsing(unittest.TestCase):
@@ -506,11 +503,9 @@ class TestModuleRegistration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_parent_module_import_called_when_module_has_parent(self, mock_import_by_name, mock_init_runtime, 
-                                                                  mock_activate_profile, mock_init_results, 
+    def test_parent_module_import_called_when_module_has_parent(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                                   mock_get_path, mock_get_logger,
                                                                   mock_find_fullname, mock_find_root, mock_exit):
         """Test that parent modules are imported before registration (Requirement 7.2)."""
@@ -539,11 +534,9 @@ class TestModuleRegistration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_parent_module_import_not_called_for_top_level_module(self, mock_import_by_name, mock_init_runtime, 
-                                                                    mock_activate_profile, mock_init_results, 
+    def test_parent_module_import_not_called_for_top_level_module(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                                     mock_get_path, mock_get_logger,
                                                                     mock_find_fullname, mock_find_root, mock_exit):
         """Test that import_by_name is not called for top-level modules without parent (Requirement 7.2)."""
@@ -572,10 +565,9 @@ class TestModuleRegistration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_module_registered_in_sys_modules(self, mock_import_by_name, mock_init_runtime, mock_activate_profile, 
+    def test_module_registered_in_sys_modules(self, mock_import_by_name, mock_init_runtime,
                                                mock_init_results, mock_get_path, mock_get_logger,
                                                mock_find_fullname, mock_find_root, mock_exit):
         """Test that test module is registered in sys.modules under full name (Requirement 7.1)."""
@@ -615,10 +607,9 @@ class TestModuleRegistration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_module_name_attribute_updated(self, mock_import_by_name, mock_init_runtime, mock_activate_profile, 
+    def test_module_name_attribute_updated(self, mock_import_by_name, mock_init_runtime,
                                             mock_init_results, mock_get_path, mock_get_logger,
                                             mock_find_fullname, mock_find_root, mock_exit):
         """Test that test module's __name__ attribute is updated to full module name (Requirement 7.3)."""
@@ -670,11 +661,9 @@ class TestClassModuleRemapping(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_class_module_attribute_updated_from_main(self, mock_import_by_name, mock_init_runtime, 
-                                                       mock_activate_profile, mock_init_results, 
+    def test_class_module_attribute_updated_from_main(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                        mock_get_path, mock_get_logger,
                                                        mock_find_fullname, mock_find_root, mock_exit):
         """Test that class __module__ attribute is updated from __main__ to full module name (Requirement 8.2)."""
@@ -711,11 +700,9 @@ class TestClassModuleRemapping(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_class_module_attribute_not_updated_when_not_main(self, mock_import_by_name, mock_init_runtime, 
-                                                               mock_activate_profile, mock_init_results, 
+    def test_class_module_attribute_not_updated_when_not_main(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                                mock_get_path, mock_get_logger,
                                                                mock_find_fullname, mock_find_root, mock_exit):
         """Test that class __module__ attribute is NOT updated when not __main__ (Requirement 8.4)."""
@@ -753,11 +740,9 @@ class TestClassModuleRemapping(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_multiple_classes_remapped(self, mock_import_by_name, mock_init_runtime, 
-                                        mock_activate_profile, mock_init_results, 
+    def test_multiple_classes_remapped(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                         mock_get_path, mock_get_logger,
                                         mock_find_fullname, mock_find_root, mock_exit):
         """Test that multiple classes with __module__ = __main__ are all remapped (Requirement 8.1, 8.3)."""
@@ -831,12 +816,11 @@ class TestInjectionRegistryRenaming(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
     @patch('automojo.testbase.entrypoints.InjectionRegistry')
     def test_injection_registry_rename_called_when_module_is_main(self, mock_registry_class, mock_import_by_name, 
-                                                                   mock_init_runtime, mock_activate_profile, 
+                                                                   mock_init_runtime,
                                                                    mock_init_results, mock_get_path, mock_get_logger,
                                                                    mock_find_fullname, mock_find_root, mock_exit):
         """Test that InjectionRegistry.rename_resource_origins_from_main is called when module is __main__ (Requirement 10.1, 10.2)."""
@@ -871,12 +855,11 @@ class TestInjectionRegistryRenaming(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
     @patch('automojo.testbase.entrypoints.InjectionRegistry')
     def test_injection_registry_rename_called_with_correct_module_name(self, mock_registry_class, mock_import_by_name, 
-                                                                        mock_init_runtime, mock_activate_profile, 
+                                                                        mock_init_runtime,
                                                                         mock_init_results, mock_get_path, mock_get_logger,
                                                                         mock_find_fullname, mock_find_root, mock_exit):
         """Test that rename_resource_origins_from_main is called with the correct full module name (Requirement 10.2)."""
@@ -911,12 +894,11 @@ class TestInjectionRegistryRenaming(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
     @patch('automojo.testbase.entrypoints.InjectionRegistry')
     def test_injection_registry_rename_not_called_when_module_not_main(self, mock_registry_class, mock_import_by_name, 
-                                                                        mock_init_runtime, mock_activate_profile, 
+                                                                        mock_init_runtime,
                                                                         mock_init_results, mock_get_path, mock_get_logger,
                                                                         mock_find_fullname, mock_find_root, mock_exit):
         """Test that rename_resource_origins_from_main is NOT called when module is not __main__."""
@@ -973,11 +955,9 @@ class TestFunctionModuleRemapping(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_function_module_attribute_updated_from_main(self, mock_import_by_name, mock_init_runtime, 
-                                                          mock_activate_profile, mock_init_results, 
+    def test_function_module_attribute_updated_from_main(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                           mock_get_path, mock_get_logger,
                                                           mock_find_fullname, mock_find_root, mock_exit):
         """Test that function __module__ attribute is updated from __main__ to full module name (Requirement 9.2)."""
@@ -1014,11 +994,9 @@ class TestFunctionModuleRemapping(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_function_module_attribute_not_updated_when_not_main(self, mock_import_by_name, mock_init_runtime, 
-                                                                  mock_activate_profile, mock_init_results, 
+    def test_function_module_attribute_not_updated_when_not_main(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                                   mock_get_path, mock_get_logger,
                                                                   mock_find_fullname, mock_find_root, mock_exit):
         """Test that function __module__ attribute is NOT updated when not __main__ (Requirement 9.4)."""
@@ -1056,11 +1034,9 @@ class TestFunctionModuleRemapping(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_multiple_functions_remapped(self, mock_import_by_name, mock_init_runtime, 
-                                          mock_activate_profile, mock_init_results, 
+    def test_multiple_functions_remapped(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                           mock_get_path, mock_get_logger,
                                           mock_find_fullname, mock_find_root, mock_exit):
         """Test that multiple functions with __module__ = __main__ are all remapped (Requirement 9.1, 9.3)."""
@@ -1134,11 +1110,9 @@ class TestEnvironmentConfiguration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_jobtype_set_to_testrun(self, mock_import_by_name, mock_init_runtime, 
-                                     mock_activate_profile, mock_init_results, 
+    def test_jobtype_set_to_testrun(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                      mock_get_path, mock_get_logger,
                                      mock_find_fullname, mock_find_root, mock_exit):
         """Test that jobtype is set to 'testrun' in the environment (Requirement 17.3)."""
@@ -1171,11 +1145,9 @@ class TestEnvironmentConfiguration(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_output_directory_set_correctly(self, mock_import_by_name, mock_init_runtime, 
-                                             mock_activate_profile, mock_init_results, 
+    def test_output_directory_set_correctly(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                              mock_get_path, mock_get_logger,
                                              mock_find_fullname, mock_find_root, mock_exit):
         """Test that output_directory is set to the test results path (Requirement 17.4)."""
@@ -1235,11 +1207,9 @@ class TestExitCodeHandling(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_exit_code_zero_for_passing_tests(self, mock_import_by_name, mock_init_runtime, 
-                                               mock_activate_profile, mock_init_results, 
+    def test_exit_code_zero_for_passing_tests(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                mock_get_path, mock_get_logger,
                                                mock_find_fullname, mock_find_root, mock_exit):
         """Test that sys.exit is called with code 0 when all tests pass (Requirement 16.1)."""
@@ -1281,11 +1251,9 @@ class TestExitCodeHandling(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_exit_code_nonzero_for_failing_tests(self, mock_import_by_name, mock_init_runtime, 
-                                                  mock_activate_profile, mock_init_results, 
+    def test_exit_code_nonzero_for_failing_tests(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                   mock_get_path, mock_get_logger,
                                                   mock_find_fullname, mock_find_root, mock_exit):
         """Test that sys.exit is called with non-zero code when tests fail (Requirement 16.2)."""
@@ -1327,11 +1295,9 @@ class TestExitCodeHandling(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_exit_code_from_testjob_execute(self, mock_import_by_name, mock_init_runtime, 
-                                             mock_activate_profile, mock_init_results, 
+    def test_exit_code_from_testjob_execute(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                              mock_get_path, mock_get_logger,
                                              mock_find_fullname, mock_find_root, mock_exit):
         """Test that exit code is the result code returned by TestJob.execute() (Requirement 16.3)."""
@@ -1375,11 +1341,9 @@ class TestExitCodeHandling(unittest.TestCase):
     @patch('automojo.testbase.entrypoints.getEnhancedLogger')
     @patch('automojo.testbase.entrypoints.get_path_for_testresults')
     @patch('automojo.testbase.initialize.initialize_testbase_results')
-    @patch('automojo.runtime.activation.activate_profile_job')
     @patch('automojo.testbase.initialize.initialize_testbase_runtime')
     @patch('automojo.testbase.entrypoints.import_by_name')
-    def test_sys_exit_is_called_with_result_code(self, mock_import_by_name, mock_init_runtime, 
-                                                  mock_activate_profile, mock_init_results, 
+    def test_sys_exit_is_called_with_result_code(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                                   mock_get_path, mock_get_logger,
                                                   mock_find_fullname, mock_find_root, mock_exit):
         """Test that sys.exit() is called with the result code (Requirement 16.4)."""

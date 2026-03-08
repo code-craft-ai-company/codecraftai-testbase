@@ -18,7 +18,7 @@ import urllib.parse
 
 import automojo.testbase as testbase
 
-from automojo.testbase.properties import given, settings, expect_exception
+from automojo.testbase.properties import given, expect_exception
 from automojo.testbase.properties import strategies as st
 
 
@@ -115,7 +115,7 @@ def test_url_quote_roundtrip(s):
     params=st.explicit([
         {"a": "", "b": "x"},
     ]),
-    settings=settings(max_examples=1)
+    constraints={"max_examples": 1}
 )
 def test_url_encode_decode_roundtrip(params):
     """

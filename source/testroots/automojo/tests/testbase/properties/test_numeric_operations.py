@@ -13,7 +13,7 @@
 
 import automojo.testbase as testbase
 
-from automojo.testbase.properties import given, settings
+from automojo.testbase.properties import given
 from automojo.testbase.properties import strategies as st
 
 
@@ -119,7 +119,7 @@ def test_absolute_value_non_negative(x):
 @given(
     base=st.integers(2, 10),
     exp=st.integers(0, 6),
-    settings=settings(max_examples=50)
+    constraints={"max_examples": 50}
 )
 def test_power_of_base(base, exp):
     """

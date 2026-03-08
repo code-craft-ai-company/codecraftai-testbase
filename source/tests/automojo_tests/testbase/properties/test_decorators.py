@@ -1,16 +1,15 @@
 """
     .. module:: automojo_tests.testbase.properties.test_decorators
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Unit tests for the @given decorator and settings() function.
+    :synopsis: Unit tests for the @given decorator and expect_exception decorator.
 
     .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
 
 import unittest
 
-from automojo.testbase.properties.decorators import given, settings
+from automojo.testbase.properties.decorators import given, expect_exception
 from automojo.testbase.properties.strategies import integers, text, booleans
-from automojo.testbase.properties.propertysettings import PropertySettings
 
 
 class GivenDecoratorTests(unittest.TestCase):
@@ -56,27 +55,23 @@ class GivenDecoratorTests(unittest.TestCase):
         self.assertIs(test_func._property_['strategies']['x'], int_strat)
         self.assertIs(test_func._property_['strategies']['y'], text_strat)
 
-    def test_given_with_settings(self):
-        """Test that @given accepts and stores settings."""
-        ps = settings(max_examples=50, seed=42)
-
-        @given(x=integers(), settings=ps)
+    def test_given_with_constraints(self):
+        """Test that @given accepts and stores constraints dict."""
+        @given(x=integers(), constraints={"max_examples": 50})
         def test_func(x):
             pass
 
-        self.assertIsInstance(test_func._property_['settings'], PropertySettings)
-        self.assertEqual(test_func._property_['settings'].max_examples, 50)
-        self.assertEqual(test_func._property_['settings'].seed, 42)
+        self.assertIsInstance(test_func._property_['constraints'], dict)
+        self.assertEqual(test_func._property_['constraints']['max_examples'], 50)
 
-    def test_given_default_settings(self):
-        """Test that @given uses default settings when none provided."""
+    def test_given_default_constraints(self):
+        """Test that @given uses empty constraints dict when none provided."""
         @given(x=integers())
         def test_func(x):
             pass
 
-        self.assertIsInstance(test_func._property_['settings'], PropertySettings)
-        self.assertEqual(test_func._property_['settings'].max_examples, 100)
-        self.assertIsNone(test_func._property_['settings'].seed)
+        self.assertIsInstance(test_func._property_['constraints'], dict)
+        self.assertEqual(len(test_func._property_['constraints']), 0)
 
     def test_given_with_multiple_strategies(self):
         """Test @given with many parameter strategies."""
@@ -100,43 +95,43 @@ class GivenDecoratorTests(unittest.TestCase):
         result = test_func(x=5)
         self.assertEqual(result, 10)
 
+    def test_given_rejects_non_strategy_kwargs(self):
+        """Test that @given raises TypeError for non-Strategy kwargs."""
+        with self.assertRaises(TypeError):
+            @given(x=42)
+            def test_func(x):
+                pass
 
-class SettingsFunctionTests(unittest.TestCase):
-    """Tests for the settings() helper function."""
+    def test_given_with_full_constraints(self):
+        """Test @given with all supported constraint keys."""
+        @given(x=integers(), constraints={"max_examples": 200, "max_shrink_attempts": 50})
+        def test_func(x):
+            pass
 
-    def test_settings_returns_property_settings(self):
-        """Test that settings() returns a PropertySettings instance."""
-        ps = settings()
-        self.assertIsInstance(ps, PropertySettings)
+        self.assertEqual(test_func._property_['constraints']['max_examples'], 200)
+        self.assertEqual(test_func._property_['constraints']['max_shrink_attempts'], 50)
 
-    def test_settings_with_max_examples(self):
-        """Test settings() with custom max_examples."""
-        ps = settings(max_examples=200)
-        self.assertEqual(ps.max_examples, 200)
 
-    def test_settings_with_seed(self):
-        """Test settings() with custom seed."""
-        ps = settings(seed=12345)
-        self.assertEqual(ps.seed, 12345)
+class ExpectExceptionDecoratorTests(unittest.TestCase):
+    """Tests for the expect_exception decorator."""
 
-    def test_settings_with_max_shrink_attempts(self):
-        """Test settings() with custom max_shrink_attempts."""
-        ps = settings(max_shrink_attempts=50)
-        self.assertEqual(ps.max_shrink_attempts, 50)
+    def test_expect_exception_attaches_metadata(self):
+        """Test that expect_exception sets _expect_exception_ attribute."""
+        @expect_exception(ValueError, reason="test reason")
+        def test_func():
+            pass
 
-    def test_settings_with_all_params(self):
-        """Test settings() with all parameters."""
-        ps = settings(max_examples=50, seed=999, max_shrink_attempts=25)
-        self.assertEqual(ps.max_examples, 50)
-        self.assertEqual(ps.seed, 999)
-        self.assertEqual(ps.max_shrink_attempts, 25)
+        self.assertTrue(hasattr(test_func, '_expect_exception_'))
+        self.assertEqual(test_func._expect_exception_['exception_type'], ValueError)
+        self.assertEqual(test_func._expect_exception_['reason'], 'test reason')
 
-    def test_settings_defaults(self):
-        """Test settings() default values."""
-        ps = settings()
-        self.assertEqual(ps.max_examples, 100)
-        self.assertIsNone(ps.seed)
-        self.assertEqual(ps.max_shrink_attempts, 100)
+    def test_expect_exception_default_reason(self):
+        """Test that expect_exception defaults to empty reason."""
+        @expect_exception(RuntimeError)
+        def test_func():
+            pass
+
+        self.assertEqual(test_func._expect_exception_['reason'], '')
 
 
 if __name__ == '__main__':

@@ -34,11 +34,14 @@ from automojo.errors.xtraceback import (
 )
 
 from automojo.testbase.properties.assumptions import UnsatisfiedAssumption
-from automojo.testbase.properties.propertysettings import PropertySettings
 from automojo.testbase.properties.strategies import Strategy
 
 from automojo.testbase.results.model.checkresult import CheckResult
 from automojo.testbase.results.model.resultcode import ResultCode
+
+
+DEFAULT_MAX_EXAMPLES = 100
+DEFAULT_MAX_SHRINK_ATTEMPTS = 100
 
 
 def derive_test_seed(job_seed: str, test_name: str) -> int:
@@ -68,35 +71,43 @@ class PropertyRunner:
         automatic counterexample shrinking, and creates :class:`CheckResult`
         instances for each generated example.
 
-        :param settings: The :class:`PropertySettings` controlling execution.
+        The per-test seed is always derived deterministically from the job seed
+        and fully qualified test name. This ensures that a given ``--job-seed``
+        value always reproduces the same property test results. Each generated
+        random value is derived from the previous PRNG state, guaranteeing a
+        fully deterministic sequence.
+
+        :param constraints: Dictionary of execution constraints. Supported keys:
+            ``max_examples`` (int, default 100), ``max_shrink_attempts`` (int, default 100).
         :param job_seed: The job-level seed for reproducibility (UUID string).
         :param test_name: The fully qualified test name.
         :param recorder: The result recorder for writing check results.
         :param parent_inst: The instance ID of the parent test result.
     """
 
-    def __init__(self, settings: PropertySettings, job_seed: str,
+    def __init__(self, constraints: dict, job_seed: str,
                  test_name: str, recorder: Any, parent_inst: str):
         """
             Initializes the PropertyRunner.
 
-            :param settings: The :class:`PropertySettings` controlling execution.
+            :param constraints: Dictionary of execution constraints. Supported keys:
+                ``max_examples`` (int, default 100), ``max_shrink_attempts`` (int, default 100).
             :param job_seed: The job-level seed for reproducibility (UUID string).
             :param test_name: The fully qualified test name.
             :param recorder: The result recorder for writing check results.
             :param parent_inst: The instance ID of the parent test result.
         """
-        self._settings = settings
+        self._max_examples = constraints.get("max_examples", DEFAULT_MAX_EXAMPLES)
+        self._max_shrink_attempts = constraints.get("max_shrink_attempts", DEFAULT_MAX_SHRINK_ATTEMPTS)
         self._job_seed = job_seed
         self._test_name = test_name
         self._recorder = recorder
         self._parent_inst = parent_inst
 
-        # Determine the per-test seed
-        if settings.seed is not None:
-            self._test_seed = settings.seed
-        else:
-            self._test_seed = derive_test_seed(job_seed, test_name)
+        # The per-test seed is always derived from the job seed and test name.
+        # This ensures full reproducibility: same job seed produces the same
+        # random sequence for every property test in the job.
+        self._test_seed = derive_test_seed(job_seed, test_name)
 
         self._rng = random.Random(self._test_seed)
         return
@@ -142,7 +153,7 @@ class PropertyRunner:
             :raises AssertionError: Re-raised after recording when a property
                 test fails (after shrinking).
         """
-        max_examples = self._settings.max_examples
+        max_examples = self._max_examples
         examples_run = 0
         assumptions_rejected = 0
         max_rejections = 50 * max_examples
@@ -302,7 +313,7 @@ class PropertyRunner:
             :returns: The simplest failing set of generated values found,
                 or ``None`` if no simpler counterexample was found.
         """
-        max_attempts = self._settings.max_shrink_attempts
+        max_attempts = self._max_shrink_attempts
         attempts = 0
         current_best = dict(failing_values)
         improved = False

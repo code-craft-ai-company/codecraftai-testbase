@@ -10,9 +10,9 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 
 ### Completed Tasks
 
-**Phase 1:** Core Engine — PropertySettings, Strategy base, 11 built-in strategies, @composite, public API
+**Phase 1:** Core Engine — Strategy base, 11 built-in strategies, @composite, public API
 
-**Phase 2:** Decorator and Metadata — @given decorator, settings() helper, properties/__init__.py
+**Phase 2:** Decorator and Metadata — @given decorator, properties/__init__.py
 
 **Phase 3:** Result Model — ResultType.CHECK, CheckResult class, model __init__ export
 
@@ -34,8 +34,8 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 
 #### Phase 1: Core Engine
 
-- [x] Implement `PropertySettings` dataclass (`properties/propertysettings.py`)
-  - `max_examples` (default: 100), `seed` (Optional[int]), `max_shrink_attempts` (default: 100)
+- [x] ~~Implement `PropertySettings` dataclass~~ **REMOVED**: Replaced by constraints dict passed to `@given(constraints={...})`
+  - Configuration is now via `constraints` parameter: `{"max_examples": N, "max_shrink_attempts": N}`
   - _Requirements: 2.1–2.6_
 
 - [x] Implement `Strategy` base class (`properties/strategies.py`)
@@ -69,17 +69,16 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 
 - [x] Implement `@given` decorator (`properties/decorators.py`)
   - Accept keyword args mapping param names to Strategy instances
-  - Accept optional `settings` keyword for PropertySettings
-  - Store `_property_` attribute on decorated function containing strategies and settings
+  - Accept optional `constraints` keyword for execution constraints dictionary
+  - Store `_property_` attribute on decorated function containing strategies and constraints
   - Preserve function name, module, and existing decorators
   - _Requirements: 1.1–1.7_
 
-- [x] Implement `settings()` helper function (`properties/decorators.py`)
-  - Return PropertySettings instance with provided overrides
+- [x] ~~Implement `settings()` helper function~~ **REMOVED**: Replaced by constraints dict
   - _Requirements: 2.1–2.6_
 
 - [x] Create `properties/__init__.py` package init
-  - Export `given`, `settings`, `strategies` (as `st` alias)
+  - Export `given`, `expect_exception`, `assume`, `strategies` (as `st` alias)
   - _Requirements: 1.1_
 
 #### Phase 3: Result Model
@@ -104,11 +103,12 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 - [x] Implement seed derivation logic (`properties/propertyrunner.py`)
   - `derive_test_seed(job_seed, test_name)` using `hashlib.sha256`
   - Per-test seed isolation using `random.Random(per_test_seed)`
-  - Per-test seed override from `PropertySettings.seed`
+  - Per-test seed always derived from job seed — no per-test override
   - _Requirements: 13.1–13.9_
 
 - [x] Implement `PropertyRunner` class (`properties/propertyrunner.py`)
-  - Constructor: accept `settings`, `job_seed`, `test_name`, `recorder`, `parent_inst`
+  - Constructor: accept `constraints` dict, `job_seed`, `test_name`, `recorder`, `parent_inst`
+  - Read `max_examples` and `max_shrink_attempts` from constraints dict with defaults (100)
   - `run()` method: generate `max_examples` sets, invoke test function, catch failures
   - Merge injected args with generated args for each invocation
   - Create `CheckResult` for each example
@@ -121,7 +121,7 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 - [x] Implement shrinking engine (`properties/propertyrunner.py`)
   - For each strategy parameter, attempt `strategy.shrink()` candidates
   - Continue while candidates still reproduce the failure
-  - Bounded by `max_shrink_attempts` from settings
+  - Bounded by `max_shrink_attempts` from constraints dict
   - Record the final shrunk counterexample
   - _Requirements: 5.1–5.5_
 
@@ -245,14 +245,14 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 - [ ] Add unit tests for @given decorator (`test_decorators.py`)
   - Test _property_ attribute attachment
   - Test composability with @mark_categories, @mark_priority
-  - Test settings override
+  - Test constraints override
   - Test function name preservation
   - _Requirements: 1.1–1.7_
 
 - [ ] Add unit tests for seed derivation (`test_seed_derivation.py`)
   - Test deterministic: same inputs → same seed
   - Test isolation: different test names → different seeds
-  - Test per-test override takes precedence
+  - Test seed always derived from job seed (no per-test override)
   - Test no job seed → auto-generated seed → recorded
   - _Requirements: 13.1–13.10_
 
@@ -313,7 +313,7 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 | Requirement | Status | Implementation Location |
 |-------------|--------|------------------------|
 | 1.1–1.7 | ⬜ Not Started | `properties/decorators.py` |
-| 2.1–2.6 | ⬜ Not Started | `properties/propertysettings.py`, `properties/decorators.py` |
+| 2.1–2.6 | ⬜ Not Started | `properties/decorators.py` (constraints kwarg) |
 | 3.1–3.5 | ⬜ Not Started | `properties/strategies.py` |
 | 4.1–4.5 | ⬜ Not Started | `properties/strategies.py` (@composite) |
 | 5.1–5.5 | ⬜ Not Started | `properties/propertyrunner.py` (shrinking) |
@@ -336,7 +336,7 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 | Strategy Classes | ⬜ | — |
 | @composite | ⬜ | — |
 | @given Decorator | ⬜ | — |
-| PropertySettings | ⬜ | — |
+| Constraints Config | ⬜ | — |
 | PropertyRunner | ⬜ | ⬜ |
 | CheckResult | ⬜ | — |
 | Seed Derivation | ⬜ | ⬜ |
@@ -354,11 +354,11 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 ```
 source/packages/automojo/testbase/
 ├── properties/                       # [NEW] Property testing package
-│   ├── __init__.py                   # Exports: given, settings, strategies
-│   ├── decorators.py                 # @given decorator, settings() function
+│   ├── __init__.py                   # Exports: given, expect_exception, assume, strategies
+│   ├── decorators.py                 # @given decorator, expect_exception decorator
 │   ├── strategies.py                 # Strategy base + all built-in strategies + @composite
 │   ├── propertyrunner.py             # PropertyRunner + shrinking + seed derivation
-│   └── propertysettings.py           # PropertySettings dataclass
+│   └── assumptions.py                # assume() function, UnsatisfiedAssumption exception
 │
 ├── results/model/
 │   ├── checkresult.py                # [NEW] CheckResult class

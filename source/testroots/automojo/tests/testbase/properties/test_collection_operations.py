@@ -13,7 +13,7 @@
 
 import automojo.testbase as testbase
 
-from automojo.testbase.properties import given, settings
+from automojo.testbase.properties import given
 from automojo.testbase.properties import strategies as st
 
 
@@ -156,7 +156,7 @@ def test_min_max_within_list(xs):
 
 @given(
     xs=st.lists(st.integers(0, 100), max_size=15),
-    settings=settings(max_examples=30)
+    constraints={"max_examples": 30}
 )
 def test_list_sum_matches_manual_accumulation(xs):
     """

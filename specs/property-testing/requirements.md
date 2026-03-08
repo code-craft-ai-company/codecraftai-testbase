@@ -38,20 +38,20 @@ for tasking-based tests.
 4. WHEN a test function has parameters NOT listed in `@given`, THOSE parameters SHALL be resolved through the normal TestBase injection system
 5. THE `@given` decorator SHALL be composable with existing TestBase decorators (`@mark_categories`, `@mark_priority`, `@mark_keywords`)
 6. THE `@given` decorator SHALL store property metadata on the function's `_property_` attribute for discovery by the test sequencer
-7. WHEN a `settings` keyword is passed to `@given`, THE framework SHALL use the provided `PropertySettings` to configure execution behavior
+7. WHEN a `constraints` keyword is passed to `@given`, THE framework SHALL use the provided constraints dictionary to configure execution behavior
 
-### Requirement 2: Property Settings
+### Requirement 2: Property Constraints
 
-**User Story:** As a test author, I want to configure property test execution parameters, so that I can control how many examples are generated and ensure reproducibility.
+**User Story:** As a test author, I want to configure property test execution parameters using the existing TestBase constraints mechanism, so that I can control how many examples are generated while maintaining consistency with the framework's configuration patterns.
 
 #### Acceptance Criteria
 
-1. THE framework SHALL provide a `settings()` function that returns a `PropertySettings` instance
-2. THE `PropertySettings` SHALL support a `max_examples` parameter controlling the number of generated examples per test (default: 100)
-3. THE `PropertySettings` SHALL support a `seed` parameter for overriding the seed at the individual test level
-4. WHEN a per-test `seed` is not specified in settings, THE framework SHALL derive the seed from the job-level seed (see Requirement 13)
+1. THE `@given` decorator SHALL accept a `constraints` keyword whose value is a dictionary of execution constraints
+2. THE constraints dictionary SHALL support a `max_examples` key controlling the number of generated examples per test (default: 100)
+3. THE constraints dictionary SHALL support a `max_shrink_attempts` key controlling the maximum number of shrinking iterations (default: 100)
+4. THE per-test seed SHALL always be derived from the job-level seed and the fully qualified test name (see Requirement 13); per-test seed overrides SHALL NOT be supported
 5. THE seed used for each property test execution SHALL be included in the test result metadata
-6. THE `PropertySettings` SHALL support a `max_shrink_attempts` parameter controlling the maximum number of shrinking iterations (default: 100)
+6. WHEN no constraints are provided, THE framework SHALL use defaults: `max_examples=100`, `max_shrink_attempts=100`
 
 ### Requirement 3: Built-in Strategies
 
@@ -205,8 +205,8 @@ for tasking-based tests.
 5. WHEN no job seed is provided via `--job-seed` or `AM_JOB_SEED`, THE framework SHALL generate a random job-level seed and record it in the job metadata
 6. THE job seed and per-test seed SHALL both be recorded in the `TestResult` metadata for each property test
 7. THE job seed and per-test seed SHALL both be recorded in each `CheckResult` for traceability
-8. WHEN a property test has a per-test `seed` override specified in its `@given(settings=settings(seed=N))`, THAT override SHALL take precedence over the derived per-test seed
-9. THE `PropertyRunner` SHALL initialize a `random.Random` instance with the resolved seed before generating any values, ensuring that the random state is isolated per test function
+8. THE per-test seed SHALL always be derived from the job seed and fully qualified test name; per-test seed overrides SHALL NOT be supported, ensuring that the job seed is the single source of truth for reproducibility
+9. THE `PropertyRunner` SHALL initialize a `random.Random` instance with the derived seed before generating any values, ensuring that the random state is isolated per test function and that each random value is a derivative of the previous one
 10. THE agent extraction output for failed property tests SHALL include the seed value, enabling agents to recommend a `--job-seed` value for reproduction
 
 ### Requirement 14: Test Result Rendering

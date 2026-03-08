@@ -13,7 +13,7 @@
 
 import automojo.testbase as testbase
 
-from automojo.testbase.properties import given, settings
+from automojo.testbase.properties import given
 from automojo.testbase.properties import strategies as st
 
 
@@ -90,7 +90,7 @@ def test_string_split_join_roundtrip(s):
 
 @given(
     s=st.text(max_size=50),
-    settings=settings(max_examples=25)
+    constraints={"max_examples": 25}
 )
 def test_string_strip_idempotent(s):
     """

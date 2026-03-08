@@ -10,7 +10,7 @@
 
     **Quick Start**::
 
-        from automojo.testbase.properties import given, settings
+        from automojo.testbase.properties import given
         from automojo.testbase.properties import strategies as st
 
         @given(x=st.integers(), y=st.integers())
@@ -29,7 +29,6 @@ __credits__ = []
 
 from automojo.testbase.properties.decorators import (
     given,
-    settings,
     expect_exception
 )
 
@@ -37,5 +36,3 @@ from automojo.testbase.properties.assumptions import assume
 
 from automojo.testbase.properties import strategies
 from automojo.testbase.properties import strategies as st
-
-from automojo.testbase.properties.propertysettings import PropertySettings

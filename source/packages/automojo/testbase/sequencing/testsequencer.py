@@ -1907,13 +1907,13 @@ class TestSequencer:
 
         prop_meta = test_func._property_
         strategies = prop_meta['strategies']
-        settings = prop_meta['settings']
+        constraints = prop_meta.get('constraints', {})
 
         # Filter out strategy params from injected args
         filtered_injected = {k: v for k, v in injected_args.items() if k not in strategies}
 
         runner = PropertyRunner(
-            settings=settings,
+            constraints=constraints,
             job_seed=self.job_seed,
             test_name=test_name,
             recorder=recorder,

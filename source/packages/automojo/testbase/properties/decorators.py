@@ -1,7 +1,7 @@
 """
     .. module:: automojo.testbase.properties.decorators
     :platform: Darwin, Linux, Unix, Windows
-    :synopsis: Module for property test decorators — @given and settings().
+    :synopsis: Module for property test decorators — @given and expect_exception.
 
     .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
@@ -17,34 +17,7 @@ from typing import Optional
 
 import functools
 
-from automojo.testbase.properties.propertysettings import PropertySettings
 from automojo.testbase.properties.strategies import Strategy
-
-
-def settings(max_examples: int = 100, seed: Optional[int] = None,
-             max_shrink_attempts: int = 100) -> PropertySettings:
-    """
-        Creates a :class:`PropertySettings` instance with the provided overrides.
-
-        Use this function in combination with the ``@given`` decorator to
-        customize property test execution parameters.
-
-        Example::
-
-            @given(x=st.integers(), settings=settings(max_examples=200, seed=42))
-            def test_my_property(x):
-                assert x + 0 == x
-
-        :param max_examples: Number of examples to generate. Default is 100.
-        :param seed: Optional per-test seed override for reproducibility.
-        :param max_shrink_attempts: Maximum shrinking iterations. Default is 100.
-        :returns: A :class:`PropertySettings` instance.
-    """
-    return PropertySettings(
-        max_examples=max_examples,
-        seed=seed,
-        max_shrink_attempts=max_shrink_attempts
-    )
 
 
 def given(**kwargs) -> callable:
@@ -52,11 +25,11 @@ def given(**kwargs) -> callable:
         Decorator that marks a test function as a property-based test.
 
         Accepts keyword arguments mapping parameter names to ``Strategy``
-        instances. An optional ``settings`` keyword provides a
-        :class:`PropertySettings` instance for execution configuration.
+        instances. An optional ``constraints`` keyword provides a dictionary
+        of execution constraints for the property test runner.
 
         The decorator stores a ``_property_`` attribute on the decorated
-        function containing the strategy mappings and settings. This attribute
+        function containing the strategy mappings and constraints. This attribute
         is detected by the test sequencer to invoke the ``PropertyRunner``
         rather than the standard test execution path.
 
@@ -66,28 +39,37 @@ def given(**kwargs) -> callable:
         The ``@given`` decorator is composable with existing TestBase
         decorators (``@mark_categories``, ``@mark_priority``, ``@mark_keywords``).
 
+        Supported Constraint Keys:
+            - ``max_examples`` (int): Number of examples to generate. Default is 100.
+            - ``max_shrink_attempts`` (int): Maximum shrinking iterations. Default is 100.
+
+        .. note::
+            The property test seed is always derived from the job seed and fully
+            qualified test name. It cannot be overridden per-test. This ensures
+            that a given ``--job-seed`` always reproduces the same property test
+            results across all property tests in the job.
+
         Example::
 
-            from automojo.testbase.properties import given, strategies as st
+            from automojo.testbase.properties import given
+            from automojo.testbase.properties import strategies as st
 
             @given(x=st.integers(), y=st.integers())
             def test_addition_commutative(x, y):
                 assert x + y == y + x
 
             @given(x=st.integers(min_value=0, max_value=100),
-                   settings=settings(max_examples=50))
+                   constraints={"max_examples": 50})
             def test_positive_square(x):
                 assert x * x >= 0
 
         :param kwargs: Keyword arguments mapping parameter names to ``Strategy``
-            instances, plus an optional ``settings`` keyword for
-            :class:`PropertySettings`.
+            instances, plus an optional ``constraints`` keyword for execution
+            constraints dictionary.
         :returns: A decorator function.
     """
-    # Extract settings if provided
-    prop_settings = kwargs.pop("settings", None)
-    if prop_settings is None:
-        prop_settings = PropertySettings()
+    # Extract constraints if provided
+    prop_constraints = kwargs.pop("constraints", {})
 
     # Validate that all remaining kwargs are Strategy instances
     strategies = {}
@@ -107,7 +89,7 @@ def given(**kwargs) -> callable:
         # Attach property metadata for discovery by the test sequencer
         wrapper._property_ = {
             "strategies": strategies,
-            "settings": prop_settings,
+            "constraints": prop_constraints,
         }
 
         return wrapper

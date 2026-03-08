@@ -24,7 +24,6 @@ graph TB
     subgraph "User API"
         GV[@given decorator]
         ST[strategies module]
-        SE[settings function]
     end
 
     subgraph "Properties Engine"
@@ -54,7 +53,6 @@ graph TB
 
     GV --> SD
     ST --> PR
-    SE --> PR
 
     SD --> PR
     PR --> SB
@@ -86,13 +84,7 @@ classDiagram
 
     class PropertyMetadata {
         +strategies: Dict[str, Strategy]
-        +settings: PropertySettings
-    }
-
-    class PropertySettings {
-        +max_examples: int = 100
-        +seed: Optional[int] = None
-        +max_shrink_attempts: int = 100
+        +constraints: dict
     }
 ```
 
@@ -106,7 +98,17 @@ def test_addition_commutative(x, y):
 # After decoration:
 # test_addition_commutative._property_ = {
 #     "strategies": {"x": IntegerStrategy(), "y": IntegerStrategy()},
-#     "settings": PropertySettings(max_examples=100)
+#     "constraints": {}
+# }
+
+# With custom constraints:
+@given(x=st.integers(), constraints={"max_examples": 50})
+def test_positive(x):
+    assert x == x
+
+# test_positive._property_ = {
+#     "strategies": {"x": IntegerStrategy()},
+#     "constraints": {"max_examples": 50}
 # }
 ```
 
@@ -235,12 +237,11 @@ Orchestrates generation, execution, shrinking, and `CheckResult` creation.
 ```mermaid
 classDiagram
     class PropertyRunner {
-        -settings: PropertySettings
+        -constraints: dict
         -seed: int
-        -sequencer: TestSequencer
-        +run(test_func, strategies, injected_args, tscope) None
+        -job_seed: str
+        +run(test_func, strategies, injected_args) dict
         -_shrink(test_func, strategies, failing, injected_args) dict
-        -_create_check_result(tscope, index, generated, result_code) CheckResult
     }
 ```
 
@@ -326,7 +327,7 @@ sequenceDiagram
     SC->>RR: Preview TestResult (UNSET)
 
     SD->>SD: Detect _property_ attribute
-    SD->>PR: PropertyRunner(settings, seed)
+    SD->>PR: PropertyRunner(constraints, job_seed, test_name, recorder, parent_inst)
     PR->>PR: Derive per-test seed from job_seed + test_name
 
     loop For each example (1..max_examples)
@@ -364,12 +365,13 @@ flowchart TD
     H --> I["random.Random(per_test_seed)"]
     I --> J["Deterministic strategy generation"]
 
-    K["@given(settings=settings(seed=N))"] -->|"per-test override"| L["Override per-test seed"]
-    L --> I
-
     style B fill:#f9f,stroke:#333
     style H fill:#bbf,stroke:#333
 ```
+
+> [!IMPORTANT]
+> Per-test seed overrides are **not** supported. The job seed is the single source of truth
+> for reproducibility. The per-test seed is always derived from `hash(job_seed + test_name)`.
 
 **Seed derivation algorithm:**
 
@@ -397,16 +399,16 @@ with sequencer.enter_test_scope_context(test_scope_name) as tscope:
 
     prop_meta = test_sort_is_idempotent._property_
     runner = PropertyRunner(
-        settings=prop_meta["settings"],
+        constraints=prop_meta.get("constraints", {}),
         job_seed=sequencer.job_seed,
         test_name="mypackage.test_sorting#test_sort_is_idempotent",
-        sequencer=sequencer
+        recorder=tscope.recorder,
+        parent_inst=tscope.scope_id
     )
     runner.run(
         test_sort_is_idempotent,
         strategies=prop_meta["strategies"],
         injected_args={},   # populated from scope tree for injected params
-        tscope=tscope
     )
 ```
 
@@ -417,7 +419,6 @@ For tests with injected parameters, `injected_args` is populated from the scope 
         test_cache_roundtrip,
         strategies=prop_meta["strategies"],
         injected_args={"cache_client": cache_client},
-        tscope=tscope
     )
 ```
 
@@ -602,7 +603,7 @@ if ("property_metadata" in testItem) {
 | `test_strategies.py` | Strategy classes | Generation range, shrinking correctness, describe() output |
 | `test_propertyrunner.py` | PropertyRunner | Pass/fail/error paths, shrinking, seed determinism |
 | `test_checkresult.py` | CheckResult | Serialization, as_dict() format, ResultType.CHECK |
-| `test_decorators.py` | @given, settings | Metadata attachment, settings defaults, composability with markers |
+| `test_decorators.py` | @given, constraints | Metadata attachment, constraints defaults, composability with markers |
 | `test_seed_derivation.py` | Seed logic | Determinism, per-test isolation, override precedence |
 
 ### Property Testing the Property Tester
@@ -615,11 +616,11 @@ of `PropertyRunner` in unit tests rather than going through the full sequencer p
 ```
 source/packages/automojo/testbase/
 ├── properties/
-│   ├── __init__.py              # Exports: given, settings, strategies
-│   ├── decorators.py            # @given decorator, settings() function
+│   ├── __init__.py              # Exports: given, expect_exception, assume, strategies
+│   ├── decorators.py            # @given decorator, expect_exception decorator
 │   ├── strategies.py            # Strategy base class + all built-in strategies
 │   ├── propertyrunner.py        # PropertyRunner (generation + shrinking + CheckResult creation)
-│   └── propertysettings.py      # PropertySettings dataclass
+│   └── assumptions.py           # assume() function, UnsatisfiedAssumption exception
 │
 ├── results/model/
 │   ├── checkresult.py           # [NEW] CheckResult class

@@ -279,7 +279,7 @@ class TestJob(ITestJob):
                 pipeline_info = PipelineInfo(id=_resolve_val(self._pipeline_id), name=_resolve_val(self._pipeline_name), instance=_resolve_val(self._pipeline_instance))
 
                 job_info = JobInfo(id=_resolve_val(self._job_id), name=_resolve_val(self._job_name), type=_resolve_val(self._job_type), owner=_resolve_val(self._job_owner), label=_resolve_val(self._job_label),
-                                   initiator=_resolve_val(self._job_initiator), venue=_resolve_val(self._job_venue), tag=_resolve_val(self._job_tag))
+                                   initiator=_resolve_val(self._job_initiator), venue=_resolve_val(self._job_venue), seed=self.job_seed, tag=_resolve_val(self._job_tag))
                 
                 self._logger.section("Running Tests")
 

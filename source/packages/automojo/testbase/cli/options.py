@@ -70,6 +70,7 @@ HELP_INCLUDE_MARKER_EXP = "Allows the specification of a marker expression that 
 HELP_EXCLUDE_MARKER_EXP = "Allows the specification of a marker expression that if matched will exclude a test."
 HELP_FILTER = "Add a job filter expression."
 HELP_JOB = "The identifier of the job to {action}."
+HELP_TIMEOUT = "The maximum duration in seconds for the test execution phase. When exceeded, the test run is terminated and remaining tests are marked as errored."
 
 
 class RootOptionGroup(OptionGroup):
@@ -343,3 +344,27 @@ class DebugOptionGroup(OptionGroup):
     """
     name = "debug"
     debug = OptionField("--debug", default=False, ptype=BooleanParameter, help=HELP_DEBUG)
+
+
+class TimeoutOptionGroup(OptionGroup):
+    """
+    Option group for test run timeout configuration.
+
+    This group provides the ``--timeout`` option for specifying the maximum
+    allowed duration of the test execution phase. When the timeout is exceeded,
+    the test run is terminated gracefully and remaining tests are marked as errored.
+
+    Attributes:
+        name (str): Group identifier, set to ``"timeout"``.
+        timeout (OptionField): The ``--timeout`` option for maximum run duration in seconds.
+
+    Example CLI Usage::
+
+        # Set a 5-minute timeout for the test run
+        testbase testing run --root ./tests --timeout 300
+
+        # Set a 1-hour timeout
+        testbase testing run --root ./tests --timeout 3600
+    """
+    name = "timeout"
+    timeout = OptionField("--timeout", default=None, required=False, help=HELP_TIMEOUT)

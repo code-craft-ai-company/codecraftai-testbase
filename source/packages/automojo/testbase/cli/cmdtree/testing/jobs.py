@@ -26,6 +26,7 @@ from automojo.testbase.cli.options import (
     BuildOptionGroup,
     LoggingOptionGroup,
     DebugOptionGroup,
+    TimeoutOptionGroup,
     HELP_ROOT,
     HELP_FILTER,
     HELP_JOB,
@@ -36,7 +37,8 @@ from automojo.testbase.cli.options import (
     HELP_FLAVOR,
     HELP_CONSOLE_LOG_LEVEL,
     HELP_FILE_LOG_LEVEL,
-    HELP_DEBUG
+    HELP_DEBUG,
+    HELP_TIMEOUT
 )
 
 @arcli.group("jobs")
@@ -65,10 +67,12 @@ def command_testbase_testing_jobs_show(root: Optional[str], job: str, debug: boo
 @OutputOptionGroup.attach()
 @BuildOptionGroup.attach()
 @LoggingOptionGroup.attach()
+@TimeoutOptionGroup.attach()
 @arcli.command("run")
 def command_testbase_testing_jobs_run(root: Optional[str], job: str, output: Optional[str], start: Optional[str], runid: Optional[str],
                                       branch: Optional[str], build: Optional[str], flavor: Optional[str],
-                                      console_level: Optional[str], logfile_level: Optional[str]):
+                                      console_level: Optional[str], logfile_level: Optional[str],
+                                      timeout: Optional[str]):
 
     # pylint: disable=unused-import,import-outside-toplevel
 
@@ -115,6 +119,17 @@ def command_testbase_testing_jobs_run(root: Optional[str], job: str, output: Opt
             AM_RUNTIME_OPTION_OVERRIDES.override_run_id(runid)
 
         AM_RUNTIME_OPTION_OVERRIDES.override_testroot(test_root)
+
+        if timeout is not None:
+            try:
+                timeout_value = int(timeout)
+                if timeout_value <= 0:
+                    raise ValueError("Timeout must be a positive integer, got: %d" % timeout_value)
+                AM_RUNTIME_OPTION_OVERRIDES.override_testrun_timeout(timeout_value)
+            except ValueError as e:
+                if "invalid literal" in str(e):
+                    raise ValueError("Timeout must be a positive integer, got: %s" % timeout)
+                raise
 
         from automojo.testbase.initialize import initialize_testbase_results
         initialize_testbase_results()

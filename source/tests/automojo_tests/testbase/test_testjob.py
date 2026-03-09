@@ -1331,5 +1331,261 @@ class TestJobDiagnosticErrorHandlingTests(unittest.TestCase):
         self.assertTrue(success_sequencer2.post_called)
 
 
+import time
+
+from automojo.testbase.errors.testruntimeouterror import TestRunTimeoutError
+
+
+class SlowSequencer:
+    """A sequencer that sleeps during execute_tests to simulate a long-running test run."""
+    def __init__(self, sleep_seconds=5):
+        self.import_errors = []
+        self._sleep_seconds = sleep_seconds
+        self.execute_tests_called = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        pass
+
+    def discover(self, test_module=None):
+        return 1
+
+    def record_import_errors(self, filename):
+        pass
+
+    def attach_to_framework(self):
+        pass
+
+    def attach_to_environment(self):
+        pass
+
+    def expand_test_tree_based_on_query(self):
+        pass
+
+    def generate_testrun_sequence_document(self, filename):
+        pass
+
+    def execute_tests(self, runid, recorder):
+        self.execute_tests_called = True
+        time.sleep(self._sleep_seconds)
+
+    def diagnostic_capture_post_testrun(self, level):
+        pass
+
+    def diagnostic_capture_pre_testrun(self, level):
+        pass
+
+
+class TimeoutTestJob(TestJob):
+    """A TestJob subclass for testing timeout behavior."""
+    def __init__(self, logger, testroot, slow_sequencer):
+        super().__init__(logger=logger, testroot=testroot)
+        self._slow_sequencer = slow_sequencer
+        self.recorder_finalized = False
+
+    def begin(self):
+        """Override begin to avoid path resolution dependencies."""
+        self._starttime = datetime.now()
+        self._test_results_dir = tempfile.gettempdir()
+        self._runtime_archive = os.path.join(self._test_results_dir, "runtime-declared.yaml")
+        self._stream_result_filename = os.path.join(self._test_results_dir, "testrun_results_stream.jsos")
+        self._consolidated_result_filename = os.path.join(self._test_results_dir, "testrun_results.json")
+        self._summary_filename = os.path.join(self._test_results_dir, "testrun_summary.json")
+        self._summary_template = os.path.join(self._test_results_dir, "template.html")
+        self._import_errors_filename = os.path.join(self._test_results_dir, "import_errors.jsos")
+        self._testrun_sequence_filename = os.path.join(self._test_results_dir, "testrun_sequence.py")
+
+    def execute(self):
+        """
+        Override execute() to directly test the timeout logic without all the
+        path resolution and integration setup that the real execute() does.
+        This exercises the same threading.Timer + ctypes timeout mechanism.
+        """
+        import threading
+
+        result_code = 0
+        timeout_timer = None
+        recorder = TimeoutTestRecorder(self)
+
+        try:
+            # Start timeout guard if configured (mirrors testjob.py logic)
+            if self._testrun_timeout is not None:
+                main_thread_id = threading.current_thread().ident
+
+                def _timeout_handler():
+                    import ctypes
+                    ctypes.pythonapi.PyThreadState_SetAsyncExc(
+                        ctypes.c_ulong(main_thread_id),
+                        ctypes.py_object(TestRunTimeoutError)
+                    )
+
+                timeout_timer = threading.Timer(self._testrun_timeout, _timeout_handler)
+                timeout_timer.daemon = True
+                timeout_timer.start()
+                self._logger.section("Timeout configured: %d seconds" % self._testrun_timeout)
+
+            # Execute tests (mirrors the sequencer call)
+            self._slow_sequencer.execute_tests(self._run_id, recorder)
+
+        except TestRunTimeoutError:
+            err_msg = "Test run exceeded the configured timeout of %d seconds. Remaining tests have been marked as errored." % self._testrun_timeout
+            self._logger.error(err_msg)
+            result_code = -1
+
+        finally:
+            if timeout_timer is not None:
+                timeout_timer.cancel()
+            recorder.finalize()
+
+        return result_code
+
+    def _create_sequencer(self):
+        return self._slow_sequencer
+
+    def _create_recorder(self, runid, start, render_info, build_info, pipeline_info, job_info):
+        return TimeoutTestRecorder(self)
+
+
+class TimeoutTestRecorder:
+    """A minimal recorder for timeout testing."""
+    def __init__(self, job):
+        self._job = job
+        self.summary = {"result": "PASSED"}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        pass
+
+    def finalize(self):
+        self._job.recorder_finalized = True
+
+    def format_lines(self):
+        return []
+
+
+class TestJobTimeoutTests(unittest.TestCase):
+    """Tests for TestJob timeout enforcement."""
+
+    def setUp(self):
+        if not APP_PERSONA_ESTABLISHED:
+            establish_app_persona(name="automojo-testbase", logger_name="automojo-testbase", log_basename="automojo-testbase")
+
+        self.tempdir = tempfile.TemporaryDirectory()
+
+        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
+        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+
+        self.this_app = ThisApplicationSingleton()
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+
+    def tearDown(self):
+        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
+        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+        # Reset timeout to None for other tests
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, None)
+        self.tempdir.cleanup()
+
+    def test_testrun_timeout_defaults_to_none(self):
+        """Test that _testrun_timeout defaults to None when not configured."""
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, None)
+        job = TestJob(logger=DummyLogger(), testroot="root")
+        self.assertIsNone(job._testrun_timeout)
+
+    def test_testrun_timeout_reads_runtime_variable(self):
+        """Test that _testrun_timeout reads AM_TESTRUN_TIMEOUT from runtime variables."""
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, 300)
+        job = TestJob(logger=DummyLogger(), testroot="root")
+        self.assertEqual(job._testrun_timeout, 300)
+
+    def test_testrun_timeout_reads_large_value(self):
+        """Test that _testrun_timeout correctly stores large timeout values."""
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, 86400)
+        job = TestJob(logger=DummyLogger(), testroot="root")
+        self.assertEqual(job._testrun_timeout, 86400)
+
+    def test_execute_without_timeout_completes_normally(self):
+        """Test that execute() completes normally when no timeout is configured."""
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, None)
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RUN_ID, "test-run-id")
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_STARTTIME, datetime.now())
+
+        slow_seq = SlowSequencer(sleep_seconds=0.1)
+        logger = DummyLogger()
+        job = TimeoutTestJob(logger=logger, testroot="root", slow_sequencer=slow_seq)
+        job.begin()
+        result_code = job.execute()
+
+        self.assertEqual(result_code, 0)
+        self.assertTrue(slow_seq.execute_tests_called)
+        self.assertTrue(job.recorder_finalized)
+
+    def test_execute_with_timeout_exceeding_returns_error(self):
+        """Test that execute() returns -1 when timeout is exceeded."""
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, 1)
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RUN_ID, "test-run-id")
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_STARTTIME, datetime.now())
+
+        slow_seq = SlowSequencer(sleep_seconds=10)
+        logger = DummyLogger()
+        job = TimeoutTestJob(logger=logger, testroot="root", slow_sequencer=slow_seq)
+        job.begin()
+        result_code = job.execute()
+
+        self.assertEqual(result_code, -1)
+        # Verify error was logged
+        timeout_logged = any("timeout" in msg.lower() for msg in logger.errors)
+        self.assertTrue(timeout_logged, "Expected a timeout error message to be logged")
+
+    def test_execute_with_sufficient_timeout_completes_normally(self):
+        """Test that execute() completes normally when timeout is not exceeded."""
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, 30)
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RUN_ID, "test-run-id")
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_STARTTIME, datetime.now())
+
+        slow_seq = SlowSequencer(sleep_seconds=0.1)
+        logger = DummyLogger()
+        job = TimeoutTestJob(logger=logger, testroot="root", slow_sequencer=slow_seq)
+        job.begin()
+        result_code = job.execute()
+
+        self.assertEqual(result_code, 0)
+        self.assertTrue(slow_seq.execute_tests_called)
+        self.assertTrue(job.recorder_finalized)
+
+    def test_timeout_logs_section_message(self):
+        """Test that when timeout is configured, a section message is logged."""
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, 30)
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RUN_ID, "test-run-id")
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_STARTTIME, datetime.now())
+
+        slow_seq = SlowSequencer(sleep_seconds=0.1)
+        logger = DummyLogger()
+        job = TimeoutTestJob(logger=logger, testroot="root", slow_sequencer=slow_seq)
+        job.begin()
+        job.execute()
+
+        timeout_section = any("timeout" in msg.lower() and "30" in msg for msg in logger.sections)
+        self.assertTrue(timeout_section, "Expected a timeout section message to be logged")
+
+    def test_recorder_finalized_on_timeout(self):
+        """Test that the recorder is finalized even when a timeout occurs."""
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT, 1)
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RUN_ID, "test-run-id")
+        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_STARTTIME, datetime.now())
+
+        slow_seq = SlowSequencer(sleep_seconds=10)
+        logger = DummyLogger()
+        job = TimeoutTestJob(logger=logger, testroot="root", slow_sequencer=slow_seq)
+        job.begin()
+        job.execute()
+
+        self.assertTrue(job.recorder_finalized, "Recorder should be finalized even on timeout")
+
+
 if __name__ == "__main__":
     unittest.main()

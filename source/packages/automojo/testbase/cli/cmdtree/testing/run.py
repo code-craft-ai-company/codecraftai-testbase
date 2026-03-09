@@ -29,6 +29,7 @@ from automojo.testbase.cli.options import (
     LoggingOptionGroup,
     DiagnosticOptionGroup,
     FilteringOptionGroup,
+    TimeoutOptionGroup,
     HELP_ROOT,
     HELP_EXCLUDES,
     HELP_INCLUDES,
@@ -55,7 +56,8 @@ from automojo.testbase.cli.options import (
     HELP_PRERUN_DIAGNOSTIC,
     HELP_POSTRUN_DIAGNOSTIC,
     HELP_INCLUDE_MARKER_EXP,
-    HELP_EXCLUDE_MARKER_EXP
+    HELP_EXCLUDE_MARKER_EXP,
+    HELP_TIMEOUT
 )
 
 @RootOptionGroup.attach(help_fill={"action": "run"})
@@ -65,6 +67,7 @@ from automojo.testbase.cli.options import (
 @JobOptionGroup.attach()
 @LoggingOptionGroup.attach()
 @DiagnosticOptionGroup.attach()
+@TimeoutOptionGroup.attach()
 @arcli.command("run")
 def command_testbase_testing_run(root: Optional[str], includes: Optional[List[str]], excludes: Optional[List[str]], output: Optional[str],
                                  start: Optional[str], runid: Optional[str], branch: Optional[str], build: Optional[str], flavor: Optional[str],
@@ -73,7 +76,8 @@ def command_testbase_testing_run(root: Optional[str], includes: Optional[List[st
                                  console_level: Optional[str], logfile_level: Optional[str],
                                  debugger: Optional[str], breakpoints: Optional[List[str]], debug_port: Optional[str],
                                  debug_port_range: Optional[str], debug_log_level: Optional[str], prerun_diagnostic: bool, postrun_diagnostic: bool,
-                                 diagnostic_level: Optional[str], include_marker_exp: Optional[List[str]], exclude_marker_exp: Optional[List[str]]):
+                                 diagnostic_level: Optional[str], include_marker_exp: Optional[List[str]], exclude_marker_exp: Optional[List[str]],
+                                 timeout: Optional[str]):
     """
     Command used to run collections of tests.
     """
@@ -227,6 +231,17 @@ def command_testbase_testing_run(root: Optional[str], includes: Optional[List[st
     test_root = resolve_test_root(root)
 
     AM_RUNTIME_OPTION_OVERRIDES.override_testroot(test_root)
+
+    if timeout is not None:
+        try:
+            timeout_value = int(timeout)
+            if timeout_value <= 0:
+                raise ValueError("Timeout must be a positive integer, got: %d" % timeout_value)
+            AM_RUNTIME_OPTION_OVERRIDES.override_testrun_timeout(timeout_value)
+        except ValueError as e:
+            if "invalid literal" in str(e):
+                raise ValueError("Timeout must be a positive integer, got: %s" % timeout)
+            raise
 
     # Make sure we extend PATH to include the test roots parent folder so imports will
     # work properly.

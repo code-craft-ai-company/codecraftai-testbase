@@ -18,6 +18,7 @@ from typing import List, Optional
 from datetime import datetime
 
 import os
+import threading
 import traceback
 
 from automojo.xmodules.xformatting import CommandOutputFormat
@@ -43,6 +44,7 @@ from automojo.testbase.results.model.renderinfo import RenderInfo
 from automojo.testbase.results.recorders.jsonresultrecorder import ResultRecorder, JsonResultRecorder
 
 from automojo.testbase.sequencing.testsequencer import TestSequencer
+from automojo.testbase.errors.testruntimeouterror import TestRunTimeoutError
 from automojo.interfaces.itestjob import ITestJob
 
 class TestJob(ITestJob):
@@ -119,6 +121,8 @@ class TestJob(ITestJob):
         self._job_tag = RuntimeVariables.AM_JOB_TAG
         
         self._import_errors = []
+
+        self._testrun_timeout = RuntimeVariables.AM_TESTRUN_TIMEOUT
 
         self._title = "Test Run"
         if self._job_name != DefaultValue.NotSet:
@@ -287,7 +291,26 @@ class TestJob(ITestJob):
                 # test scopes and instances and start executing setup, teardown and test level code
                 with self._create_recorder(runid=runid, start=start, render_info=render_info,
                                         build_info=build_info, pipeline_info=pipeline_info, job_info=job_info) as recorder:
+
+                    timeout_timer = None
+
                     try:
+                        # Start timeout guard if configured
+                        if self._testrun_timeout is not None:
+                            main_thread_id = threading.current_thread().ident
+
+                            def _timeout_handler():
+                                import ctypes
+                                ctypes.pythonapi.PyThreadState_SetAsyncExc(
+                                    ctypes.c_ulong(main_thread_id),
+                                    ctypes.py_object(TestRunTimeoutError)
+                                )
+
+                            timeout_timer = threading.Timer(self._testrun_timeout, _timeout_handler)
+                            timeout_timer.daemon = True
+                            timeout_timer.start()
+                            self._logger.section("Timeout configured: %d seconds" % self._testrun_timeout)
+
                         # Traverse the execution graph
                         tseq.execute_tests(runid, recorder)
 
@@ -326,7 +349,16 @@ class TestJob(ITestJob):
                             err_msg = traceback.format_exc()
                             self._logger.error(err_msg)
 
+                    except TestRunTimeoutError:
+                        err_msg = "Test run exceeded the configured timeout of %d seconds. Remaining tests have been marked as errored." % self._testrun_timeout
+                        self._logger.error(err_msg)
+                        result_code = -1
+
                     finally:
+                        # Cancel timeout timer if it is still active
+                        if timeout_timer is not None:
+                            timeout_timer.cancel()
+
                         recorder.finalize()
 
                         recorded_sumary = recorder.summary

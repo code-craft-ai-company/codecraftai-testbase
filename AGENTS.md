@@ -84,7 +84,7 @@ In order to run the unittest tests, you must first enter the virtual environment
 For running the 'unittest' tests located under the folder '<repository-root>/source/tests', use the commands:
 
 ```
-    python -m unittest discover -s source/tests -p "test_*.py"
+    .venv/bin/python-env -m unittest discover -s source/tests -p "test_*.py"
 ```
 
 ## TestBase

@@ -18,6 +18,7 @@ from typing import Any, List, Optional, OrderedDict
 from types import FunctionType
 
 import collections
+import inspect
 
 from automojo.testbase.injection.injectionmoment import InjectionMoment
 
@@ -32,13 +33,15 @@ class TestRef(InjectionMoment):
         being used.
     """
 
-    def __init__(self, testfunc: FunctionType, monikers: Optional[List[str]] = None, pivots: Optional[OrderedDict[str, Any]] = None):
+    def __init__(self, testfunc: FunctionType, monikers: Optional[List[str]] = None,
+                 pivots: Optional[OrderedDict[str, Any]] = None, is_async: Optional[bool] = None):
         """
             Initializes the test reference object.
 
             :param FunctionType testfunc: The test function being referenced.
             :param List[str] monikers: Optional list of monikers associated with the test.
             :param OrderedDict[str, Any] pivots: Optional mapping describing pivot variations.
+            :param bool is_async: Optional flag indicating whether the test function is async.
 
             :returns: ``None``
             :rtype: None
@@ -49,5 +52,13 @@ class TestRef(InjectionMoment):
         if pivots is None:
             pivots = collections.OrderedDict()
 
+        if is_async is None:
+            is_async = inspect.iscoroutinefunction(testfunc)
+
         super().__init__(testfunc, monikers=monikers, pivots=pivots)
+        self._is_async = is_async
         return
+
+    @property
+    def is_async(self) -> bool:
+        return self._is_async

@@ -1,11 +1,14 @@
 import unittest
 import os
+import tempfile
+from types import ModuleType
 from unittest import mock
 
 from automojo.testbase.testcollector import (
     catagorize_exclusions,
     TestCollector,
 )
+from automojo.testbase.queries import collect_test_references
 from automojo.testbase.testref import TestRef
 from automojo.testbase.testgroup import TestGroup
 
@@ -118,6 +121,48 @@ class CollectIntegrationsAndConfigurationsTests(unittest.TestCase):
         with mock.patch("automojo.testbase.testcollector.injection_registry", fake):
             with self.assertRaises(Exception):
                 col.collect_integrations_and_configurations()
+
+
+class TestRefAsyncFlagTests(unittest.TestCase):
+    def test_testref_marks_async_functions(self):
+        async def async_test():
+            return None
+
+        tref = TestRef(async_test)
+
+        self.assertTrue(tref.is_async)
+
+    def test_testref_marks_sync_functions_as_not_async(self):
+        def sync_test():
+            return None
+
+        tref = TestRef(sync_test)
+
+        self.assertFalse(tref.is_async)
+
+
+class QueryCollectionAsyncDetectionTests(unittest.TestCase):
+    def test_collect_test_references_marks_async_tests(self):
+        async def test_async_example():
+            return None
+
+        module_name = 'tests.test_async_module'
+        test_async_example.__module__ = module_name
+
+        mod = ModuleType(module_name)
+        mod.test_async_example = test_async_example
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = os.path.join(tempdir, 'tests')
+            os.makedirs(root)
+            included_file = os.path.join(root, 'test_async_module.py')
+
+            with mock.patch('automojo.testbase.queries.import_by_name', return_value=mod):
+                refs, import_errors = collect_test_references(root, [included_file], None, None, None, 'test')
+
+        self.assertEqual(import_errors, {})
+        self.assertIn('tests.test_async_module#test_async_example', refs)
+        self.assertTrue(refs['tests.test_async_module#test_async_example'].is_async)
 
 
 if __name__ == "__main__":

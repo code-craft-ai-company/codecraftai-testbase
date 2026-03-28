@@ -51,6 +51,27 @@ class MockTestGroup(TestGroup):
         return self._mock_scope
 
 
+class NamedTestRef(TestRef):
+    """TestRef variant that can override the generated scope name and async flag."""
+
+    def __init__(self, testfunc, scope_name=None, is_async=None):
+        super().__init__(testfunc, is_async=is_async)
+        self._scope_name_override = scope_name
+        self._is_async_override = is_async
+
+    @property
+    def name(self):
+        if self._scope_name_override is not None:
+            return self._scope_name_override
+        return super().name
+
+    @property
+    def is_async(self):
+        if self._is_async_override is not None:
+            return self._is_async_override
+        return super().is_async
+
+
 def create_test_function(name, module_name, params=None):
     """
     Create a mock test function with the given name, module, and parameters.
@@ -123,6 +144,34 @@ def create_scope_node_with_multiple_tests(module_name, test_names):
         test_func = create_test_function(test_name, module_name)
         test_ref = TestRef(test_func)
         parent._children[test_ref.base_name] = test_ref
+    return parent
+
+
+def create_property_test_function(name, module_name, params=None, strategies=None):
+    """Create a mock property test function for sequence code generation tests."""
+    test_func = create_test_function(name, module_name, params=params)
+    if strategies is None:
+        strategies = {}
+    test_func._property_ = {"strategies": strategies}
+    return test_func
+
+
+def create_scope_node_with_property_test(module_name, test_name, test_params=None,
+                                         strategies=None, scope_name=None):
+    """Create a scope node with a single property test reference."""
+    parent = MockTestGroup(module_name, package="")
+    test_func = create_property_test_function(test_name, module_name, test_params, strategies)
+    test_ref = NamedTestRef(test_func, scope_name=scope_name)
+    parent._children[test_ref.base_name] = test_ref
+    return parent
+
+
+def create_scope_node_with_async_test(module_name, test_name, test_params=None, scope_name=None):
+    """Create a scope node with a single async test reference."""
+    parent = MockTestGroup(module_name, package="")
+    test_func = create_test_function(test_name, module_name, test_params)
+    test_ref = NamedTestRef(test_func, scope_name=scope_name, is_async=True)
+    parent._children[test_ref.base_name] = test_ref
     return parent
 
 
@@ -955,6 +1004,196 @@ class TestFunctionImportAndCallTests(unittest.TestCase):
             "test_second(",
             generated_code,
             "Second test should have its own call"
+        )
+
+
+class PropertyTestCaseNameGenerationTests(unittest.TestCase):
+    """Tests for generated property test case-name variables."""
+
+    def setUp(self):
+        """Set up test fixtures."""
+        if not APP_PERSONA_ESTABLISHED:
+            establish_app_persona(
+                name="automojo-testbase",
+                logger_name="automojo-testbase",
+                log_basename="automojo-testbase"
+            )
+
+        self.tempdir = tempfile.TemporaryDirectory()
+
+        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
+        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+
+        this_app = ThisApplicationSingleton()
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+
+        self._original_scope_tree = injection_registry._scope_tree_root
+        injection_registry._scope_tree_root = InjectionScope()
+
+    def tearDown(self):
+        """Clean up test fixtures."""
+        self.tempdir.cleanup()
+        injection_registry._scope_tree_root = self._original_scope_tree
+
+    def _create_sequencer(self):
+        """Create a TestSequencer for testing."""
+        sequencer = TestSequencer(
+            jobtitle="Test Job",
+            root=self.tempdir.name,
+            includes=["*"],
+            excludes=[],
+            metafilters=[]
+        )
+        return sequencer
+
+    def _register_test_scope(self, scope_name):
+        """Register a test scope in the injection registry."""
+        injection_registry._scope_tree_root.add_descendent_resource_origination(scope_name, None)
+
+    def test_property_test_generates_test_case_name_variable(self):
+        """Verify property test generation assigns test_case_name before invocation."""
+        scope_name = "test_module#test_property"
+        scope_node = create_scope_node_with_property_test(
+            "test_module",
+            "test_property",
+            strategies={"value": object()},
+        )
+        sequencer = self._create_sequencer()
+
+        self._register_test_scope(scope_name)
+
+        output_buffer = io.StringIO()
+        factory_imports = set()
+        constraint_imports = set()
+
+        sequencer._generate_scope_method(
+            output_buffer, "test_module", "test_module", scope_node,
+            ["sequencer"], factory_imports, constraint_imports, "    "
+        )
+
+        generated_code = output_buffer.getvalue()
+
+        self.assertIn(
+            'test_case_name = "test_module#test_property"',
+            generated_code,
+            "Property tests should assign test_case_name"
+        )
+        self.assertIn(
+            "sequencer.run_property_test(test_property, test_case_name, tscope.recorder, tscope.scope_id, {})",
+            generated_code,
+            "Property tests should pass test_case_name to run_property_test"
+        )
+
+    def test_property_test_keeps_scope_and_case_name_separate(self):
+        """Verify property test generation keeps test_scope_name and test_case_name distinct."""
+        scope_name = "test_module#test_property[param-set-a]"
+        scope_node = create_scope_node_with_property_test(
+            "test_module",
+            "test_property",
+            strategies={"value": object()},
+            scope_name=scope_name,
+        )
+        sequencer = self._create_sequencer()
+
+        self._register_test_scope(scope_name)
+
+        output_buffer = io.StringIO()
+        factory_imports = set()
+        constraint_imports = set()
+
+        sequencer._generate_scope_method(
+            output_buffer, "test_module", "test_module", scope_node,
+            ["sequencer"], factory_imports, constraint_imports, "    "
+        )
+
+        generated_code = output_buffer.getvalue()
+
+        self.assertIn(
+            'test_scope_name = "test_module#test_property[param-set-a]"',
+            generated_code,
+            "Generated code should preserve the scope name"
+        )
+        self.assertIn(
+            'test_case_name = "test_module#test_property"',
+            generated_code,
+            "Generated code should define the property test case name separately"
+        )
+        self.assertNotIn(
+            "sequencer.run_property_test(test_property, 'test_module#test_property'",
+            generated_code,
+            "Property test generation should not inline the case name literal"
+        )
+
+
+class AsyncTestCodeGenerationTests(unittest.TestCase):
+    """Tests for generated async test execution calls."""
+
+    def setUp(self):
+        if not APP_PERSONA_ESTABLISHED:
+            establish_app_persona(
+                name="automojo-testbase",
+                logger_name="automojo-testbase",
+                log_basename="automojo-testbase"
+            )
+
+        self.tempdir = tempfile.TemporaryDirectory()
+
+        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
+        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+
+        this_app = ThisApplicationSingleton()
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+
+        self._original_scope_tree = injection_registry._scope_tree_root
+        injection_registry._scope_tree_root = InjectionScope()
+
+    def tearDown(self):
+        self.tempdir.cleanup()
+        injection_registry._scope_tree_root = self._original_scope_tree
+
+    def _create_sequencer(self):
+        return TestSequencer(
+            jobtitle="Test Job",
+            root=self.tempdir.name,
+            includes=["*"],
+            excludes=[],
+            metafilters=[]
+        )
+
+    def _register_test_scope(self, test_name, module_name):
+        scope_name = "{}#{}".format(module_name, test_name)
+        injection_registry._scope_tree_root.add_descendent_resource_origination(scope_name, None)
+
+    def test_async_test_uses_run_async_test_helper(self):
+        scope_node = create_scope_node_with_async_test(
+            "test_module", "test_async_example", test_params=["param1", "param2"]
+        )
+        sequencer = self._create_sequencer()
+
+        self._register_test_scope("test_async_example", "test_module")
+
+        output_buffer = io.StringIO()
+        factory_imports = set()
+        constraint_imports = set()
+
+        sequencer._generate_scope_method(
+            output_buffer, "test_module", "test_module", scope_node,
+            ["sequencer"], factory_imports, constraint_imports, "    "
+        )
+
+        generated_code = output_buffer.getvalue()
+
+        self.assertIn(
+            "sequencer.run_async_test(test_async_example, {'param1': param1, 'param2': param2})",
+            generated_code,
+            "Async tests should be routed through run_async_test with injected arguments"
+        )
+        self.assertNotIn(
+            "test_async_example(param1, param2)",
+            generated_code,
+            "Async tests should not be emitted as direct function calls"
         )
 
 

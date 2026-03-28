@@ -16,6 +16,7 @@ __credits__ = []
 from typing import Any, Dict, List, OrderedDict, Optional, Sequence, Tuple, Type, Union
 
 
+import asyncio
 import collections
 import json
 import os
@@ -1922,6 +1923,18 @@ class TestSequencer:
 
         return runner.run(test_func, strategies, filtered_injected)
 
+    def run_async_test(self, test_func: 'Callable', injected_args: 'Dict[str, Any]') -> 'Any':
+        """
+            Runs an async test function and re-raises any exception from the coroutine so
+            the surrounding test scope can mark the result correctly.
+
+            :param test_func: The async test function to invoke.
+            :param injected_args: Dictionary of injection-resolved parameter values.
+            :returns: The result returned by the async test coroutine.
+        """
+        coroutine = test_func(**injected_args)
+        return asyncio.run(coroutine)
+
     def get_top_scope_id(self) -> str:
         """
             Returns the scope ID at the top of the scope stack without modifying the stack.
@@ -2784,6 +2797,8 @@ class TestSequencer:
                     # PROPERTY TEST: delegate to sequencer.run_property_test()
                     prop_indent = current_indent + val_indent
                     test_qualified_name = "{}#{}".format(child_node.module_name, child_node.base_name)
+                    method_lines.append('{}test_case_name = "{}"'.format(prop_indent, test_qualified_name))
+                    method_lines.append('')
 
                     # Exclude strategy params — they don't exist as variables in the
                     # generated scope; PropertyRunner generates them at runtime.
@@ -2792,11 +2807,21 @@ class TestSequencer:
 
                     if len(injected_only) > 0:
                         args_dict = ", ".join(["'{}': {}".format(a, a) for a in injected_only])
-                        method_lines.append("{}sequencer.run_property_test({}, '{}', tscope.recorder, tscope.scope_id, {{{}}})".format(
-                            prop_indent, child_node.base_name, test_qualified_name, args_dict))
+                        method_lines.append("{}sequencer.run_property_test({}, test_case_name, tscope.recorder, tscope.scope_id, {{{}}})".format(
+                            prop_indent, child_node.base_name, args_dict))
                     else:
-                        method_lines.append("{}sequencer.run_property_test({}, '{}', tscope.recorder, tscope.scope_id, {{}})".format(
-                            prop_indent, child_node.base_name, test_qualified_name))
+                        method_lines.append("{}sequencer.run_property_test({}, test_case_name, tscope.recorder, tscope.scope_id, {{}})".format(
+                            prop_indent, child_node.base_name))
+                elif child_node.is_async:
+                    async_indent = current_indent + val_indent
+
+                    if len(test_args) > 0:
+                        args_dict = ", ".join(["'{}': {}".format(a, a) for a in test_args])
+                        method_lines.append("{}sequencer.run_async_test({}, {{{}}})".format(
+                            async_indent, child_node.base_name, args_dict))
+                    else:
+                        method_lines.append("{}sequencer.run_async_test({}, {{}})".format(
+                            async_indent, child_node.base_name))
                 else:
                     # REGULAR TEST: direct function call (existing behavior)
                     call_line = '{}{}{}({})'.format(current_indent, val_indent, child_node.base_name, ", ".join(test_args))

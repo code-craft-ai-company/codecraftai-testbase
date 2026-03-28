@@ -77,10 +77,10 @@ def collect_test_references(root, included_files, filter_package, filter_module,
                         # If we have a testname expression only add a reference to the test function
                         # if the function_name matches the filter expression
                         if fnmatch.fnmatch(function_name, filter_testname):
-                            tref = TestRef(function_obj)
+                            tref = TestRef(function_obj, is_async=inspect.iscoroutinefunction(function_obj))
                             test_references[tref.name] = tref
                     else:
-                        tref = TestRef(function_obj)
+                        tref = TestRef(function_obj, is_async=inspect.iscoroutinefunction(function_obj))
                         test_references[tref.name] = tref
 
         except ImportError:

@@ -14,6 +14,7 @@ from automojo.thisapp.wellknown import ThisApplicationSingleton
 from automojo.testbase.sequencing.testactivity import TestActivity
 from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope
 from automojo.testbase.sequencing.sequencerscopebase import SequencerScopeBase
+from automojo.testbase.sequencing.testsequencer import TestSequencer
 
 class DummyResult:
     def __init__(self, inst_id=None, name=None, parent_inst=None):
@@ -296,6 +297,52 @@ class SequencerScopeBaseTests(unittest.TestCase):
         ssb._mark_descendants_as_error(root, "rid", tb)
         ssb._mark_descendants_skipped(root, "rid", "skip", "bug")
         self.assertEqual(len(rec.recorded), 6)
+
+
+class TestSequencerAsyncExecutionTests(unittest.TestCase):
+
+    def setUp(self):
+        if not APP_PERSONA_ESTABLISHED:
+            establish_app_persona(name="automojo-testbase", logger_name="automojo-testbase", log_basename="automojo-testbase")
+
+        self.tempdir = tempfile.TemporaryDirectory()
+
+        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
+        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+
+        this_app = ThisApplicationSingleton()
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
+        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+
+        self.sequencer = TestSequencer(
+            jobtitle="Async Test Job",
+            root=self.tempdir.name,
+            includes=["*"],
+            excludes=[],
+            metafilters=[]
+        )
+
+    def tearDown(self):
+        self.tempdir.cleanup()
+
+    def test_run_async_test_executes_coroutine(self):
+        observed = []
+
+        async def async_test(value):
+            observed.append(value)
+            return value * 2
+
+        result = self.sequencer.run_async_test(async_test, {"value": 21})
+
+        self.assertEqual(result, 42)
+        self.assertEqual(observed, [21])
+
+    def test_run_async_test_reraises_async_exception(self):
+        async def async_test():
+            raise RuntimeError("boom")
+
+        with self.assertRaisesRegex(RuntimeError, "boom"):
+            self.sequencer.run_async_test(async_test, {})
 
 
 if __name__ == "__main__":

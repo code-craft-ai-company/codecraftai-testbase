@@ -25,7 +25,23 @@ that are well design, cohesive, and easy to use and that provide rapid but stabl
 - Always prioritize the reuse of code from 'automojo-*' packages over rewriting functionality
 
 # Project Overview
+The `automojo-testbase` package is the single-host test framework used across
+the automojo suite. It provides the primitives, CLI, and result infrastructure
+that other `automojo-*` repositories rely on for running `test_*`-style
+functions, declaring resource factories, producing machine-processable result
+streams, and generating summaries suitable for agent-driven automation.
 
+The package is organised into a handful of cohesive subsystems:
+`sequencing/` and `tandem/` for test ordering and coordination, `results/`
+with its `recorders/`, `streaming/`, and `filtering/` submodules for writing
+and processing the `testrun_summary.json` and `testrun_results_stream.jsos`
+artefacts, `server/` for the result-server side of distributed runs,
+`mocking/` for the in-house `Mock`/`MockContext` mocking API, `properties/`
+for the built-in property-based testing engine, and a `cli/cmdtree/` tree
+implementing the `testbase` command-line tool (including the machine-readable
+`testbase agents` subcommand group). It is the foundation for
+`automojo-testplus`, which extends it with distributed multi-host test
+execution.
 
 # Testing Conventions
 The 'automojo-testbase' package repository utilizes the 'unittest' framework in order to test the functionality of the testframework components.  It also uses the 'testbase'

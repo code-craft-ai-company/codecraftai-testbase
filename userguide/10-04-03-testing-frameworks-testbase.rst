@@ -80,6 +80,18 @@ Running Tests
 - Substitute the ``--includes`` path with any other resource-specific subtree (for example ``automojo.tests.simplecluster``) when appropriate infrastructure exists.
 - Always point ``--output`` to a writable directory created for the current run so artifacts do not overlap between executions.
 
+Property-Based Tests and the Max-Examples Cap
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ``testbase`` ships a built-in property testing engine under ``automojo.testbase.properties`` (``@given`` / ``strategies`` / ``assume``). Each property test runs ``max_examples`` randomised cases by default (100, or whatever the test specifies via ``constraints={"max_examples": N}``).
+- For fast-CI / per-PR validation, set ``TESTBASE_MAX_EXAMPLES_CAP`` in your ``.env`` (or environment) to a positive integer. The runner caps every property test's effective ``max_examples`` at that ceiling, regardless of what the test specified::
+
+    TESTBASE_MAX_EXAMPLES_CAP="10"
+
+- The cap acts as a *ceiling only*: tests with ``max_examples`` below the cap still run their declared count. A representative agent-kit run (about 415 property tests at 50 examples each) drops from roughly 11 hours to roughly 12 minutes with ``TESTBASE_MAX_EXAMPLES_CAP="10"``.
+- Leave the variable unset for nightly / release runs to get the full case sweep.
+- Empty / non-integer / zero / negative values are treated as "no cap" so a misconfigured ``.env`` never silently disables property testing.
+
 Evaluating Test Results
 -----------------------
 

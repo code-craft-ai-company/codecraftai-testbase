@@ -22,6 +22,7 @@ __credits__ = []
 from typing import Any, Callable, Dict, Optional
 
 import hashlib
+import os
 import random
 import traceback
 import uuid
@@ -42,6 +43,40 @@ from automojo.testbase.results.model.resultcode import ResultCode
 
 DEFAULT_MAX_EXAMPLES = 100
 DEFAULT_MAX_SHRINK_ATTEMPTS = 100
+
+# Environment variable name for the per-property max-examples cap.  When set
+# to a positive integer, ``PropertyRunner`` caps every property test's
+# ``max_examples`` at this value, regardless of what the test specifies.
+# This is intended for fast-CI runs where the full case sweep is too slow;
+# nightly / release runs leave the variable unset and get full coverage.
+ENV_MAX_EXAMPLES_CAP = "TESTBASE_MAX_EXAMPLES_CAP"
+
+
+def _resolve_max_examples_cap() -> Optional[int]:
+    """
+        Read the ``TESTBASE_MAX_EXAMPLES_CAP`` environment variable and
+        return it as a positive integer, or ``None`` when the variable
+        is unset, empty, or not a positive integer.
+
+        :returns: The cap value, or ``None`` to indicate "no cap".
+    """
+    raw = os.environ.get(ENV_MAX_EXAMPLES_CAP)
+    if raw is None:
+        return None
+
+    raw_stripped = raw.strip()
+    if len(raw_stripped) == 0:
+        return None
+
+    try:
+        cap = int(raw_stripped)
+    except ValueError:
+        return None
+
+    if cap <= 0:
+        return None
+
+    return cap
 
 
 def derive_test_seed(job_seed: str, test_name: str) -> int:
@@ -97,7 +132,13 @@ class PropertyRunner:
             :param recorder: The result recorder for writing check results.
             :param parent_inst: The instance ID of the parent test result.
         """
-        self._max_examples = constraints.get("max_examples", DEFAULT_MAX_EXAMPLES)
+        configured_max_examples = constraints.get("max_examples", DEFAULT_MAX_EXAMPLES)
+        env_cap = _resolve_max_examples_cap()
+        if env_cap is not None and env_cap < configured_max_examples:
+            self._max_examples = env_cap
+        else:
+            self._max_examples = configured_max_examples
+
         self._max_shrink_attempts = constraints.get("max_shrink_attempts", DEFAULT_MAX_SHRINK_ATTEMPTS)
         self._job_seed = job_seed
         self._test_name = test_name

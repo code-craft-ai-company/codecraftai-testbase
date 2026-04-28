@@ -6,10 +6,15 @@
     .. moduleauthor:: Myron Walker <myron.walker@gmail.com>
 """
 
+import os
 import unittest
 import random
 
-from automojo.testbase.properties.propertyrunner import PropertyRunner, derive_test_seed
+from automojo.testbase.properties.propertyrunner import (
+    ENV_MAX_EXAMPLES_CAP,
+    PropertyRunner,
+    derive_test_seed,
+)
 from automojo.testbase.properties.strategies import integers, text, booleans
 from automojo.testbase.properties.assumptions import assume, UnsatisfiedAssumption
 
@@ -103,6 +108,101 @@ class PropertyRunnerConstructionTests(unittest.TestCase):
         runner = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
 
         self.assertEqual(runner._max_shrink_attempts, 100)
+
+
+class PropertyRunnerMaxExamplesCapTests(unittest.TestCase):
+    """
+        Tests for the ``TESTBASE_MAX_EXAMPLES_CAP`` environment-variable cap.
+
+        The cap is intended for fast-CI runs.  When set to a positive integer,
+        every property test's effective ``max_examples`` is capped at that
+        ceiling regardless of the value the test specified.  When unset or
+        invalid, the configured / default value flows through unchanged.
+    """
+
+    def setUp(self):
+        self._saved_env = os.environ.get(ENV_MAX_EXAMPLES_CAP)
+        if self._saved_env is not None:
+            del os.environ[ENV_MAX_EXAMPLES_CAP]
+        return
+
+    def tearDown(self):
+        if self._saved_env is not None:
+            os.environ[ENV_MAX_EXAMPLES_CAP] = self._saved_env
+        else:
+            os.environ.pop(ENV_MAX_EXAMPLES_CAP, None)
+        return
+
+    def test_cap_lowers_default_when_set(self):
+        """Cap below the default should reduce effective max_examples."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = "10"
+        recorder = MockRecorder()
+        runner = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 10)
+
+    def test_cap_lowers_explicit_when_below(self):
+        """Cap below an explicit max_examples should override it."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = "10"
+        recorder = MockRecorder()
+        runner = PropertyRunner({"max_examples": 50}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 10)
+
+    def test_cap_above_explicit_does_not_raise(self):
+        """Cap above an explicit max_examples must NOT raise it (cap is a ceiling)."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = "200"
+        recorder = MockRecorder()
+        runner = PropertyRunner({"max_examples": 50}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 50)
+
+    def test_cap_above_default_does_not_raise(self):
+        """Cap above the default must leave the default in effect."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = "500"
+        recorder = MockRecorder()
+        runner = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 100)
+
+    def test_unset_means_no_cap(self):
+        """Unset env var must leave the configured / default value alone."""
+        recorder = MockRecorder()
+        runner_default = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
+        runner_explicit = PropertyRunner({"max_examples": 25}, 12345, "test_func2", recorder, "parent-001")
+        self.assertEqual(runner_default._max_examples, 100)
+        self.assertEqual(runner_explicit._max_examples, 25)
+
+    def test_empty_string_means_no_cap(self):
+        """Empty string env var must be treated as 'unset'."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = ""
+        recorder = MockRecorder()
+        runner = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 100)
+
+    def test_non_integer_means_no_cap(self):
+        """Non-integer env var must be treated as 'unset'."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = "not-a-number"
+        recorder = MockRecorder()
+        runner = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 100)
+
+    def test_zero_means_no_cap(self):
+        """Zero must be treated as 'unset' (a cap of zero would disable property tests)."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = "0"
+        recorder = MockRecorder()
+        runner = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 100)
+
+    def test_negative_means_no_cap(self):
+        """Negative values must be treated as 'unset'."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = "-5"
+        recorder = MockRecorder()
+        runner = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 100)
+
+    def test_whitespace_around_value(self):
+        """Surrounding whitespace must be stripped."""
+        os.environ[ENV_MAX_EXAMPLES_CAP] = "   15   "
+        recorder = MockRecorder()
+        runner = PropertyRunner({}, 12345, "test_func", recorder, "parent-001")
+        self.assertEqual(runner._max_examples, 15)
 
 
 class PropertyRunnerExecutionTests(unittest.TestCase):

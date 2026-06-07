@@ -2,18 +2,18 @@
 
 ## Overview
 
-This document tracks the implementation status of the Test Entry Points system and identifies enhancement opportunities for future development. The entry point system provides standardized mechanisms for initiating test execution, handling critical initialization tasks including runtime environment setup, test module name resolution and registration, Python path management, command-line argument parsing, and test job creation and execution orchestration.
+This document tracks the implementation status of the Test Entry Points system and identifies enhancement opportunities for future development. The primary entry point, `generic_test_entrypoint`, is the DECOUPLED standalone core in TestBase: it performs no integration/activation initialization and no this-app environment setup, reads only core knobs from `os.environ` via `automojo.testbase.environment`, and resolves output through the test job's injected `IOutputContext` / recorder seams. The integration entry point, `integrated_test_entrypoint`, lives in `automojo-integration-runtime`; it activates the application then delegates to the standalone core with a `DefaultIntegratedTestJob`. The standalone core handles test module name resolution and registration, Python path management, command-line argument parsing, and test job creation and execution orchestration.
 
 ## Implementation Status
 
 ### Completed Tasks
 
 #### Generic Test Entry Point (`entrypoints.py`)
-- [x] Implement `generic_test_entrypoint` function
+- [x] Implement `generic_test_entrypoint` function as the decoupled standalone core
   - Accept optional `job_type` parameter defaulting to `DefaultTestJob`
-  - Call `initialize_testbase_runtime()` for runtime setup
-  - Call `activate_profile_job()` with `JobType.TestRun`
-  - Call `initialize_testbase_results()` for results configuration
+  - Perform NO runtime activation, NO profile activation, NO result-resource initialization
+  - Import nothing from `automojo.runtime` / `automojo.thisapp`
+  - Call `load_entrypoint_configuration()` for default include/exclude/log-level options
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
 - [x] Implement command-line argument parsing
@@ -24,16 +24,16 @@ This document tracks the implementation status of the Test Entry Points system a
   - Default includes to `["*"]` when no include expressions provided
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
 
-- [x] Implement environment context configuration
-  - Obtain `ThisApplicationSingleton()` for application context
-  - Access environment through context lookup at "/environment"
-  - Set "jobtype" key to "testrun"
-  - Set "output_directory" key to test results path
+- [x] Read core environment knobs via the dependency-free `automojo.testbase.environment` module
+  - Read `AM_TESTROOT`, `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`, `AM_DEBUG_*`, `AM_DIAGNOSTICS_PRERUN/POSTRUN` from `os.environ`
+  - Do NOT obtain `ThisApplicationSingleton()` or look up an application context "/environment"
+  - Do NOT set "jobtype" or "output_directory" keys in any application environment
   - _Requirements: 17.1, 17.2, 17.3, 17.4_
 
-- [x] Implement output directory configuration
-  - Call `get_path_for_testresults()` to obtain results directory
-  - Create results directory if it does not exist
+- [x] Resolve output through injected seams (no this-app well-known paths)
+  - Do NOT call `get_path_for_testresults()` or any this-app well-known-path helper
+  - Let the test job's injected `IOutputContext` (default `SimpleOutputContext`) root artefacts under one base dir
+  - Default recorder `StdoutResultRecorder` emits a stdout summary, writes JSOS/JSON when an output dir is given, and skips HTML
   - _Requirements: 12.1, 12.2, 12.3, 12.4_
 
 - [x] Implement logger configuration
@@ -85,8 +85,11 @@ This document tracks the implementation status of the Test Entry Points system a
   - Update resource origins referencing `__main__` to use full module name
   - _Requirements: 10.1, 10.2, 10.3_
 
-#### Runtime Initialization (`initialize.py`)
-- [x] Implement `initialize_testbase_runtime` function
+#### Integration Initialization (`automojo-integration-runtime`, `integrationruntime/initialize.py`)
+
+> Scope: activation initialization belongs to `integrated_test_entrypoint`, NOT the standalone core. The legacy `automojo.testbase.initialize` still exists on disk but is no longer called by `generic_test_entrypoint`.
+
+- [x] Implement `initialize_integration_runtime` function
   - Establish application persona with name "automojo"
   - Set home directory to `~/automojo`
   - Set logger name prefix to "TB"
@@ -94,11 +97,18 @@ This document tracks the implementation status of the Test Entry Points system a
   - Resolve runtime variables from environment and configuration
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-- [x] Implement `initialize_testbase_results` function
+- [x] Implement `initialize_integration_results` function
   - Configure static resource source directory
   - Configure static resource destination directory
   - Configure summary template path
+  - Activate the `JobType.TestRun` profile
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [x] Implement `integrated_test_entrypoint` (activation + delegation)
+  - Call `initialize_integration_runtime()` and `initialize_integration_results()`
+  - Default `job_type` to `DefaultIntegratedTestJob` when not supplied
+  - Delegate to `generic_test_entrypoint(job_type=...)`
+  - _Requirements: 2.1-2.6, 3.1-3.5_
 
 #### Unit Tests (`test_utilities_module.py`)
 - [x] Test `find_testmodule_root` with valid test hierarchy
@@ -149,9 +159,10 @@ _No tasks currently in progress._
   - Test resource origins are renamed from `__main__`
   - _Requirements: 10.1, 10.2, 10.3_
 
-- [x] Add unit tests for environment configuration
-  - Test jobtype is set correctly
-  - Test output_directory is set correctly
+- [x] Add unit tests for core environment knob access
+  - Test core knobs are read from `os.environ` via `automojo.testbase.environment`
+  - Test the standalone core does NOT set "jobtype"/"output_directory" and does NOT touch this-app/runtime
+  - Test output is resolved through the injected `IOutputContext` / recorder seams
   - _Requirements: 17.1-17.4_
 
 - [x] Add unit tests for exit code handling
@@ -166,9 +177,9 @@ _No tasks currently in progress._
   - Verify result code reflects test outcomes
   - _Requirements: 1.1-1.6, 11.1-11.5_
 
-- [x] Add integration tests for CLI integration
-  - Verify shared initialization behavior with CLI
-  - Compare entry point vs CLI execution results
+- [x] Add integration tests for integration entry point delegation
+  - Verify `integrated_test_entrypoint` activates the runtime then delegates to `generic_test_entrypoint`
+  - Verify `DefaultIntegratedTestJob` produces presence-folder JSOS + HTML, while the standalone core records to stdout
   - _Requirements: 1.3, 1.4, 1.5_
 
 - [x] Add integration tests for custom job types
@@ -280,9 +291,9 @@ _No tasks currently in progress._
 | Requirement | Status | Implementation Location |
 |-------------|--------|------------------------|
 | 1.1-1.2 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` |
-| 1.3-1.6 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (initialization) |
-| 2.1-2.6 | ✅ Complete | `initialize.py::initialize_testbase_runtime` |
-| 3.1-3.5 | ✅ Complete | `initialize.py::initialize_testbase_results` |
+| 1.3-1.6 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (decoupled core: no activation, config + seams) |
+| 2.1-2.6 | ✅ Complete | `integration-runtime` `integrationruntime/initialize.py::initialize_integration_runtime` |
+| 3.1-3.5 | ✅ Complete | `integration-runtime` `integrationruntime/initialize.py::initialize_integration_results` |
 | 4.1-4.6 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (argument parsing) |
 | 5.1-5.5 | ✅ Complete | `utilities.py::find_testmodule_root` |
 | 6.1-6.5 | ✅ Complete | `utilities.py::find_testmodule_fullname` |
@@ -291,12 +302,12 @@ _No tasks currently in progress._
 | 9.1-9.4 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (function remapping) |
 | 10.1-10.3 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (injection renaming) |
 | 11.1-11.5 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (job execution) |
-| 12.1-12.4 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (output directory) |
+| 12.1-12.4 | ✅ Complete | `testjob.py` injected `IOutputContext` / recorder seams (output via `SimpleOutputContext` + `StdoutResultRecorder`) |
 | 13.1-13.2 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (logger config) |
 | 14.1-14.4 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (custom job type) |
 | 15.1-15.3 | ✅ Complete | Test root marker file convention |
 | 16.1-16.4 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (exit codes) |
-| 17.1-17.4 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` (environment context) |
+| 17.1-17.4 | ✅ Complete | `entrypoints.py::generic_test_entrypoint` + `environment.py` (core os.environ knobs; no this-app context) |
 
 ---
 
@@ -311,12 +322,12 @@ _No tasks currently in progress._
 | Class/Function Remapping | ✅ | ⬜ |
 | Injection Registry Renaming | ✅ | ⬜ |
 | Argument Parsing | ✅ | ✅ |
-| Environment Configuration | ✅ | ⬜ |
+| Core Env Knobs / Output Seams | ✅ | ⬜ |
 | Exit Code Handling | ✅ | ✅ |
-| Runtime Initialization | ✅ | ✅ |
-| Results Initialization | ✅ | ✅ |
+| Integration Runtime Initialization | ✅ | ✅ |
+| Integration Results Initialization | ✅ | ✅ |
 | Custom Job Types | ✅ | ✅ |
-| CLI Integration | ⬜ | ✅ |
+| Integration Entry Point Delegation | ⬜ | ✅ |
 
 **Legend:** ✅ = Complete, ⚠️ = Partial, ⬜ = Not Started
 
@@ -337,11 +348,25 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
+# TestBase (standalone core)
 source/packages/automojo/testbase/
-├── entrypoints.py          # Generic test entry point function
-├── initialize.py           # Runtime and results initialization
+├── entrypoints.py          # generic_test_entrypoint (decoupled standalone core)
+├── environment.py          # Dependency-free os.environ knob accessors
 ├── utilities.py            # Module resolution utilities (find_testmodule_root, find_testmodule_fullname)
-├── testjob.py              # TestJob base class and DefaultTestJob
+├── testjob.py              # TestJob base class + DefaultTestJob + injected output/recorder hooks
+├── output/
+│   ├── outputcontext.py    # IOutputContext / SimpleOutputContext
+│   └── runmetadata.py      # IRunMetadata / StandaloneRunMetadata
+├── results/recorders/
+│   └── stdoutresultrecorder.py  # Default StdoutResultRecorder
 └── injection/
-    └── injectionregistry.py  # Resource origin management
+    └── injectionregistry.py     # Resource origin management
+
+# Integration entry point (automojo-integration-runtime)
+source/packages/automojo/integrationruntime/
+├── entrypoints.py          # integrated_test_entrypoint (activation + delegation)
+├── initialize.py           # initialize_integration_runtime / initialize_integration_results
+└── integratedtestjob.py    # DefaultIntegratedTestJob (presence-folder JSOS + HTML)
 ```
+
+> Note: `automojo.testbase.initialize` still exists on disk but is no longer called by the standalone `generic_test_entrypoint`.

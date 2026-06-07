@@ -19,12 +19,6 @@ import os
 import tempfile
 import unittest
 
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-import automojo.runtime.paths as runtime_paths
-
 from automojo.testbase.testgroup import TestGroup
 from automojo.testbase.testref import TestRef
 from automojo.testbase.injection.injectionregistry import injection_registry
@@ -168,21 +162,10 @@ class NotablesDictionaryGenerationTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
@@ -191,6 +174,11 @@ class NotablesDictionaryGenerationTests(unittest.TestCase):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
+
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
 
     def _create_sequencer(self):
         """Create a TestSequencer for testing."""
@@ -270,21 +258,10 @@ class NotablesFormatTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
@@ -293,6 +270,11 @@ class NotablesFormatTests(unittest.TestCase):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
+
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
 
     def _create_sequencer(self):
         """Create a TestSequencer for testing."""
@@ -378,21 +360,10 @@ class NotablesTrailingCommaTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
@@ -401,6 +372,11 @@ class NotablesTrailingCommaTests(unittest.TestCase):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
+
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
 
     def _create_sequencer(self):
         """Create a TestSequencer for testing."""
@@ -500,21 +476,10 @@ class NotablesPassedToTestScopeContextTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
@@ -523,6 +488,11 @@ class NotablesPassedToTestScopeContextTests(unittest.TestCase):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
+
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
 
     def _create_sequencer(self):
         """Create a TestSequencer for testing."""
@@ -602,21 +572,10 @@ class NotablesSkippedWhenNoLocalParamsTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
@@ -625,6 +584,11 @@ class NotablesSkippedWhenNoLocalParamsTests(unittest.TestCase):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
+
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
 
     def _create_sequencer(self):
         """Create a TestSequencer for testing."""

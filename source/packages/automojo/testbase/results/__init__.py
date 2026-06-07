@@ -11,13 +11,11 @@ __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
 
-# Import streaming module for convenience
-from automojo.testbase.results.streaming import (
-    ResultStreamer,
-    RestResultStreamer,
-    WebSocketResultStreamer,
-    create_result_streamer
-)
+# NOTE: the result streaming transport relocated to automojo-integration-runtime (Phase 3 results
+# split): automojo.integrationruntime.results.streaming (ResultStreamer / RestResultStreamer /
+# WebSocketResultStreamer / create_result_streamer). The near-standalone testbase framework keeps
+# only the JSOS/JSON serialization core; real-time streaming to external services is an
+# integration-tier concern.
 
 # Import filtering module for convenience
 from automojo.testbase.results.filtering import (
@@ -28,10 +26,6 @@ from automojo.testbase.results.filtering import (
 )
 
 __all__ = [
-    "ResultStreamer",
-    "RestResultStreamer",
-    "WebSocketResultStreamer",
-    "create_result_streamer",
     "ResultFilter",
     "ResultFilterCriteria",
     "filter_results",

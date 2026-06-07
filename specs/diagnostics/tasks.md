@@ -32,10 +32,11 @@ This document tracks the implementation status of the Diagnostics System and ide
   - Provide `--breakpoint` option for specifying breakpoints
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-#### Runtime Variable Integration
-- [x] Implement runtime variable setting from CLI options
-  - Set AM_DIAGNOSTICS_PRERUN when `--prerun-diagnostic` is specified
-  - Set AM_DIAGNOSTICS_POSTRUN when `--postrun-diagnostic` is specified
+#### Environment Knob Integration
+- [x] Implement environment knob setting from CLI options
+  - Set AM_DIAGNOSTICS_PRERUN (in `os.environ`) when `--prerun-diagnostic` is specified
+  - Set AM_DIAGNOSTICS_POSTRUN (in `os.environ`) when `--postrun-diagnostic` is specified
+  - Flags read back via `automojo.testbase.environment` (NOT RuntimeVariables)
   - _Requirements: 3.5, 3.6, 11.1, 11.2, 11.3, 11.4, 11.5_
 
 #### IntegrationCoupling Diagnostic Interface (`coupling/integrationcoupling.py`)
@@ -49,18 +50,18 @@ This document tracks the implementation status of the Diagnostics System and ide
 
 #### TestSequencer Diagnostic Capture (`sequencing/testsequencer.py`)
 - [x] Implement `diagnostic_capture_pre_testrun` method
-  - Check AM_DIAGNOSTICS_PRERUN runtime variable
+  - Check AM_DIAGNOSTICS_PRERUN via `environment.diagnostics_prerun_enabled()`
   - Use DiagnosticLabel.PRERUN_DIAGNOSTIC label
-  - Create diagnostic folder path using `get_path_for_diagnostics`
+  - Resolve diagnostic folder path via injected IOutputContext (`get_diagnostics_dir`)
   - Iterate over registered integration couplings
   - Call `diagnostic` method on each integration
   - Skip capture when pre-run diagnostics disabled
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
 - [x] Implement `diagnostic_capture_post_testrun` method
-  - Check AM_DIAGNOSTICS_POSTRUN runtime variable
+  - Check AM_DIAGNOSTICS_POSTRUN via `environment.diagnostics_postrun_enabled()`
   - Use DiagnosticLabel.POSTRUN_DIAGNOSTIC label
-  - Create diagnostic folder path using `get_path_for_diagnostics`
+  - Resolve diagnostic folder path via injected IOutputContext (`get_diagnostics_dir`)
   - Iterate over registered integration couplings
   - Call `diagnostic` method on each integration
   - Skip capture when post-run diagnostics disabled
@@ -164,8 +165,8 @@ _No tasks currently in progress._
   - _Requirements: 5.1-5.5, 6.1-6.5_
 
 - [x] Add integration tests for CLI diagnostic options
-  - Test `--prerun-diagnostic` flag sets runtime variable
-  - Test `--postrun-diagnostic` flag sets runtime variable
+  - Test `--prerun-diagnostic` flag sets AM_DIAGNOSTICS_PRERUN knob (in `os.environ`)
+  - Test `--postrun-diagnostic` flag sets AM_DIAGNOSTICS_POSTRUN knob (in `os.environ`)
   - Test combined flags
   - _Requirements: 3.5, 3.6, 11.1-11.5_
 
@@ -295,7 +296,7 @@ _No tasks currently in progress._
 | 8.4 | ⬜ Planned | Integration subfolder creation (per-integration) |
 | 9.1-9.5 | ✅ Complete | `testjob.py::fire_diagnostic_capture_*` methods |
 | 10.1-10.4 | ✅ Complete | Error handling in diagnostic capture |
-| 11.1-11.5 | ✅ Complete | Runtime variable integration |
+| 11.1-11.5 | ✅ Complete | `environment.diagnostics_prerun_enabled` / `diagnostics_postrun_enabled` |
 | 12.1-12.5 | ⬜ Planned | Custom integration diagnostic implementation guidance |
 
 ---
@@ -336,11 +337,14 @@ _No tasks currently in progress._
 source/packages/automojo/testbase/
 ├── diagnostics.py              # DiagnosticLabel and RuntimeConfigPaths constants
 ├── diagnostic_streaming.py     # Diagnostic streaming to external systems
+├── environment.py              # AM_DIAGNOSTICS_PRERUN/POSTRUN enable-flag accessors (os.environ)
 ├── testjob.py                  # TestJob with fire_diagnostic_capture_* methods
 ├── cli/
 │   └── options.py              # DiagnosticOptionGroup CLI options
 ├── coupling/
 │   └── integrationcoupling.py  # IntegrationCoupling.diagnostic() abstract method
+├── output/
+│   └── outputcontext.py        # IOutputContext / SimpleOutputContext.get_diagnostics_dir
 └── sequencing/
     └── testsequencer.py        # Diagnostic capture implementation
 
@@ -352,3 +356,5 @@ source/examples/
 ├── debug_diagnostics.py        # Example usage of diagnostics (planned)
 └── debug_diagnostics_streaming.py # Example usage of diagnostic streaming
 ```
+
+> The presence-folder-rooted diagnostics path is an integration concern, not a testbase-core concern. It is provided by `RuntimeOutputContext.get_diagnostics_dir` in `automojo-integration-runtime` (wired through `IntegratedTestJob`), which delegates to the well-known presence-folder paths. The testbase core only knows the injected `IOutputContext` seam.

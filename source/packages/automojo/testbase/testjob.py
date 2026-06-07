@@ -25,15 +25,9 @@ from automojo.xmodules.xformatting import CommandOutputFormat
 from automojo.xmodules.debugging import debugger_wellknown_breakpoint_entry
 from automojo.xmodules.xlogging.enhancedloggers import EnhancedLogger
 
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-
-from automojo.runtime.runtimevariables import RuntimeVariables, DefaultValue
-from automojo.runtime.paths import (
-    get_summary_html_template_source,
-    get_summary_static_resource_dest_dir,
-    get_summary_static_resource_src_dir,
-    get_path_for_testresults
-)
+from automojo.testbase import environment
+from automojo.testbase.output.outputcontext import IOutputContext, SimpleOutputContext
+from automojo.testbase.output.runmetadata import IRunMetadata, StandaloneRunMetadata
 
 from automojo.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
 from automojo.testbase.results.model.buildinfo import BuildInfo
@@ -41,7 +35,8 @@ from automojo.testbase.results.model.jobinfo import JobInfo
 from automojo.testbase.results.model.pipelineinfo import PipelineInfo
 from automojo.testbase.results.model.renderinfo import RenderInfo
 
-from automojo.testbase.results.recorders.jsonresultrecorder import ResultRecorder, JsonResultRecorder
+from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
+from automojo.testbase.results.recorders.stdoutresultrecorder import StdoutResultRecorder
 
 from automojo.testbase.sequencing.testsequencer import TestSequencer
 from automojo.testbase.errors.testruntimeouterror import TestRunTimeoutError
@@ -97,36 +92,17 @@ class TestJob(ITestJob):
 
         self._testpacks = None
 
-        self._apod = RuntimeVariables.AM_AUTOMATION_POD
-        self._release = RuntimeVariables.AM_BUILD_RELEASE
-        self._branch = RuntimeVariables.AM_BUILD_BRANCH
-        self._build = RuntimeVariables.AM_BUILD_NAME
-        self._flavor = RuntimeVariables.AM_BUILD_FLAVOR
-        self._build_url = RuntimeVariables.AM_BUILD_URL
+        self._run_metadata = self._create_run_metadata()
+        self._output_context = self._create_output_context()
 
-        self._run_id = RuntimeVariables.AM_RUN_ID
-
-        self._pipeline_id = RuntimeVariables.AM_PIPELINE_ID
-        self._pipeline_name = RuntimeVariables.AM_PIPELINE_NAME
-        self._pipeline_instance = RuntimeVariables.AM_PIPELINE_INSTANCE
-
-        self._job_initiator = RuntimeVariables.AM_JOB_INITIATOR
-        self._job_id = RuntimeVariables.AM_JOB_ID
-        self._job_label = RuntimeVariables.AM_JOB_LABEL
-        self._job_name = RuntimeVariables.AM_JOB_NAME
-        self._job_owner = RuntimeVariables.AM_JOB_OWNER
-        self._job_seed = RuntimeVariables.AM_JOB_SEED
-        self._job_type = RuntimeVariables.AM_JOB_TYPE
-        self._job_venue = RuntimeVariables.AM_JOB_VENUE
-        self._job_tag = RuntimeVariables.AM_JOB_TAG
+        self._apod = self._run_metadata.apod
+        self._run_id = self._run_metadata.run_id
         
         self._import_errors = []
 
-        self._testrun_timeout = RuntimeVariables.AM_TESTRUN_TIMEOUT
+        self._testrun_timeout = self._run_metadata.testrun_timeout
 
-        self._title = "Test Run"
-        if self._job_name != DefaultValue.NotSet:
-            self._title = self._job_name
+        self._title = self._run_metadata.title
 
         return
 
@@ -153,20 +129,17 @@ class TestJob(ITestJob):
 
             :returns: A string seed value (UUID).
         """
-        import uuid
-
-        if self._job_seed is None or self._job_seed == DefaultValue.NotSet:
-            self._job_seed = str(uuid.uuid4())
-        return str(self._job_seed)
+        seed = self._run_metadata.job_seed
+        return seed
 
     def begin(self):
         """
             Called at the beginning of a test job in order to setup the recording of test results.
         """
 
-        self._starttime = RuntimeVariables.AM_STARTTIME
+        self._starttime = self._run_metadata.starttime
 
-        self._test_results_dir = get_path_for_testresults()
+        self._test_results_dir = self._output_context.get_test_results_dir()
         
         # Dump out a flattened copy of the runtime file to the test output folder so we have a copy
         # of the inputs to the automation run.
@@ -175,7 +148,7 @@ class TestJob(ITestJob):
         self._stream_result_filename = os.path.join(self._test_results_dir, "testrun_results_stream.jsos")
         self._consolidated_result_filename = os.path.join(self._test_results_dir, "testrun_results.json")
         self._summary_filename = os.path.join(self._test_results_dir, "testrun_summary.json")
-        self._summary_template = get_summary_html_template_source()
+        self._summary_template = self._output_context.get_summary_template_source()
         self._import_errors_filename = os.path.join(self._test_results_dir, "import_errors.jsos")
         self._testrun_sequence_filename = os.path.join(self._test_results_dir, "testrun_sequence.py")
         
@@ -193,10 +166,8 @@ class TestJob(ITestJob):
             # order in the automation code and that we provide the ability for configuration
             # issues to be discovered as early as possible.
 
-            this_app = ThisApplicationSingleton()
-
-            debugger_name = RuntimeVariables.AM_DEBUG_DEBUGGER
-            configured_breakpoints = RuntimeVariables.AM_DEBUG_BREAKPOINTS
+            debugger_name = environment.get_debugger_name()
+            configured_breakpoints = environment.get_debug_breakpoints()
             if debugger_name is not None and configured_breakpoints is not None:
                 debugger_wellknown_breakpoint_entry(debugger_name, WELLKNOWN_BREAKPOINTS.TEST_DISCOVERY, configured_breakpoints)
 
@@ -261,25 +232,18 @@ class TestJob(ITestJob):
                 runid = self._run_id
                 start = self._starttime
 
-                static_resource_source = get_summary_static_resource_src_dir()
-                static_resource_destination = get_summary_static_resource_dest_dir()
+                static_resource_source = self._output_context.get_static_resource_source()
+                static_resource_destination = self._output_context.get_static_resource_destination()
                 
                 render_info = RenderInfo(title=title, summary_filename=self._summary_filename, summary_template=self._summary_template,
                                          stream_results_filename=self._stream_result_filename, consolidated_results_filename=self._consolidated_result_filename, static_resource_source=static_resource_source,
                                          static_resource_destination=static_resource_destination)
 
-                def _resolve_val(val):
-                    if val is None or val == "" or type(val).__name__ == "DefaultValue":
-                        return "(unknown)"
-                    return val
+                build_info = self._run_metadata.build_info()
 
-                build_info = BuildInfo(branch=_resolve_val(self._branch), build=_resolve_val(self._build), flavor=_resolve_val(self._flavor),
-                                       release=_resolve_val(self._release), url=_resolve_val(self._build_url))
+                pipeline_info = self._run_metadata.pipeline_info()
 
-                pipeline_info = PipelineInfo(id=_resolve_val(self._pipeline_id), name=_resolve_val(self._pipeline_name), instance=_resolve_val(self._pipeline_instance))
-
-                job_info = JobInfo(id=_resolve_val(self._job_id), name=_resolve_val(self._job_name), type=_resolve_val(self._job_type), owner=_resolve_val(self._job_owner), label=_resolve_val(self._job_label),
-                                   initiator=_resolve_val(self._job_initiator), venue=_resolve_val(self._job_venue), seed=self.job_seed, tag=_resolve_val(self._job_tag))
+                job_info = self._run_metadata.job_info()
                 
                 self._logger.section("Running Tests")
 
@@ -604,7 +568,7 @@ class TestJob(ITestJob):
             any given job.
         """
 
-        inst = JsonResultRecorder(runid=runid, start=start, render_info=render_info, apod=self._apod,
+        inst = StdoutResultRecorder(runid=runid, start=start, render_info=render_info, apod=self._apod,
                                         build_info=build_info, pipeline_info=pipeline_info, job_info=job_info)
         return inst
 
@@ -613,7 +577,35 @@ class TestJob(ITestJob):
             Simple hook function to make it possible to overload the type of the TestSequencer that is created
             for jobs.
         """
-        inst = TestSequencer(self._title, self._testroot, includes=self.includes, excludes=self.excludes, metafilters=self.metafilters, job_seed=self.job_seed)
+        inst = TestSequencer(self._title, self._testroot, includes=self.includes, excludes=self.excludes, metafilters=self.metafilters, job_seed=self.job_seed, output_context=self._output_context)
+        return inst
+
+    def _create_output_context(self) -> IOutputContext:
+        """
+            Hook function to make it possible to overload the :class:`IOutputContext` used to resolve
+            where run artefacts are written.  The standalone default roots everything under the
+            ``AM_OUTPUT_DIRECTORY`` environment variable or ``<cwd>/.output``.  The integration
+            runtime overrides this hook to use the well-known result paths.
+
+            :returns: An :class:`IOutputContext` instance.
+        """
+        inst = SimpleOutputContext()
+        return inst
+
+    def _create_run_metadata(self) -> IRunMetadata:
+        """
+            Hook function to make it possible to overload the :class:`IRunMetadata` that describes
+            this run.  The standalone default auto-generates a run id and fills the CI / build /
+            pipeline / job descriptors with ``(unknown)`` placeholders.  The integration runtime
+            overrides this hook to source the values from ``RuntimeVariables``.
+
+            :returns: An :class:`IRunMetadata` instance.
+        """
+        run_title = "Test Run"
+        if self.name is not None and len(self.name) > 0:
+            run_title = self.name
+
+        inst = StandaloneRunMetadata(title=run_title)
         return inst
 
 

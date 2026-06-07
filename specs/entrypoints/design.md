@@ -2,19 +2,19 @@
 
 ## Overview
 
-The Test Entry Points system provides standardized mechanisms for initiating test execution in the TestBase framework. It serves as the bridge between:
+The Test Entry Points system provides standardized mechanisms for initiating test execution in the TestBase framework. There are two distinct entry points:
 
-- Individual test modules that need to be run directly for debugging
-- The CLI command system for production test runs
-- Custom test job implementations for specialized execution scenarios
+- **`generic_test_entrypoint`** — the DECOUPLED standalone core that lives in TestBase (`automojo.testbase.entrypoints`). It runs an individual test module directly for debugging, performs NO integration/activation initialization and NO this-app environment setup, and lets the `TestJob` it builds resolve output through injected seams (`IOutputContext` / recorder) rather than reading `env["output_directory"]` or runtime/this-app well-known paths.
+- **`integrated_test_entrypoint`** — the integration counterpart that lives in `automojo-integration-runtime` (`automojo.integrationruntime.entrypoints`), NOT in TestBase. It performs the this-app activation (persona + runtime-variable resolution + `activate_profile_job`), then delegates to the same decoupled TestBase core with a `DefaultIntegratedTestJob` (an `IntegratedTestJob`-derived type).
 
-The entry point system handles critical initialization tasks including:
+This document describes the TestBase standalone core; the integration entry point is summarized in the Integration Points section for context.
 
-- Runtime environment setup and configuration
+The standalone core handles these tasks (and nothing that couples it to runtime/this-app):
+
 - Test module name resolution and registration
 - Python path management for proper module imports
 - Command-line argument parsing for test filtering
-- Test job creation and execution orchestration
+- Test job creation and execution orchestration, with output resolved via injected seams
 
 ## Architecture
 
@@ -22,17 +22,16 @@ The entry point system handles critical initialization tasks including:
 
 ```mermaid
 graph TB
-    subgraph "Entry Layer"
+    subgraph "Entry Layer (TestBase - standalone core)"
         GTE[generic_test_entrypoint]
-        CLI[CLI testbase command]
     end
-    
-    subgraph "Initialization Layer"
-        ITR[initialize_testbase_runtime]
-        ITRES[initialize_testbase_results]
-        AP[activate_profile_job]
+
+    subgraph "Entry Layer (integration-runtime)"
+        ITE[integrated_test_entrypoint]
+        IIR[initialize_integration_runtime]
+        IIRES[initialize_integration_results]
     end
-    
+
     subgraph "Module Resolution Layer"
         FTR[find_testmodule_root]
         FTF[find_testmodule_fullname]
@@ -49,40 +48,47 @@ graph TB
         DTJ[DefaultTestJob]
         TS[TestSequencer]
     end
-    
+
+    subgraph "Output Seams (injected)"
+        OC[IOutputContext / SimpleOutputContext]
+        RM[IRunMetadata / StandaloneRunMetadata]
+        RR[StdoutResultRecorder]
+    end
+
     subgraph "Configuration Layer"
         AP2[ArgumentParser]
-        RV[RuntimeVariables]
-        TAS[ThisApplicationSingleton]
+        ENV[automojo.testbase.environment]
     end
-    
-    GTE --> ITR
-    GTE --> ITRES
-    GTE --> AP
-    CLI --> ITR
-    CLI --> ITRES
-    
+
     GTE --> FTR
     GTE --> FTF
     GTE --> IBN
-    
+
     GTE --> IR
     IR --> RRO
-    
+
     GTE --> TJ
     TJ --> DTJ
     TJ --> TS
-    
+    TJ --> OC
+    TJ --> RM
+    TJ --> RR
+
     GTE --> AP2
-    ITR --> TAS
-    ITR --> RV
+    GTE --> ENV
+
+    ITE --> IIR
+    ITE --> IIRES
+    ITE -->|"delegates (job_type=DefaultIntegratedTestJob)"| GTE
 ```
+
+The integration entry point (`integrated_test_entrypoint`, in `automojo-integration-runtime`) is the only place where activation initialization happens; it delegates into the decoupled `generic_test_entrypoint` after activating. The standalone core never touches `automojo.runtime` or `automojo.thisapp`.
 
 ### Components
 
 #### 1. Generic Test Entry Point (`generic_test_entrypoint`)
 
-The primary entry point function for running test modules as standalone scripts. This is the recommended way to enable debugging of individual test files.
+The primary, DECOUPLED standalone entry point function for running test modules as standalone scripts. This is the recommended way to enable debugging of individual test files. It performs NO integration/activation initialization and NO this-app environment setup; it imports nothing from `automojo.runtime` / `automojo.thisapp`. Output location and run identity are resolved by the `TestJob` it builds through injected seams (`IOutputContext` / `IRunMetadata` / recorder), not by reading `env["output_directory"]` or well-known runtime/this-app paths.
 
 ```mermaid
 classDiagram
@@ -90,9 +96,7 @@ classDiagram
         <<function>>
         +job_type: Optional[Type[TestJob]] = DefaultTestJob
         <<behavior>>
-        +initialize_testbase_runtime()
-        +activate_profile_job()
-        +initialize_testbase_results()
+        +load_entrypoint_configuration()
         +parse_command_line_arguments()
         +resolve_test_module_identity()
         +register_module_in_sys_modules()
@@ -107,14 +111,14 @@ classDiagram
 
 | Responsibility | Description |
 |----------------|-------------|
-| Runtime Initialization | Sets up the TestBase runtime environment |
-| Profile Activation | Activates the test run job profile |
-| Results Initialization | Configures the results recording system |
+| Configuration Loading | Loads default include/exclude/log-level options from configuration files |
 | Module Resolution | Finds test root and computes full module name |
 | Module Registration | Registers the `__main__` module under its proper name |
 | Class/Function Remapping | Updates `__module__` attributes for proper identification |
 | Injection Renaming | Updates resource origins from `__main__` to proper module name |
-| Job Execution | Creates and executes the test job |
+| Job Execution | Creates and executes the test job; output is resolved by the job's injected `IOutputContext` / recorder |
+
+**Explicitly NOT a responsibility of the standalone core:** runtime initialization, profile activation, results-resource initialization, or any this-app environment configuration. Those belong to `integrated_test_entrypoint` in `automojo-integration-runtime` (see Integration Points).
 
 **Command Line Arguments:**
 
@@ -125,53 +129,23 @@ classDiagram
 | `--console-level` | | Logging level for console output | `INFO` |
 | `--logfile-level` | | Logging level for logfile output | `DEBUG` |
 
-#### 2. Runtime Initialization (`initialize_testbase_runtime`)
+#### 2. Integration Initialization (in `automojo-integration-runtime`)
 
-Establishes the application persona and resolves runtime variables.
+Activation initialization is NOT part of the standalone core. It is performed by `integrated_test_entrypoint`, which calls `initialize_integration_runtime` (establishes the application persona — name "automojo", home `~/automojo`, "TB" logger prefix, "testrun" log basename — and resolves runtime variables) and `initialize_integration_results` (configures the static-resource source/destination directories and the HTML summary template, and activates the `JobType.TestRun` profile). These live in `automojo.integrationruntime.initialize`. The standalone `generic_test_entrypoint` invokes none of them.
 
-```mermaid
-classDiagram
-    class initialize_testbase_runtime {
-        <<function>>
-        <<behavior>>
-        +establish_app_persona(name, home_dir, logger_name, log_basename)
-        +resolve_runtime_variables()
-    }
-```
+> Historical note: the legacy `automojo.testbase.initialize` module (`initialize_testbase_runtime` / `initialize_testbase_results`) still exists on disk but is no longer called by the standalone entry point; its runtime/this-app coupling is the reason this responsibility was moved to the integration entry point.
 
-**Initialization Steps:**
+#### 3. Output Resolution via Injected Seams
 
-| Step | Action | Purpose |
-|------|--------|---------|
-| 1 | Set application name | Identifies the application as "automojo" |
-| 2 | Set home directory | Creates `~/automojo` for configuration |
-| 3 | Set logger name | Uses "TB" prefix for log messages |
-| 4 | Set log basename | Uses "testrun" for log file naming |
-| 5 | Resolve runtime variables | Loads environment and configuration values |
+The standalone core does not configure output directories itself. The `TestJob` it builds resolves output and run identity through injected hooks:
 
-#### 3. Results Initialization (`initialize_testbase_results`)
+| Seam | Default (standalone core) | Purpose |
+|------|---------------------------|---------|
+| `IOutputContext` | `SimpleOutputContext` | Roots artefacts under a single base directory; supplies result dir and (optional) summary-template source |
+| `IRunMetadata` | `StandaloneRunMetadata` | Supplies run id, start time, title, timeout, and build/pipeline/job info |
+| `ResultRecorder` | `StdoutResultRecorder` | Emits a stdout summary; writes JSOS/JSON when an output dir is given; SKIPS HTML |
 
-Configures the results recording system with appropriate paths and templates.
-
-```mermaid
-classDiagram
-    class initialize_testbase_results {
-        <<function>>
-        <<behavior>>
-        +configure_static_resource_source()
-        +configure_static_resource_destination()
-        +configure_summary_template()
-        +activate_profile_job(JobType.TestRun)
-    }
-```
-
-**Configuration Variables:**
-
-| Variable | Default Value | Description |
-|----------|---------------|-------------|
-| `AM_RESULTS_STATIC_RESOURCE_SRC_DIR` | `<testbase>/templates/v2/static` | Source for static resources |
-| `AM_RESULTS_STATIC_RESOURCE_DEST_DIR` | `<presence>/results/static/v2` | Destination for static resources |
-| `AM_RESULTS_STATIC_SUMMARY_TEMPLATE` | `<testbase>/templates/v2/testsummary.html` | HTML summary template |
+The integration variants (presence-folder paths via `RuntimeOutputContext`, `RuntimeVariables`-sourced `RuntimeRunMetadata`, and JSOS-to-disk plus HTML via `JsonResultRecorder`) are supplied by `DefaultIntegratedTestJob` in `automojo-integration-runtime` by overriding these same hooks. Core test-execution knobs (`AM_TESTROOT`, `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`, `AM_DEBUG_*`, `AM_DIAGNOSTICS_PRERUN/POSTRUN`) are read directly from `os.environ` through the dependency-free `automojo.testbase.environment` module.
 
 #### 4. Module Resolution Functions
 
@@ -233,36 +207,34 @@ classDiagram
 sequenceDiagram
     participant User
     participant EP as generic_test_entrypoint
-    participant Init as Initialization
+    participant Cfg as Configuration
     participant Resolve as Module Resolution
     participant Reg as Registration
     participant Job as TestJob
-    
+
     User->>EP: python test_module.py -i "*"
-    
-    Note over EP,Init: Phase 1: Initialization
-    EP->>Init: initialize_testbase_runtime()
-    Init->>Init: establish_app_persona()
-    Init->>Init: resolve_runtime_variables()
-    EP->>Init: activate_profile_job(TestRun)
-    EP->>Init: initialize_testbase_results()
-    
+
+    Note over EP,Cfg: Phase 1: Configuration (no activation, no this-app setup)
+    EP->>Cfg: load_entrypoint_configuration()
+    Cfg-->>EP: default includes/excludes/log-levels
+
     Note over EP,Resolve: Phase 2: Module Resolution
     EP->>Resolve: find_testmodule_root(test_module)
     Resolve-->>EP: testroot path
     EP->>Resolve: find_testmodule_fullname(test_module, testroot)
     Resolve-->>EP: module_fullname
-    
+
     Note over EP,Reg: Phase 3: Module Registration
     EP->>Reg: import_by_name(parent_module_name)
     EP->>Reg: sys.modules[module_fullname] = test_module
     EP->>Reg: Remap class __module__ attributes
     EP->>Reg: Remap function __module__ attributes
     EP->>Reg: InjectionRegistry.rename_resource_origins_from_main()
-    
-    Note over EP,Job: Phase 4: Execution
+
+    Note over EP,Job: Phase 4: Execution (output via injected seams)
     EP->>Job: Parse command line arguments
     EP->>Job: Create TestJob(job_type)
+    Job->>Job: resolve IOutputContext / IRunMetadata / recorder
     Job->>Job: execute()
     Job-->>EP: result_code
     EP->>User: sys.exit(result_code)
@@ -315,25 +287,28 @@ The entry point provides a template for test execution that can be customized th
 
 ```python
 def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
-    # Fixed initialization steps
-    initialize_testbase_runtime()
-    activate_profile_job(job_type=JobType.TestRun)
-    initialize_testbase_results()
-    
+    # Standalone core: no activation, no this-app setup
+    file_config = load_entrypoint_configuration()
+
     # ... module resolution and registration ...
-    
-    # Customizable job execution
-    with job_type(logger, testroot, includes=includes, excludes=excludes, test_module=test_module) as tjob:
+
+    # Customizable job execution; the job resolves output via its injected seams
+    with job_type(logger, testroot, includes=includes, excludes=excludes, metafilters=metafilters, test_module=test_module) as tjob:
         result_code = tjob.execute()
 ```
 
-#### 2. Singleton Pattern
+#### 2. Injected Seam (Dependency Injection) Pattern
 
-The entry point uses singletons for application-wide state:
+Rather than reading runtime/this-app singletons or `env["output_directory"]`, the standalone core delegates output-location and run-identity decisions to seams that the `TestJob` injects via overridable hooks. The default `TestJob` returns `SimpleOutputContext` / `StandaloneRunMetadata` / `StdoutResultRecorder`; `DefaultIntegratedTestJob` overrides the same hooks to use presence-folder paths and HTML rendering:
 
 ```python
-this_app = ThisApplicationSingleton()
-env = this_app.context.lookup("/environment")
+def _create_output_context(self) -> IOutputContext:
+    inst = SimpleOutputContext()
+    return inst
+
+def _create_run_metadata(self) -> IRunMetadata:
+    inst = StandaloneRunMetadata(title=run_title)
+    return inst
 ```
 
 #### 3. Registry Pattern
@@ -356,37 +331,38 @@ with job_type(logger, testroot, includes=includes, excludes=excludes, test_modul
 
 ## Integration Points
 
-### With CLI System
+### With the Integration Entry Point (`integrated_test_entrypoint`)
 
-The entry point system integrates with the CLI through shared initialization:
+The standalone core is wrapped — not duplicated — by the integration entry point that lives in `automojo-integration-runtime`. The integration entry point performs activation and then delegates into the same decoupled core:
 
 ```mermaid
 sequenceDiagram
-    participant CLI as CLI Command
-    participant EP as Entry Point
-    participant Init as Initialization
-    participant Job as TestJob
-    
-    Note over CLI,Init: CLI Path
-    CLI->>Init: initialize_testbase_runtime()
-    CLI->>Init: initialize_testbase_results()
-    CLI->>Job: Create and execute TestJob
-    
-    Note over EP,Init: Entry Point Path
-    EP->>Init: initialize_testbase_runtime()
-    EP->>Init: activate_profile_job()
-    EP->>Init: initialize_testbase_results()
-    EP->>Job: Create and execute TestJob
+    participant User
+    participant ITE as integrated_test_entrypoint (integration-runtime)
+    participant Init as Integration Initialization
+    participant GTE as generic_test_entrypoint (testbase core)
+    participant Job as DefaultIntegratedTestJob
+
+    User->>ITE: run under integration runtime
+    ITE->>Init: initialize_integration_runtime()
+    ITE->>Init: initialize_integration_results()
+    ITE->>GTE: generic_test_entrypoint(job_type=DefaultIntegratedTestJob)
+    GTE->>Job: Create and execute (presence-folder output, JSOS + HTML)
+    Job-->>GTE: result_code
+    GTE->>User: sys.exit(result_code)
 ```
 
-**Shared Components:**
+**Division of responsibility:**
 
-| Component | CLI Usage | Entry Point Usage |
-|-----------|-----------|-------------------|
-| `initialize_testbase_runtime()` | Called by root command | Called at entry |
-| `initialize_testbase_results()` | Called by run command | Called at entry |
-| `TestJob` | Created with CLI options | Created with parsed args |
-| `InjectionRegistry` | Used during execution | Updated for `__main__` modules |
+| Concern | Standalone core (`generic_test_entrypoint`, testbase) | Integration entry point (`integrated_test_entrypoint`, integration-runtime) |
+|---------|-------------------------------------------------------|------------------------------------------------------------------------------|
+| Activation / persona / runtime variables | None | `initialize_integration_runtime()` |
+| Result resources / profile activation | None | `initialize_integration_results()` |
+| Output resolution | Injected `SimpleOutputContext` + `StdoutResultRecorder` (stdout; JSOS/JSON when an output dir is given; no HTML) | `DefaultIntegratedTestJob` overrides hooks for presence-folder paths + JSOS-to-disk + HTML |
+| Module resolution / registration / job execution | Performed here | Delegated to the standalone core |
+| `InjectionRegistry` | Updated for `__main__` modules | Inherited from the delegated core |
+
+> The TestBase CLI move and the relocation of HTML rendering are pending later phases; this section describes the entry-point split only.
 
 ### With Test Execution Engine
 
@@ -446,15 +422,18 @@ tpmod.logger = logger
 
 ### Environment Variables
 
-The entry point respects these environment variables through `RuntimeVariables`:
+The standalone core reads core test-execution knobs directly from `os.environ` through the dependency-free `automojo.testbase.environment` module (it does NOT go through `RuntimeVariables` or this-app):
 
 | Variable | Purpose |
 |----------|---------|
 | `AM_TESTROOT` | Default test root directory |
-| `AM_OUTPUT` | Output directory for results |
-| `AM_LOG_LEVEL_CONSOLE` | Console logging level |
-| `AM_LOG_LEVEL_FILE` | File logging level |
-| `AM_PRESENCE_DIR` | Presence directory for results |
+| `AM_OUTPUT_DIRECTORY` | Base output directory for artefacts (consumed by the injected `IOutputContext`) |
+| `AM_RUN_ID` | Externally supplied run identifier |
+| `AM_TESTRUN_TIMEOUT` | Overall test-run timeout (seconds) |
+| `AM_DEBUG_DEBUGGER`, `AM_DEBUG_BREAKPOINTS` | Debugger selection and breakpoint list |
+| `AM_DIAGNOSTICS_PRERUN`, `AM_DIAGNOSTICS_POSTRUN` | Enable pre-/post-run diagnostic capture |
+
+Presence-folder paths and `RuntimeVariables`/this-app-sourced values are NOT consumed by the standalone core; they are introduced by `DefaultIntegratedTestJob` in `automojo-integration-runtime`.
 
 ### Test Root Marker
 
@@ -586,14 +565,28 @@ python test_module.py --console-level WARNING --logfile-level DEBUG
 ## File Structure
 
 ```
+# TestBase (standalone core)
 source/packages/automojo/testbase/
-├── entrypoints.py          # Entry point functions
-├── initialize.py           # Runtime and results initialization
+├── entrypoints.py          # generic_test_entrypoint (decoupled standalone core)
+├── environment.py          # Dependency-free os.environ knob accessors (AM_TESTROOT, etc.)
 ├── utilities.py            # Module resolution utilities
-├── testjob.py              # TestJob base class
+├── testjob.py              # TestJob base class + injected output/recorder hooks
+├── output/
+│   ├── outputcontext.py    # IOutputContext / SimpleOutputContext
+│   └── runmetadata.py      # IRunMetadata / StandaloneRunMetadata
+├── results/recorders/
+│   └── stdoutresultrecorder.py  # Default StdoutResultRecorder
 └── injection/
-    └── injectionregistry.py  # Resource origin management
+    └── injectionregistry.py     # Resource origin management
+
+# Integration entry point (separate package/repo)
+source/packages/automojo/integrationruntime/
+├── entrypoints.py          # integrated_test_entrypoint (activation + delegation)
+├── initialize.py           # initialize_integration_runtime / initialize_integration_results
+└── integratedtestjob.py    # DefaultIntegratedTestJob (RuntimeOutputContext / JsonResultRecorder + HTML)
 ```
+
+> Note: `automojo.testbase.initialize` (legacy `initialize_testbase_runtime` / `initialize_testbase_results`) still exists on disk but is no longer used by the standalone entry point.
 
 ## Testing Strategy
 
@@ -614,21 +607,21 @@ source/packages/automojo/testbase/
    - Log level validation
    - Default value handling
 
-4. **Initialization**
-   - Runtime variable resolution
-   - Results configuration
-   - Profile activation
+4. **Output Seams**
+   - `SimpleOutputContext` base-dir resolution
+   - `StandaloneRunMetadata` run-id / title / timeout
+   - `StdoutResultRecorder` stdout summary, JSOS/JSON when an output dir is given, no HTML
 
 ### Integration Testing
 
 1. **End-to-End Entry Point**
-   - Execute test module via entry point
+   - Execute test module via the standalone core
    - Verify result code reflects test outcomes
-   - Validate result file generation
+   - Validate stdout summary (and JSOS/JSON when an output dir is supplied)
 
-2. **CLI Integration**
-   - Verify shared initialization behavior
-   - Compare entry point vs CLI execution results
+2. **Integration Entry Point Delegation**
+   - Verify `integrated_test_entrypoint` activates then delegates to `generic_test_entrypoint`
+   - Verify `DefaultIntegratedTestJob` produces presence-folder JSOS + HTML
 
 ### Test Categories
 
@@ -636,5 +629,5 @@ source/packages/automojo/testbase/
 |----------|------------|-------|
 | Resolution | `find_testmodule_root`, `find_testmodule_fullname` | Path handling, marker detection |
 | Registration | Module remapping, injection renaming | Identity management |
-| Initialization | Runtime, results setup | Configuration correctness |
+| Output Seams | `SimpleOutputContext`, `StandaloneRunMetadata`, `StdoutResultRecorder` | Injected output resolution |
 | Execution | Job creation, execution | End-to-end flow |

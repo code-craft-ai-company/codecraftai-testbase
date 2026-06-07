@@ -26,7 +26,7 @@ graph TB
     end
     
     subgraph "Configuration Layer"
-        RV[RuntimeVariables]
+        ENV[automojo.testbase.environment]
         DOG[DiagnosticOptionGroup]
     end
     
@@ -41,21 +41,21 @@ graph TB
     end
     
     subgraph "Storage Layer"
+        OC[IOutputContext]
         DF[Diagnostic Folder]
-        RP[Runtime Paths]
     end
     
-    DOG --> RV
-    RV --> TS
+    DOG --> ENV
+    ENV --> TS
     DL --> TS
-    RCP --> RV
+    RCP --> ENV
     
     TJ --> TS
     TS --> IC
     IC --> DIC
     
-    TS --> RP
-    RP --> DF
+    TS --> OC
+    OC --> DF
     DIC --> DF
 ```
 
@@ -175,19 +175,20 @@ sequenceDiagram
     participant CLI as CLI Command
     participant TJ as TestJob
     participant TS as TestSequencer
-    participant RV as RuntimeVariables
+    participant ENV as environment
+    participant OC as IOutputContext
     participant IC as IntegrationCoupling
     participant FS as File System
     
-    Note over CLI,RV: Configuration Phase
-    CLI->>RV: Set AM_DIAGNOSTICS_PRERUN/POSTRUN
+    Note over CLI,ENV: Configuration Phase
+    CLI->>ENV: Set AM_DIAGNOSTICS_PRERUN/POSTRUN (os.environ)
     
     Note over TJ,TS: Pre-Run Diagnostic Phase
     TJ->>TS: fire_diagnostic_capture_pre_testrun(level)
-    TS->>RV: Check AM_DIAGNOSTICS_PRERUN
+    TS->>ENV: diagnostics_prerun_enabled()
     alt Prerun enabled
-        TS->>FS: get_path_for_diagnostics("prerun-diagnostic")
-        FS-->>TS: diagnostic_root path
+        TS->>OC: get_diagnostics_dir("prerun-diagnostic")
+        OC-->>TS: diagnostic_root path
         loop For each integration
             TS->>IC: diagnostic("prerun-diagnostic", level, diagnostic_root)
             IC->>FS: Write diagnostic files
@@ -199,10 +200,10 @@ sequenceDiagram
     
     Note over TJ,TS: Post-Run Diagnostic Phase
     TJ->>TS: fire_diagnostic_capture_post_testrun(level)
-    TS->>RV: Check AM_DIAGNOSTICS_POSTRUN
+    TS->>ENV: diagnostics_postrun_enabled()
     alt Postrun enabled
-        TS->>FS: get_path_for_diagnostics("postrun-diagnostic")
-        FS-->>TS: diagnostic_root path
+        TS->>OC: get_diagnostics_dir("postrun-diagnostic")
+        OC-->>TS: diagnostic_root path
         loop For each integration
             TS->>IC: diagnostic("postrun-diagnostic", level, diagnostic_root)
             IC->>FS: Write diagnostic files
@@ -216,14 +217,16 @@ sequenceDiagram
 flowchart TD
     A[CLI: --prerun-diagnostic] --> B[AM_RUNTIME_OPTION_OVERRIDES]
     B --> C[override_diagnostics_prerun]
-    C --> D[RuntimeVariables.AM_DIAGNOSTICS_PRERUN = True]
+    C --> D[os.environ AM_DIAGNOSTICS_PRERUN = truthy]
     
     E[CLI: --postrun-diagnostic] --> F[AM_RUNTIME_OPTION_OVERRIDES]
     F --> G[override_diagnostics_postrun]
-    G --> H[RuntimeVariables.AM_DIAGNOSTICS_POSTRUN = True]
+    G --> H[os.environ AM_DIAGNOSTICS_POSTRUN = truthy]
     
-    D --> I[TestSequencer.diagnostic_capture_pre_testrun]
-    H --> J[TestSequencer.diagnostic_capture_post_testrun]
+    D --> D2[environment.diagnostics_prerun_enabled]
+    H --> H2[environment.diagnostics_postrun_enabled]
+    D2 --> I[TestSequencer.diagnostic_capture_pre_testrun]
+    H2 --> J[TestSequencer.diagnostic_capture_post_testrun]
 ```
 
 ### Design Patterns
@@ -287,9 +290,10 @@ The TestSequencer acts as an observer coordinator, notifying all registered inte
 
 ```python
 def diagnostic_capture_post_testrun(self, level: int=9):
+    postrun_info = environment.diagnostics_postrun_enabled()
     if postrun_info is not None and postrun_info == True:
         label = DiagnosticLabel.POSTRUN_DIAGNOSTIC
-        diagnostic_root = get_path_for_diagnostics(label)
+        diagnostic_root = self._output_context.get_diagnostics_dir(label)
         
         # Notify all integrations
         for _, integ_type in self._integrations.items():
@@ -308,15 +312,15 @@ sequenceDiagram
     participant CLI as testbase testing run
     participant DOG as DiagnosticOptionGroup
     participant RO as RuntimeOptionOverrides
-    participant RV as RuntimeVariables
+    participant ENV as os.environ
     
     User->>CLI: --prerun-diagnostic --postrun-diagnostic
     CLI->>DOG: Parse options
     DOG-->>CLI: prerun_diagnostic=True, postrun_diagnostic=True
     CLI->>RO: override_diagnostics_prerun({})
     CLI->>RO: override_diagnostics_postrun({})
-    RO->>RV: Set AM_DIAGNOSTICS_PRERUN
-    RO->>RV: Set AM_DIAGNOSTICS_POSTRUN
+    RO->>ENV: Set AM_DIAGNOSTICS_PRERUN
+    RO->>ENV: Set AM_DIAGNOSTICS_POSTRUN
 ```
 
 ### With Test Execution Engine
@@ -356,12 +360,14 @@ DEFAULT_DO_NOT_DESCEND_DIRS = [
 
 ## Configuration
 
-### Runtime Variables
+### Environment Knobs
 
-| Variable | Type | Description |
-|----------|------|-------------|
-| `AM_DIAGNOSTICS_PRERUN` | `bool` | Enable pre-run diagnostic capture |
-| `AM_DIAGNOSTICS_POSTRUN` | `bool` | Enable post-run diagnostic capture |
+The pre/post-run diagnostic ENABLE flags are read through the dependency-free `automojo.testbase.environment` module, which resolves these knobs directly from `os.environ`. The core does NOT read them via `RuntimeVariables`.
+
+| Variable | Accessor | Type | Description |
+|----------|----------|------|-------------|
+| `AM_DIAGNOSTICS_PRERUN` | `environment.diagnostics_prerun_enabled()` | `bool` | Enable pre-run diagnostic capture |
+| `AM_DIAGNOSTICS_POSTRUN` | `environment.diagnostics_postrun_enabled()` | `bool` | Enable post-run diagnostic capture |
 
 ### Diagnostic Levels
 
@@ -374,6 +380,8 @@ The diagnostic level parameter controls the verbosity of captured diagnostics:
 | 7-9 | Detailed diagnostics | Deep investigation |
 
 ### File System Structure
+
+The diagnostics output directory is resolved through the injected `IOutputContext` seam rather than well-known-path helpers. The default `SimpleOutputContext.get_diagnostics_dir(label)` roots diagnostics under the single output base dir (`<test_results_dir>/diagnostics/<label>/`). The presence-folder-rooted variant is an integration concern provided by `RuntimeOutputContext.get_diagnostics_dir` in `automojo-integration-runtime`, which delegates to the well-known presence-folder paths.
 
 ```
 <test_results_dir>/
@@ -491,14 +499,19 @@ def process_diagnostics(label: str):
 ```
 source/packages/automojo/testbase/
 ├── diagnostics.py              # DiagnosticLabel and RuntimeConfigPaths
+├── environment.py              # AM_DIAGNOSTICS_PRERUN/POSTRUN enable-flag accessors (os.environ)
 ├── testjob.py                  # TestJob with diagnostic fire methods
 ├── cli/
 │   └── options.py              # DiagnosticOptionGroup
 ├── coupling/
 │   └── integrationcoupling.py  # IntegrationCoupling.diagnostic()
+├── output/
+│   └── outputcontext.py        # IOutputContext / SimpleOutputContext.get_diagnostics_dir
 └── sequencing/
     └── testsequencer.py        # Diagnostic capture implementation
 ```
+
+> The presence-folder-rooted diagnostics path is an integration concern. It lives in `automojo-integration-runtime` as `RuntimeOutputContext.get_diagnostics_dir` (wired through `IntegratedTestJob`), which delegates to the well-known presence-folder paths. The testbase core resolves diagnostics only through the injected `IOutputContext` seam.
 
 ## Testing Strategy
 
@@ -538,7 +551,7 @@ source/packages/automojo/testbase/
 2. **CLI Integration**
    - Test `--prerun-diagnostic` flag
    - Test `--postrun-diagnostic` flag
-   - Verify runtime variables are set correctly
+   - Verify the AM_DIAGNOSTICS_PRERUN/POSTRUN environment knobs are set correctly (and read back via `automojo.testbase.environment`)
 
 ### Test Categories
 

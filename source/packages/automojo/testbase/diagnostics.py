@@ -717,8 +717,8 @@ class DiagnosticLabel:
     #               └── diagnostic_files...
     #
     # The folder creation flow:
-    # 1. TestSequencer calls get_path_for_diagnostics(label) with one of these labels
-    # 2. get_path_for_diagnostics() creates: <test_results_dir>/diagnostics/<label>/
+    # 1. TestSequencer resolves the path via output_context.get_diagnostics_dir(label) with one of these labels
+    # 2. IOutputContext.get_diagnostics_dir() creates: <test_results_dir>/diagnostics/<label>/
     # 3. Each IntegrationCoupling.diagnostic() creates its own subfolder within
     # 4. Integration writes diagnostic files to its subfolder
     #

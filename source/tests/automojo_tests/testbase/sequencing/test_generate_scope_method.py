@@ -20,12 +20,6 @@ import os
 import tempfile
 import unittest
 
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-import automojo.runtime.paths as runtime_paths
-
 from automojo.testbase.testgroup import TestGroup
 from automojo.testbase.testref import TestRef
 from automojo.testbase.injection.injectionregistry import injection_registry
@@ -113,27 +107,21 @@ class ScopeMethodFunctionSignatureTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
 
     def tearDown(self):
         """Clean up test fixtures."""
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
 
@@ -299,27 +287,21 @@ class ScopeMethodDocstringTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
 
     def tearDown(self):
         """Clean up test fixtures."""
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
 
@@ -472,27 +454,21 @@ class ModuleScopeContextTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
 
     def tearDown(self):
         """Clean up test fixtures."""
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
 
@@ -666,27 +642,21 @@ class ScopeMethodReturnStatementTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
 
     def tearDown(self):
         """Clean up test fixtures."""
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
 
@@ -811,27 +781,21 @@ class ScopesCalledReturnValueTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self._original_scope_tree = injection_registry._scope_tree_root
         injection_registry._scope_tree_root = InjectionScope()
 
     def tearDown(self):
         """Clean up test fixtures."""
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
         injection_registry._scope_tree_root = self._original_scope_tree
 

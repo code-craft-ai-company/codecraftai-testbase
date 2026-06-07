@@ -3,18 +3,13 @@ import tempfile
 import unittest
 from collections import OrderedDict
 
-import automojo.runtime.paths as runtime_paths
 from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
-
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
 
 from automojo.testbase.sequencing.testactivity import TestActivity
 from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope
 from automojo.testbase.sequencing.sequencerscopebase import SequencerScopeBase
 from automojo.testbase.sequencing.testsequencer import TestSequencer
+from automojo.testbase.output.outputcontext import SimpleOutputContext
 
 class DummyResult:
     def __init__(self, inst_id=None, name=None, parent_inst=None):
@@ -54,6 +49,8 @@ class DummySequencer:
     def __init__(self):
         self.calls = []
         self._scope_stack = []
+        # The scope resolves its by-products directory via the sequencer's output context.
+        self.output_context = SimpleOutputContext(base_dir=tempfile.mkdtemp())
 
     def scope_id_create(self, ctx_name):
         parent = self._scope_stack[-1][1] if self._scope_stack else None
@@ -97,22 +94,20 @@ class TestActivityTests(unittest.TestCase):
 class SequencerTestScopeTests(unittest.TestCase):
 
     def setUp(self):
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(name="automojo-testbase", logger_name="automojo-testbase", log_basename="automojo-testbase")
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        # Reset cached runtime paths so overrides take effect for each test
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
         self.seq = DummySequencer()
         self.rec = DummyRecorder()
 
     def tearDown(self):
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
 
     def test_get_monikers_and_pivots(self):
@@ -302,17 +297,10 @@ class SequencerScopeBaseTests(unittest.TestCase):
 class TestSequencerAsyncExecutionTests(unittest.TestCase):
 
     def setUp(self):
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(name="automojo-testbase", logger_name="automojo-testbase", log_basename="automojo-testbase")
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         self.sequencer = TestSequencer(
             jobtitle="Async Test Job",
@@ -323,6 +311,11 @@ class TestSequencerAsyncExecutionTests(unittest.TestCase):
         )
 
     def tearDown(self):
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
 
     def test_run_async_test_executes_coroutine(self):

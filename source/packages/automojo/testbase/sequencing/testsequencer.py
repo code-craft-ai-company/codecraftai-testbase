@@ -33,7 +33,8 @@ from automojo.xmodules.ximport import import_file
 from automojo.xmodules.jsos import CHAR_RECORD_SEPERATOR
 from automojo.xmodules.debugging import debugger_wellknown_breakpoint_code_append
 
-from automojo.runtime.runtimevariables import RuntimeVariables
+from automojo.testbase import environment
+from automojo.testbase.output.outputcontext import IOutputContext, SimpleOutputContext
 
 from automojo.testbase.injection.injectionregistry import injection_registry
 from automojo.testbase.origins.resourceorigin import ResourceOrigin
@@ -53,7 +54,7 @@ from automojo.testbase.results.model.testresult import TestResult
 
 from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 
-from automojo.runtime.paths import get_path_for_testresults, get_path_for_diagnostics
+# Well-known result/diagnostic paths are resolved via the injected IOutputContext (see __init__).
 
 from automojo.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
 from automojo.testbase.testcollector import TestCollector
@@ -190,7 +191,7 @@ class TestSequencer:
             - :class:`SequencerTestScope`: Test-level scope context manager
     """
 
-    def __init__(self, jobtitle: str, root: str, includes: Sequence[str], excludes: Sequence[str], metafilters: List[MetaFilter], job_seed: int = None):
+    def __init__(self, jobtitle: str, root: str, includes: Sequence[str], excludes: Sequence[str], metafilters: List[MetaFilter], job_seed: int = None, output_context: Optional[IOutputContext] = None):
         """
             Creates a :class:`TestSequencer` object which is used to discover tests and control the
             flow of a test run through its various phases.
@@ -256,7 +257,17 @@ class TestSequencer:
         self._root_result = None
         self._scope_stack = []
         self._job_seed = job_seed
+
+        self._output_context = output_context if output_context is not None else SimpleOutputContext()
+
         return
+
+    @property
+    def output_context(self) -> IOutputContext:
+        """
+            The :class:`IOutputContext` used to resolve where this sequencer writes run artefacts.
+        """
+        return self._output_context
 
     def __enter__(self):
         """
@@ -374,7 +385,7 @@ class TestSequencer:
                 - :meth:`create_password_masked_environment`: Creates masked environment copy
         """
 
-        results_dir = get_path_for_testresults()
+        results_dir = self._output_context.get_test_results_dir()
 
         environment_dict = self.create_password_masked_environment()
 
@@ -739,7 +750,7 @@ class TestSequencer:
         # Step 1: Check if pre-run diagnostics are enabled
         # The AM_DIAGNOSTICS_PRERUN runtime variable is set by the --prerun-diagnostic
         # CLI option. If not set or False, we skip the entire capture process.
-        prerun_info = RuntimeVariables.AM_DIAGNOSTICS_PRERUN
+        prerun_info = environment.diagnostics_prerun_enabled()
 
         if prerun_info is not None and prerun_info == True:
             # Step 2: Use the well-known pre-run diagnostic label
@@ -751,9 +762,9 @@ class TestSequencer:
                 return
             
             # Step 3: Create the diagnostic folder structure
-            # get_path_for_diagnostics() creates: <test_results_dir>/diagnostics/<label>/
+            # output_context.get_diagnostics_dir() creates: <test_results_dir>/diagnostics/<label>/
             # The folder is created automatically if it doesn't exist
-            diagnostic_root = get_path_for_diagnostics(label)
+            diagnostic_root = self._output_context.get_diagnostics_dir(label)
 
             # Step 4-5: Iterate over all registered integrations and capture diagnostics
             # Each integration coupling implements its own diagnostic() method to capture
@@ -834,7 +845,7 @@ class TestSequencer:
         # Step 1: Check if post-run diagnostics are enabled
         # The AM_DIAGNOSTICS_POSTRUN runtime variable is set by the --postrun-diagnostic
         # CLI option. If not set or False, we skip the entire capture process.
-        postrun_info = RuntimeVariables.AM_DIAGNOSTICS_POSTRUN
+        postrun_info = environment.diagnostics_postrun_enabled()
 
         if postrun_info is not None and postrun_info == True:
 
@@ -847,9 +858,9 @@ class TestSequencer:
                 return
             
             # Step 3: Create the diagnostic folder structure
-            # get_path_for_diagnostics() creates: <test_results_dir>/diagnostics/<label>/
+            # output_context.get_diagnostics_dir() creates: <test_results_dir>/diagnostics/<label>/
             # The folder is created automatically if it doesn't exist
-            diagnostic_root = get_path_for_diagnostics(label)
+            diagnostic_root = self._output_context.get_diagnostics_dir(label)
 
             # Step 4-5: Iterate over all registered integrations and capture diagnostics
             # Each integration coupling implements its own diagnostic() method to capture
@@ -941,9 +952,9 @@ class TestSequencer:
             return
 
         # Create the diagnostic folder structure using the custom label
-        # get_path_for_diagnostics() creates: <test_results_dir>/diagnostics/<label>/
+        # output_context.get_diagnostics_dir() creates: <test_results_dir>/diagnostics/<label>/
         # The folder is created automatically if it doesn't exist
-        diagnostic_root = get_path_for_diagnostics(label)
+        diagnostic_root = self._output_context.get_diagnostics_dir(label)
 
         # Iterate over all registered integrations and capture diagnostics
         # Each integration coupling implements its own diagnostic() method to capture
@@ -1581,7 +1592,6 @@ class TestSequencer:
             Example Usage::
 
                 from automojo.testbase.sequencing.testsequencer import TestSequencer
-                from automojo.runtime.paths import get_path_for_testresults
                 import os
 
                 # Create and configure the sequencer
@@ -1595,7 +1605,7 @@ class TestSequencer:
                         sequencer.attach_to_environment()
 
                         # Generate the sequence document
-                        results_dir = get_path_for_testresults()
+                        results_dir = sequencer.output_context.get_test_results_dir()
                         output_file = os.path.join(results_dir, "testrun_sequence.py")
                         sequencer.generate_testrun_sequence_document(output_file)
 
@@ -2219,8 +2229,8 @@ class TestSequencer:
         # runtime variables, insert breakpoint code at TESTRUN_START. This allows
         # developers to pause execution at the start of the test run for debugging.
         # --------------------------------------------------------------------
-        debugger_name = RuntimeVariables.AM_DEBUG_DEBUGGER
-        configured_breakpoints = RuntimeVariables.AM_DEBUG_BREAKPOINTS
+        debugger_name = environment.get_debugger_name()
+        configured_breakpoints = environment.get_debug_breakpoints()
 
         if debugger_name is not None and configured_breakpoints is not None:
             debugger_wellknown_breakpoint_code_append(debugger_name, WELLKNOWN_BREAKPOINTS.TESTRUN_START, method_lines, current_indent, configured_breakpoints)
@@ -2979,7 +2989,6 @@ class TestSequencer:
             Example Usage::
 
                 from automojo.testbase.sequencing.testsequencer import TestSequencer
-                from automojo.runtime.paths import get_path_for_testresults
                 import os
 
                 # Create and configure the sequencer
@@ -2990,7 +2999,7 @@ class TestSequencer:
                     # Check if there were any import errors
                     if len(sequencer.import_errors) > 0:
                         # Record import errors to a file for later analysis
-                        results_dir = get_path_for_testresults()
+                        results_dir = sequencer.output_context.get_test_results_dir()
                         error_file = os.path.join(results_dir, "import-errors.jsos")
                         sequencer.record_import_errors(error_file)
 

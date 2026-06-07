@@ -22,6 +22,7 @@ graph TB
     subgraph "Sequencer Core"
         TS[TestSequencer]
         SS[Scope Stack]
+        OC[IOutputContext]
     end
     
     subgraph "Scope Hierarchy"
@@ -49,6 +50,7 @@ graph TB
     end
     
     TS --> SS
+    TS --> OC
     TS --> SSS
     TS --> SMS
     TS --> STSS
@@ -374,6 +376,7 @@ sequenceDiagram
     participant FS as File System
     
     Test->>STS: begin_activity("name", target, detail)
+    Note over STS: Byproducts folder resolved on enter via<br/>self._sequencer.output_context.get_testcase_byproducts_dir(scope_id)
     STS->>STS: Ensure byproducts folder exists
     STS->>TA: Create TestActivity
     TA->>TA: Record begin timestamp
@@ -507,6 +510,30 @@ stateDiagram-v2
 
 ## Integration Points
 
+### With the Output Context (IOutputContext)
+
+The `TestSequencer` resolves all run artefact locations through an injected `IOutputContext`
+seam rather than the well-known-path helpers (`get_path_for_*`), `RuntimeVariables`, or
+`ThisApplicationSingleton`. The context is supplied via the `output_context` constructor
+parameter (defaulting to `SimpleOutputContext`, which roots artefacts under a single base
+directory) and exposed as the `output_context` property.
+
+| Resolved Path | Method |
+|---------------|--------|
+| Test results directory | `output_context.get_test_results_dir()` |
+| Diagnostics directory (per label) | `output_context.get_diagnostics_dir(label)` |
+| Per-testcase by-products directory | `output_context.get_testcase_byproducts_dir(scope_id)` |
+
+`SequencerTestScope` reaches the by-products path through `self._sequencer.output_context`
+during `__enter__`, then derives the `activity.jsos` stream filename from it. The rich
+integration variants (presence-folder paths, `RuntimeVariables`-sourced metadata) are
+supplied by binding a different `IOutputContext` implementation (e.g. `RuntimeOutputContext`)
+in `automojo-integration-runtime`; the sequencer core itself stays dependency-free.
+
+`AM_DIAGNOSTICS_PRERUN` / `AM_DIAGNOSTICS_POSTRUN` gating is read through the dependency-free
+`automojo.testbase.environment` module (`environment.diagnostics_prerun_enabled()` /
+`environment.diagnostics_postrun_enabled()`) rather than `RuntimeVariables`.
+
 ### With TestSequencer
 
 The scope system is tightly integrated with the `TestSequencer`:
@@ -602,9 +629,14 @@ Activities are recorded in JSOS (JSON Separated Object Stream) format:
 
 ### Byproducts Directory Structure
 
+The per-testcase by-products directory is resolved through the injected `IOutputContext`
+(`output_context.get_testcase_byproducts_dir(scope_id)`), not through `RuntimeVariables`,
+`get_path_for_*`, or `ThisApplicationSingleton`. The exact layout depends on the bound
+context. The default `SimpleOutputContext` roots by-products under one base directory:
+
 ```
-<results_dir>/
-└── testcases/
+<base_dir>/
+└── testcase_byproducts/
     └── <scope_id>/
         └── activity.jsos
 ```

@@ -26,7 +26,7 @@ from automojo.errors.xtraceback import create_traceback_detail, format_traceback
 
 from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
-from automojo.runtime.paths import get_path_for_testcase_by_products
+# Test-case by-products dir is resolved via the sequencer's injected IOutputContext.
 
 from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 from automojo.testbase.sequencing.testactivity import TestActivity
@@ -127,7 +127,7 @@ class SequencerTestScope:
         self._parent_scope_id, self._scope_id = self._sequencer.scope_id_create(self._context_identifier)
         logger.info("TEST SCOPE ENTER: {}, {}".format(self._context_identifier, self._scope_id))
 
-        self._tc_byproducts_folder = get_path_for_testcase_by_products(self._scope_id)
+        self._tc_byproducts_folder = self._sequencer.output_context.get_testcase_byproducts_dir(self._scope_id)
         self._activity_stream_filename = os.path.join(self._tc_byproducts_folder, "activity.jsos")
         
         self._result = self._sequencer.create_test_result_node(self._scope_id, self._test_name, self._monikers, self._pivots, parent_inst=self._parent_scope_id)

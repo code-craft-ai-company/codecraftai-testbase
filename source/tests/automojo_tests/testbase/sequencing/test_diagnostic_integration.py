@@ -16,11 +16,6 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-
 from automojo.testbase.diagnostics import DiagnosticLabel
 from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
 from automojo.testbase.sequencing.testsequencer import TestSequencer
@@ -170,23 +165,12 @@ class DiagnosticCaptureIntegrationTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
-        
-        self.this_app = ThisApplicationSingleton()
-        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
-        
+
         # Reset tracking data
         TestIntegrationCoupling.reset_tracking()
         SecondTestIntegrationCoupling.reset_tracking()
-        
+
         # Create a TestSequencer instance
         self.sequencer = TestSequencer(
             jobtitle="integration_test_job",
@@ -196,29 +180,35 @@ class DiagnosticCaptureIntegrationTests(unittest.TestCase):
             metafilters=[]
         )
 
+        # Give the sequencer a controllable output context so diagnostic-dir
+        # resolution is mockable and inspectable.
+        self._diag_dir = os.path.join(self.tempdir.name, "diagnostics")
+        os.makedirs(self._diag_dir, exist_ok=True)
+        self.sequencer._output_context = MagicMock()
+        self.sequencer._output_context.get_diagnostics_dir.return_value = self._diag_dir
+
     def tearDown(self):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
 
-    @patch('automojo.testbase.sequencing.testsequencer.RuntimeVariables')
-    @patch('automojo.testbase.sequencing.testsequencer.get_path_for_diagnostics')
-    def test_prerun_diagnostic_capture_end_to_end(self, mock_get_path, mock_runtime_vars):
+    @patch('automojo.testbase.sequencing.testsequencer.environment')
+    def test_prerun_diagnostic_capture_end_to_end(self, mock_env):
         """
         Test end-to-end pre-run diagnostic capture with enabled diagnostics.
-        
+
         Verifies that when pre-run diagnostics are enabled:
         1. The diagnostic method is called on all registered integrations
         2. The correct label (PRERUN_DIAGNOSTIC) is passed
         3. The diagnostic folder path is passed correctly
-        
+
         Requirements: 5.1, 5.2, 5.3, 5.4
         """
         # Setup: Enable pre-run diagnostics
-        mock_runtime_vars.AM_DIAGNOSTICS_PRERUN = True
+        mock_env.diagnostics_prerun_enabled.return_value = True
         diagnostic_path = os.path.join(self.tempdir.name, "diagnostics", "prerun-diagnostic")
         os.makedirs(diagnostic_path, exist_ok=True)
-        mock_get_path.return_value = diagnostic_path
-        
+        self.sequencer.output_context.get_diagnostics_dir.return_value = diagnostic_path
+
         # Register test integrations
         self.sequencer._integrations = {
             "test_integration": TestIntegrationCoupling,
@@ -242,25 +232,24 @@ class DiagnosticCaptureIntegrationTests(unittest.TestCase):
         self.assertEqual(call['level'], 9)
         self.assertEqual(call['diag_folder'], diagnostic_path)
 
-    @patch('automojo.testbase.sequencing.testsequencer.RuntimeVariables')
-    @patch('automojo.testbase.sequencing.testsequencer.get_path_for_diagnostics')
-    def test_postrun_diagnostic_capture_end_to_end(self, mock_get_path, mock_runtime_vars):
+    @patch('automojo.testbase.sequencing.testsequencer.environment')
+    def test_postrun_diagnostic_capture_end_to_end(self, mock_env):
         """
         Test end-to-end post-run diagnostic capture with enabled diagnostics.
-        
+
         Verifies that when post-run diagnostics are enabled:
         1. The diagnostic method is called on all registered integrations
         2. The correct label (POSTRUN_DIAGNOSTIC) is passed
         3. The diagnostic folder path is passed correctly
-        
+
         Requirements: 6.1, 6.2, 6.3, 6.4
         """
         # Setup: Enable post-run diagnostics
-        mock_runtime_vars.AM_DIAGNOSTICS_POSTRUN = True
+        mock_env.diagnostics_postrun_enabled.return_value = True
         diagnostic_path = os.path.join(self.tempdir.name, "diagnostics", "postrun-diagnostic")
         os.makedirs(diagnostic_path, exist_ok=True)
-        mock_get_path.return_value = diagnostic_path
-        
+        self.sequencer.output_context.get_diagnostics_dir.return_value = diagnostic_path
+
         # Register test integrations
         self.sequencer._integrations = {
             "test_integration": TestIntegrationCoupling,
@@ -284,24 +273,23 @@ class DiagnosticCaptureIntegrationTests(unittest.TestCase):
         self.assertEqual(call['level'], 9)
         self.assertEqual(call['diag_folder'], diagnostic_path)
 
-    @patch('automojo.testbase.sequencing.testsequencer.RuntimeVariables')
-    @patch('automojo.testbase.sequencing.testsequencer.get_path_for_diagnostics')
-    def test_diagnostic_folders_created_by_integration(self, mock_get_path, mock_runtime_vars):
+    @patch('automojo.testbase.sequencing.testsequencer.environment')
+    def test_diagnostic_folders_created_by_integration(self, mock_env):
         """
         Test that diagnostic folders are created by integration couplings.
-        
+
         Verifies that when diagnostics are captured:
         1. Integration-specific subfolders are created
         2. Diagnostic files are written to the correct location
-        
+
         Requirements: 5.1, 5.3, 6.1, 6.3
         """
         # Setup: Enable pre-run diagnostics
-        mock_runtime_vars.AM_DIAGNOSTICS_PRERUN = True
+        mock_env.diagnostics_prerun_enabled.return_value = True
         diagnostic_path = os.path.join(self.tempdir.name, "diagnostics", "prerun-diagnostic")
         os.makedirs(diagnostic_path, exist_ok=True)
-        mock_get_path.return_value = diagnostic_path
-        
+        self.sequencer.output_context.get_diagnostics_dir.return_value = diagnostic_path
+
         # Register test integration
         self.sequencer._integrations = {
             "test_integration": TestIntegrationCoupling
@@ -325,67 +313,64 @@ class DiagnosticCaptureIntegrationTests(unittest.TestCase):
         self.assertIn("label=prerun-diagnostic", content)
         self.assertIn("level=9", content)
 
-    @patch('automojo.testbase.sequencing.testsequencer.RuntimeVariables')
-    @patch('automojo.testbase.sequencing.testsequencer.get_path_for_diagnostics')
-    def test_prerun_diagnostic_skipped_when_disabled(self, mock_get_path, mock_runtime_vars):
+    @patch('automojo.testbase.sequencing.testsequencer.environment')
+    def test_prerun_diagnostic_skipped_when_disabled(self, mock_env):
         """
         Test that pre-run diagnostic capture is skipped when disabled.
-        
+
         Requirements: 5.5
         """
         # Setup: Disable pre-run diagnostics
-        mock_runtime_vars.AM_DIAGNOSTICS_PRERUN = False
-        
+        mock_env.diagnostics_prerun_enabled.return_value = False
+
         # Register test integration
         self.sequencer._integrations = {
             "test_integration": TestIntegrationCoupling
         }
-        
+
         # Execute pre-run diagnostic capture
         self.sequencer.diagnostic_capture_pre_testrun(level=9)
-        
+
         # Verify diagnostic was NOT called
         self.assertEqual(len(TestIntegrationCoupling.diagnostic_calls), 0)
-        mock_get_path.assert_not_called()
+        self.sequencer.output_context.get_diagnostics_dir.assert_not_called()
 
-    @patch('automojo.testbase.sequencing.testsequencer.RuntimeVariables')
-    @patch('automojo.testbase.sequencing.testsequencer.get_path_for_diagnostics')
-    def test_postrun_diagnostic_skipped_when_disabled(self, mock_get_path, mock_runtime_vars):
+    @patch('automojo.testbase.sequencing.testsequencer.environment')
+    def test_postrun_diagnostic_skipped_when_disabled(self, mock_env):
         """
         Test that post-run diagnostic capture is skipped when disabled.
-        
+
         Requirements: 6.5
         """
         # Setup: Disable post-run diagnostics
-        mock_runtime_vars.AM_DIAGNOSTICS_POSTRUN = False
-        
+        mock_env.diagnostics_postrun_enabled.return_value = False
+
         # Register test integration
         self.sequencer._integrations = {
             "test_integration": TestIntegrationCoupling
         }
-        
+
         # Execute post-run diagnostic capture
         self.sequencer.diagnostic_capture_post_testrun(level=9)
-        
+
         # Verify diagnostic was NOT called
         self.assertEqual(len(TestIntegrationCoupling.diagnostic_calls), 0)
-        mock_get_path.assert_not_called()
+        self.sequencer.output_context.get_diagnostics_dir.assert_not_called()
 
-    @patch('automojo.testbase.sequencing.testsequencer.RuntimeVariables')
-    @patch('automojo.testbase.sequencing.testsequencer.get_path_for_diagnostics')
-    def test_diagnostic_level_propagated_to_integrations(self, mock_get_path, mock_runtime_vars):
+    @patch('automojo.testbase.sequencing.testsequencer.environment')
+    def test_diagnostic_level_propagated_to_integrations(self, mock_env):
         """
         Test that diagnostic level is correctly propagated to all integrations.
-        
+
         Requirements: 5.4, 6.4
         """
         # Setup: Enable both pre-run and post-run diagnostics
-        mock_runtime_vars.AM_DIAGNOSTICS_PRERUN = True
-        mock_runtime_vars.AM_DIAGNOSTICS_POSTRUN = True
+        mock_env.diagnostics_prerun_enabled.return_value = True
+        mock_env.diagnostics_postrun_enabled.return_value = True
         diagnostic_path = os.path.join(self.tempdir.name, "diagnostics")
         os.makedirs(diagnostic_path, exist_ok=True)
-        mock_get_path.return_value = diagnostic_path
-        
+        self.sequencer.output_context.get_diagnostics_dir.return_value = diagnostic_path
+
         # Register test integration
         self.sequencer._integrations = {
             "test_integration": TestIntegrationCoupling
@@ -413,19 +398,8 @@ class TestJobDiagnosticIntegrationTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
-        
-        self.this_app = ThisApplicationSingleton()
-        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
-        
+
         # Reset tracking data
         TestIntegrationCoupling.reset_tracking()
 
@@ -503,23 +477,12 @@ class DiagnosticCaptureWithMultipleIntegrationsTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
-        
-        self.this_app = ThisApplicationSingleton()
-        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
-        
+
         # Reset tracking data
         TestIntegrationCoupling.reset_tracking()
         SecondTestIntegrationCoupling.reset_tracking()
-        
+
         self.sequencer = TestSequencer(
             jobtitle="multi_integration_test",
             root=self.tempdir.name,
@@ -528,23 +491,29 @@ class DiagnosticCaptureWithMultipleIntegrationsTests(unittest.TestCase):
             metafilters=[]
         )
 
+        # Give the sequencer a controllable output context so diagnostic-dir
+        # resolution is mockable and inspectable.
+        self._diag_dir = os.path.join(self.tempdir.name, "diagnostics")
+        os.makedirs(self._diag_dir, exist_ok=True)
+        self.sequencer._output_context = MagicMock()
+        self.sequencer._output_context.get_diagnostics_dir.return_value = self._diag_dir
+
     def tearDown(self):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
 
-    @patch('automojo.testbase.sequencing.testsequencer.RuntimeVariables')
-    @patch('automojo.testbase.sequencing.testsequencer.get_path_for_diagnostics')
-    def test_all_integrations_receive_diagnostic_call(self, mock_get_path, mock_runtime_vars):
+    @patch('automojo.testbase.sequencing.testsequencer.environment')
+    def test_all_integrations_receive_diagnostic_call(self, mock_env):
         """
         Test that all registered integrations receive diagnostic calls.
-        
+
         Requirements: 5.4, 6.4
         """
-        mock_runtime_vars.AM_DIAGNOSTICS_PRERUN = True
+        mock_env.diagnostics_prerun_enabled.return_value = True
         diagnostic_path = os.path.join(self.tempdir.name, "diagnostics")
         os.makedirs(diagnostic_path, exist_ok=True)
-        mock_get_path.return_value = diagnostic_path
-        
+        self.sequencer.output_context.get_diagnostics_dir.return_value = diagnostic_path
+
         # Register multiple integrations
         self.sequencer._integrations = {
             "first": TestIntegrationCoupling,
@@ -558,18 +527,17 @@ class DiagnosticCaptureWithMultipleIntegrationsTests(unittest.TestCase):
         self.assertEqual(len(TestIntegrationCoupling.diagnostic_calls), 1)
         self.assertEqual(len(SecondTestIntegrationCoupling.diagnostic_calls), 1)
 
-    @patch('automojo.testbase.sequencing.testsequencer.RuntimeVariables')
-    @patch('automojo.testbase.sequencing.testsequencer.get_path_for_diagnostics')
-    def test_integrations_receive_same_parameters(self, mock_get_path, mock_runtime_vars):
+    @patch('automojo.testbase.sequencing.testsequencer.environment')
+    def test_integrations_receive_same_parameters(self, mock_env):
         """
         Test that all integrations receive the same diagnostic parameters.
-        
+
         Requirements: 5.2, 5.3, 5.4
         """
-        mock_runtime_vars.AM_DIAGNOSTICS_PRERUN = True
+        mock_env.diagnostics_prerun_enabled.return_value = True
         diagnostic_path = "/test/diagnostics/prerun"
-        mock_get_path.return_value = diagnostic_path
-        
+        self.sequencer.output_context.get_diagnostics_dir.return_value = diagnostic_path
+
         self.sequencer._integrations = {
             "first": TestIntegrationCoupling,
             "second": SecondTestIntegrationCoupling

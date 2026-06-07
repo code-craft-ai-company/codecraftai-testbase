@@ -29,6 +29,8 @@ The Sequencer Scopes system provides hierarchical execution context management f
 - **SkipError**: An exception type indicating a test should be intentionally skipped
 - **TracebackDetail**: A structured representation of exception traceback information
 - **JSOS**: JSON Separated Object Stream format used for activity recording
+- **IOutputContext**: The injected seam through which the sequencer resolves run artefact locations (test results, diagnostics, per-testcase by-products). The default implementation is `SimpleOutputContext`, which roots artefacts under a single base directory. Replaces the use of `get_path_for_*`, `RuntimeVariables`, and `ThisApplicationSingleton` in the sequencer core.
+- **environment**: The dependency-free `automojo.testbase.environment` module that reads core env knobs (including `AM_DIAGNOSTICS_PRERUN` / `AM_DIAGNOSTICS_POSTRUN`) from `os.environ`, providing gating helpers such as `diagnostics_prerun_enabled()` and `diagnostics_postrun_enabled()`.
 
 ## Requirements
 
@@ -271,7 +273,7 @@ The Sequencer Scopes system provides hierarchical execution context management f
 
 1. WHEN entering the test scope, THE System SHALL call scope_id_create on the sequencer to get parent_scope_id and scope_id
 2. WHEN entering the test scope, THE System SHALL log an info message indicating test scope entry with context_identifier and scope_id
-3. WHEN entering the test scope, THE System SHALL set up the byproducts folder path using get_path_for_testcase_by_products
+3. WHEN entering the test scope, THE System SHALL set up the byproducts folder path through the sequencer's output context via self._sequencer.output_context.get_testcase_byproducts_dir(scope_id)
 4. WHEN entering the test scope, THE System SHALL set up the activity stream filename as "activity.jsos" in the byproducts folder
 5. WHEN entering the test scope, THE System SHALL create a TestResult node using create_test_result_node
 6. WHEN entering the test scope, THE System SHALL preview the result using the recorder's preview method
@@ -447,7 +449,7 @@ The Sequencer Scopes system provides hierarchical execution context management f
 
 #### Acceptance Criteria
 
-1. THE byproducts folder path SHALL be determined using get_path_for_testcase_by_products with the scope_id
+1. THE byproducts folder path SHALL be determined through the sequencer's injected output context via output_context.get_testcase_byproducts_dir(scope_id), NOT via get_path_for_*, RuntimeVariables, or ThisApplicationSingleton
 2. WHEN begin_activity or mark_activity is called, THE System SHALL create the byproducts folder if it does not exist
 3. THE activity stream file SHALL be named "activity.jsos" within the byproducts folder
 4. THE byproducts folder SHALL be created using os.makedirs
@@ -467,3 +469,28 @@ The Sequencer Scopes system provides hierarchical execution context management f
 7. WHEN entering a test scope, THE System SHALL log "TEST SCOPE ENTER: {context_identifier}, {scope_id}" at INFO level
 8. WHEN exiting a test scope, THE System SHALL log "TEST SCOPE EXIT: {context_identifier}, {scope_id}" at INFO level
 9. WHEN an exception occurs in any scope, THE System SHALL log the formatted traceback at ERROR level
+
+### Requirement 36: Injected Output Context
+
+**User Story:** As a framework developer, I want the TestSequencer to resolve artefact locations through an injected output context, so that the sequencer core stays decoupled from runtime/this-app well-known-path helpers.
+
+#### Acceptance Criteria
+
+1. THE TestSequencer constructor SHALL accept an optional output_context parameter of type IOutputContext
+2. WHEN no output_context is supplied, THE TestSequencer SHALL default to a SimpleOutputContext that roots artefacts under a single base directory
+3. THE TestSequencer SHALL expose the injected output context via an output_context property
+4. THE TestSequencer SHALL resolve the test results directory through output_context.get_test_results_dir()
+5. THE TestSequencer SHALL resolve the diagnostics directory through output_context.get_diagnostics_dir(label)
+6. THE TestSequencer SHALL NOT resolve artefact locations via get_path_for_*, RuntimeVariables, or ThisApplicationSingleton
+7. THE SequencerTestScope SHALL reach the per-testcase by-products path through self._sequencer.output_context
+
+### Requirement 37: Diagnostics Gating via Environment Module
+
+**User Story:** As a framework developer, I want AM_DIAGNOSTICS_* gating read through the dependency-free environment module, so that diagnostic capture decisions do not depend on RuntimeVariables.
+
+#### Acceptance Criteria
+
+1. WHEN deciding whether to capture pre-run diagnostics, THE System SHALL read AM_DIAGNOSTICS_PRERUN via environment.diagnostics_prerun_enabled()
+2. WHEN deciding whether to capture post-run diagnostics, THE System SHALL read AM_DIAGNOSTICS_POSTRUN via environment.diagnostics_postrun_enabled()
+3. THE diagnostics gating SHALL NOT be read via RuntimeVariables or ThisApplicationSingleton
+4. WHEN diagnostics are enabled, THE System SHALL resolve the diagnostic output folder through output_context.get_diagnostics_dir(label)

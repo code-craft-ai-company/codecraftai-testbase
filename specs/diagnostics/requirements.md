@@ -51,8 +51,8 @@ The Diagnostics System provides a framework for capturing diagnostic information
 2. THE DiagnosticOptionGroup SHALL provide a `--postrun-diagnostic` boolean option for enabling post-run diagnostic capture
 3. THE DiagnosticOptionGroup SHALL provide a `--debugger` option with choices 'pdb' or 'debugpy' for debugger selection
 4. THE DiagnosticOptionGroup SHALL provide a `--breakpoint` option for specifying breakpoints to activate
-5. WHEN `--prerun-diagnostic` is specified, THE System SHALL set the AM_DIAGNOSTICS_PRERUN runtime variable to True
-6. WHEN `--postrun-diagnostic` is specified, THE System SHALL set the AM_DIAGNOSTICS_POSTRUN runtime variable to True
+5. WHEN `--prerun-diagnostic` is specified, THE System SHALL set the AM_DIAGNOSTICS_PRERUN environment knob (in `os.environ`) to a truthy value
+6. WHEN `--postrun-diagnostic` is specified, THE System SHALL set the AM_DIAGNOSTICS_POSTRUN environment knob (in `os.environ`) to a truthy value
 
 ### Requirement 4: Integration Coupling Diagnostic Interface
 
@@ -75,7 +75,7 @@ The Diagnostics System provides a framework for capturing diagnostic information
 
 1. WHEN pre-run diagnostics are enabled and `fire_diagnostic_capture_pre_testrun` is called, THE TestSequencer SHALL capture diagnostics for all registered integrations
 2. THE TestSequencer SHALL use the DiagnosticLabel.PRERUN_DIAGNOSTIC label for pre-run diagnostic capture
-3. THE TestSequencer SHALL create a diagnostic folder path using `get_path_for_diagnostics` with the prerun-diagnostic label
+3. THE TestSequencer SHALL resolve the diagnostic folder path through the injected IOutputContext (`get_diagnostics_dir`) with the prerun-diagnostic label
 4. THE TestSequencer SHALL iterate over all registered integration couplings and call their `diagnostic` method
 5. WHEN pre-run diagnostics are disabled, THE TestSequencer SHALL skip the diagnostic capture process
 
@@ -87,7 +87,7 @@ The Diagnostics System provides a framework for capturing diagnostic information
 
 1. WHEN post-run diagnostics are enabled and `fire_diagnostic_capture_post_testrun` is called, THE TestSequencer SHALL capture diagnostics for all registered integrations
 2. THE TestSequencer SHALL use the DiagnosticLabel.POSTRUN_DIAGNOSTIC label for post-run diagnostic capture
-3. THE TestSequencer SHALL create a diagnostic folder path using `get_path_for_diagnostics` with the postrun-diagnostic label
+3. THE TestSequencer SHALL resolve the diagnostic folder path through the injected IOutputContext (`get_diagnostics_dir`) with the postrun-diagnostic label
 4. THE TestSequencer SHALL iterate over all registered integration couplings and call their `diagnostic` method
 5. WHEN post-run diagnostics are disabled, THE TestSequencer SHALL skip the diagnostic capture process
 
@@ -138,17 +138,17 @@ The Diagnostics System provides a framework for capturing diagnostic information
 3. THE error message SHALL include the full traceback for debugging purposes
 4. THE diagnostic capture failure SHALL NOT cause the test run to fail or return a non-zero exit code
 
-### Requirement 11: Runtime Variable Integration
+### Requirement 11: Environment Variable Integration
 
-**User Story:** As a framework developer, I want diagnostic settings controlled via runtime variables, so that diagnostic behavior can be configured programmatically.
+**User Story:** As a framework developer, I want diagnostic settings controlled via environment knobs read through the dependency-free `automojo.testbase.environment` module, so that diagnostic behavior can be configured programmatically without coupling the core to RuntimeVariables.
 
 #### Acceptance Criteria
 
-1. THE System SHALL use the AM_DIAGNOSTICS_PRERUN runtime variable to control pre-run diagnostic capture
-2. THE System SHALL use the AM_DIAGNOSTICS_POSTRUN runtime variable to control post-run diagnostic capture
-3. WHEN AM_DIAGNOSTICS_PRERUN is True, THE System SHALL enable pre-run diagnostic capture
-4. WHEN AM_DIAGNOSTICS_POSTRUN is True, THE System SHALL enable post-run diagnostic capture
-5. THE runtime variables SHALL be settable via CLI options through the runtime option override mechanism
+1. THE System SHALL read the AM_DIAGNOSTICS_PRERUN knob via `environment.diagnostics_prerun_enabled()` to control pre-run diagnostic capture
+2. THE System SHALL read the AM_DIAGNOSTICS_POSTRUN knob via `environment.diagnostics_postrun_enabled()` to control post-run diagnostic capture
+3. WHEN AM_DIAGNOSTICS_PRERUN resolves truthy, THE System SHALL enable pre-run diagnostic capture
+4. WHEN AM_DIAGNOSTICS_POSTRUN resolves truthy, THE System SHALL enable post-run diagnostic capture
+5. THE AM_DIAGNOSTICS_PRERUN / AM_DIAGNOSTICS_POSTRUN knobs SHALL be settable via CLI options through the runtime option override mechanism, which writes their string values into `os.environ` for the environment module to read
 
 ### Requirement 12: Custom Integration Diagnostic Implementation
 

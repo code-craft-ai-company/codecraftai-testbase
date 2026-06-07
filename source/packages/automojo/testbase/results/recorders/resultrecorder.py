@@ -1000,38 +1000,15 @@ class ResultRecorder:
         """
             Initializes the report output environment.
 
-            This method is called by __enter__ to set up the output directory
-            structure and copy required resources before recording begins.
-
-            Initialization Steps:
-                1. Call update_render_environment() to copy static resources
-                   (CSS, JavaScript, images) to the output directory
-                2. Copy the HTML summary template to the output directory
-                3. Call catalog_output_directory() to generate initial catalog files
+            This method is called by __enter__ before recording begins. In the near-standalone
+            testbase framework it only generates the initial output-directory catalog. Publishing
+            the HTML presentation resources (static CSS/JavaScript/images and the HTML summary
+            template) is an integration-tier concern: automojo-integration-runtime's
+            ``IntegrationJsonResultRecorder`` overrides this method (and update_render_environment)
+            to add that behaviour before delegating here for the catalog.
 
             :returns: None
-
-            :raises: ResultRecordingError if files cannot be copied or directories
-                     cannot be created. The error includes the file path, operation
-                     description, and underlying exception details.
         """
-
-        self.update_render_environment()
-
-        summary_html_source = self._render_info.summary_template
-        summary_render_html_base = self.get_summary_render_file_basename()
-        summary_render_html_dest = os.path.join(self._output_dir, summary_render_html_base)
-
-        try:
-            shutil.copy2(summary_html_source, summary_render_html_dest)
-        except OSError as err:
-            errmsg = f"Failed to copy summary template from '{summary_html_source}' to '{summary_render_html_dest}'."
-            raise ResultRecordingError(
-                errmsg,
-                file_path=summary_render_html_dest,
-                operation="copying summary template",
-                original_error=err
-            ) from err
 
         self.catalog_output_directory()
 
@@ -1420,63 +1397,16 @@ class ResultRecorder:
 
     def update_render_environment(self):
         """
-            Publishes static resources required by the HTML presentation to the results directory.
+            Publishes the static render resources required by the HTML presentation.
 
-            This method copies static resources (CSS, JavaScript, images) from the
-            configured source directory to the output directory. It only copies files
-            that don't already exist in the destination, making it safe to call
-            multiple times.
-
-            Resource Copying Behavior:
-                - Walks the static_resource_source directory tree
-                - For each file, calculates the corresponding destination path
-                - Creates destination directories as needed
-                - Copies files only if they don't already exist at the destination
-
-            Override Consideration:
-                For Jenkins deployments and runs, you might want to override this
-                method to not publish resources for each run if they are already
-                available at a shared location.
+            In the near-standalone testbase framework this is a no-op: publishing the
+            CSS/JavaScript/image resources for the HTML summary is an integration-tier concern.
+            automojo-integration-runtime's ``IntegrationJsonResultRecorder`` overrides this method to
+            copy the resources referenced by ``render_info.static_resource_source`` into the results
+            directory.
 
             :returns: None
-
-            :raises: ResultRecordingError if directories cannot be created or files
-                     cannot be copied. The error includes the file path, operation
-                     description, and underlying exception details.
         """
-
-        if self._render_info.static_resource_source is not None:
-            static_resource_dest_dir = self._render_info.static_resource_destination
-            static_resource_src_dir = self._render_info.static_resource_source
-
-            for nxt_root, _, nxt_files in os.walk(static_resource_src_dir):
-                for nf in nxt_files:
-                    res_src_full: str = os.path.join(nxt_root, nf)
-                    res_src_leaf = res_src_full[len(static_resource_src_dir):].lstrip(os.sep)
-                    res_dest_full = os.path.join(static_resource_dest_dir, res_src_leaf)
-                    if not os.path.exists(res_dest_full):
-                        dest_dir = os.path.dirname(res_dest_full)
-                        if not os.path.exists(dest_dir):
-                            try:
-                                os.makedirs(dest_dir)
-                            except OSError as err:
-                                errmsg = f"Failed to create directory '{dest_dir}' for static resources."
-                                raise ResultRecordingError(
-                                    errmsg,
-                                    file_path=dest_dir,
-                                    operation="creating static resource directory",
-                                    original_error=err
-                                ) from err
-                        try:
-                            shutil.copy2(res_src_full, res_dest_full)
-                        except OSError as err:
-                            errmsg = f"Failed to copy static resource from '{res_src_full}' to '{res_dest_full}'."
-                            raise ResultRecordingError(
-                                errmsg,
-                                file_path=res_dest_full,
-                                operation="copying static resource",
-                                original_error=err
-                            ) from err
 
         return
 

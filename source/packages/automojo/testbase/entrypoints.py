@@ -24,10 +24,6 @@ from automojo.xmodules.xlogging.levels import LOG_LEVEL_NAMES
 from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 from automojo.xmodules.ximport import import_by_name
 
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-
-from automojo.runtime.paths import get_path_for_testresults
-
 from automojo.testbase.injection.injectionregistry import InjectionRegistry
 
 from automojo.testbase.utilities import find_testmodule_root, find_testmodule_fullname
@@ -258,10 +254,10 @@ def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
             :func:`initialize_testbase_runtime` : Initializes the runtime environment
             :func:`initialize_testbase_results` : Initializes the results recording system
     """
-    from automojo.testbase.initialize import initialize_testbase_runtime, initialize_testbase_results
-    initialize_testbase_runtime()
-
-    initialize_testbase_results()
+    # Standalone entry point: no runtime activation. Results record to stdout via the
+    # StdoutResultRecorder and artefacts (if any) land under the SimpleOutputContext base dir.
+    # The integration entry point (automojo.integrationruntime.entrypoints) performs the
+    # this-app activation before delegating here when an IntegratedTestJob is in play.
 
     # We must exit with a result code, initialize it to 0 here
     result_code = 0
@@ -295,19 +291,6 @@ def generic_test_entrypoint(job_type: Optional[Type[TestJob]] = DefaultTestJob):
     base_parser.add_argument("--logfile-level", dest="logfilelevel", action="store", default=default_logfile_level, type=validate_log_level, metavar="LEVEL", help="The logging level for logfile output. Valid options: " + ", ".join(LOG_LEVEL_NAMES) + ". Default: DEBUG.")
 
     test_module = sys.modules["__main__"]
-
-    from automojo.thisapp.wellknown import ThisApplicationSingleton
-
-    this_app = ThisApplicationSingleton()
-    env = this_app.context.lookup("/environment")
-
-    # Set the jobtype
-    env["jobtype"] = "testrun"
-
-    test_results_dir = get_path_for_testresults()
-    if not os.path.exists(test_results_dir):
-        os.makedirs(test_results_dir)
-    env["output_directory"] = test_results_dir
 
     logger = getEnhancedLogger()
 

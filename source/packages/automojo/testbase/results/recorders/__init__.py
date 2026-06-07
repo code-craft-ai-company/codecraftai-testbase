@@ -15,15 +15,17 @@ from automojo.testbase.results.recorders.resultrecorder import ResultRecorder
 from automojo.testbase.results.recorders.jsonresultrecorder import JsonResultRecorder, JsonResultEncoder
 from automojo.testbase.results.recorders.xmlresultrecorder import XmlResultRecorder
 from automojo.testbase.results.recorders.csvresultrecorder import CsvResultRecorder
-from automojo.testbase.results.recorders.streamingresultrecorder import StreamingResultRecorder
+
+# NOTE: StreamingResultRecorder relocated to automojo-integration-runtime (Phase 3 results split):
+# automojo.integrationruntime.results.recorders.streamingresultrecorder. It depends on the streaming
+# transport (also relocated), which the near-standalone testbase framework deliberately omits.
 
 __all__ = [
     "ResultRecorder",
     "JsonResultRecorder",
     "JsonResultEncoder",
     "XmlResultRecorder",
-    "CsvResultRecorder",
-    "StreamingResultRecorder"
+    "CsvResultRecorder"
 ]
 
 

@@ -21,12 +21,6 @@ import tempfile
 import unittest
 from unittest.mock import patch, MagicMock
 
-import automojo.runtime.paths as runtime_paths
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-
 from automojo.testbase.sequencing.testsequencer import TestSequencer
 from automojo.testbase.testgroup import TestGroup
 from automojo.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
@@ -61,26 +55,18 @@ class SequenceDocumentDebuggingIntegrationTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
-        
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
 
-        self.this_app = ThisApplicationSingleton()
-        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        self.this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
     def tearDown(self):
         """Clean up test fixtures."""
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
 
     def _create_minimal_test_tree(self):
@@ -88,8 +74,8 @@ class SequenceDocumentDebuggingIntegrationTests(unittest.TestCase):
         root = MockTestGroup("root")
         return root
 
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.PDB)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: DEBUGGER.PDB)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
     def test_generate_sequence_document_with_pdb_breakpoint(self):
         """
         Test sequence document generation with pdb breakpoint enabled.
@@ -122,8 +108,8 @@ class SequenceDocumentDebuggingIntegrationTests(unittest.TestCase):
         self.assertIn('# The debug flag was passed on the commandline so we break here.', content)
 
     @patch('automojo.xmodules.debugging.in_vscode_debugger', return_value=False)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.DEBUGPY)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: DEBUGGER.DEBUGPY)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
     def test_generate_sequence_document_with_debugpy_breakpoint(self, mock_in_vscode):
         """
         Test sequence document generation with debugpy breakpoint enabled.
@@ -155,8 +141,8 @@ class SequenceDocumentDebuggingIntegrationTests(unittest.TestCase):
         self.assertIn('debugpy.breakpoint()', content)
         self.assertIn('# The remote debug flag was passed on the commandline so we break here.', content)
 
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.PDB)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: DEBUGGER.PDB)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
     def test_breakpoint_code_inserted_at_correct_location(self):
         """
         Test that breakpoint code is inserted at the correct location in the session method.
@@ -199,8 +185,8 @@ class SequenceDocumentDebuggingIntegrationTests(unittest.TestCase):
         self.assertLess(set_trace_pos, enter_session_pos, 
                        "pdb.set_trace() should be before enter_session_scope_context()")
 
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.PDB)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: DEBUGGER.PDB)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
     def test_generated_code_is_syntactically_correct_pdb(self):
         """
         Test that generated sequence document with pdb breakpoint is syntactically correct.
@@ -246,8 +232,8 @@ pdb.set_trace()
         self.assertIn('pdb.set_trace()', content)
 
     @patch('automojo.xmodules.debugging.in_vscode_debugger', return_value=False)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.DEBUGPY)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: DEBUGGER.DEBUGPY)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
     def test_generated_code_is_syntactically_correct_debugpy(self, mock_in_vscode):
         """
         Test that generated sequence document with debugpy breakpoint is syntactically correct.
@@ -293,8 +279,8 @@ debugpy.breakpoint()
         self.assertIn('debugpy.breakpoint()', content)
 
     @patch('automojo.xmodules.debugging.in_vscode_debugger', return_value=True)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.DEBUGPY)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: DEBUGGER.DEBUGPY)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: [WELLKNOWN_BREAKPOINTS.TESTRUN_START])
     def test_generated_code_is_syntactically_correct_debugpy_in_vscode(self, mock_in_vscode):
         """
         Test that generated sequence document with debugpy breakpoint in VS Code is syntactically correct.
@@ -340,8 +326,8 @@ debugpy.breakpoint()
         
         self.assertTrue(syntax_valid)
 
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', None)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', None)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: None)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: None)
     def test_no_breakpoint_code_when_debugger_not_configured(self):
         """
         Test that no breakpoint code is inserted when debugger is not configured.
@@ -372,8 +358,8 @@ debugpy.breakpoint()
         self.assertNotIn('import debugpy', content)
         self.assertNotIn('debugpy.breakpoint()', content)
 
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.PDB)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [])
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: DEBUGGER.PDB)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: [])
     def test_no_breakpoint_code_when_breakpoints_empty(self):
         """
         Test that no breakpoint code is inserted when breakpoints list is empty.
@@ -402,8 +388,8 @@ debugpy.breakpoint()
         self.assertNotIn('import pdb', content)
         self.assertNotIn('pdb.set_trace()', content)
 
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.PDB)
-    @patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TEST_DISCOVERY])
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debugger_name', new=lambda: DEBUGGER.PDB)
+    @patch('automojo.testbase.sequencing.testsequencer.environment.get_debug_breakpoints', new=lambda: [WELLKNOWN_BREAKPOINTS.TEST_DISCOVERY])
     def test_no_testrun_start_breakpoint_when_only_test_discovery_configured(self):
         """
         Test that TESTRUN_START breakpoint is not inserted when only TEST_DISCOVERY is configured.

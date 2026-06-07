@@ -67,6 +67,15 @@ class TestBaseConstants:
             recording system.
     """
 
+    # NOTE (Phase 3 results split): the HTML ``templates/v2`` assets these paths point at have
+    # relocated to automojo-integration-runtime (automojo.integrationruntime.templates.v2), resolved
+    # there by automojo.integrationruntime.initialize.IntegrationResultResources. This module's
+    # initialize_testbase_results is the SUPERSEDED integration-results init (its live replacement is
+    # integration-runtime's initialize_integration_results, Phase 4a) and is scheduled for removal
+    # with the rest of the integration CLI bootstrap in the Phase 2-tail CLI relocation. The
+    # near-standalone testbase run path does not read these constants (it resolves output via the
+    # IOutputContext seam, whose SimpleOutputContext returns no template), so these now point at a
+    # directory that no longer ships in testbase.
     TESTPLUS_TEMPLATES_DIR = os.path.join(TESTPLUS_DIR, "templates")
     TESTPLUS_RESOURCE_DEST_LEAF = os.path.join("static", "v2")
     TESTPLUS_RESOURCE_SRC_DIR = os.path.join(TESTPLUS_TEMPLATES_DIR, "v2", "static")

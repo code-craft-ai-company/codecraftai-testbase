@@ -17,12 +17,6 @@ import os
 import tempfile
 import unittest
 
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-import automojo.runtime.paths as runtime_paths
-
 from automojo.testbase.testgroup import TestGroup
 from automojo.testbase.testref import TestRef
 from automojo.testbase.injection.injectionregistry import injection_registry
@@ -130,22 +124,11 @@ class SequenceDocumentGenerationTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        # Reset cached runtime paths so overrides take effect for each test
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        # Keep run artefacts isolated under the temp dir via AM_OUTPUT_DIRECTORY
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         # Store original injection registry state
         self._original_scope_tree = injection_registry._scope_tree_root
@@ -155,6 +138,13 @@ class SequenceDocumentGenerationTests(unittest.TestCase):
     def tearDown(self):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
+
+        # Restore the previous AM_OUTPUT_DIRECTORY value
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         # Restore original injection registry state
         injection_registry._scope_tree_root = self._original_scope_tree
 
@@ -316,22 +306,11 @@ class SequenceDocumentImportsTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        # Reset cached runtime paths so overrides take effect for each test
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        # Keep run artefacts isolated under the temp dir via AM_OUTPUT_DIRECTORY
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         # Store original injection registry state
         self._original_scope_tree = injection_registry._scope_tree_root
@@ -341,6 +320,13 @@ class SequenceDocumentImportsTests(unittest.TestCase):
     def tearDown(self):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
+
+        # Restore the previous AM_OUTPUT_DIRECTORY value
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         # Restore original injection registry state
         injection_registry._scope_tree_root = self._original_scope_tree
 
@@ -435,22 +421,11 @@ class SequenceDocumentStructureTests(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-
         self.tempdir = tempfile.TemporaryDirectory()
 
-        # Reset cached runtime paths so overrides take effect for each test
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
+        # Keep run artefacts isolated under the temp dir via AM_OUTPUT_DIRECTORY
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
 
         # Store original injection registry state
         self._original_scope_tree = injection_registry._scope_tree_root
@@ -460,6 +435,13 @@ class SequenceDocumentStructureTests(unittest.TestCase):
     def tearDown(self):
         """Clean up test fixtures."""
         self.tempdir.cleanup()
+
+        # Restore the previous AM_OUTPUT_DIRECTORY value
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         # Restore original injection registry state
         injection_registry._scope_tree_root = self._original_scope_tree
 

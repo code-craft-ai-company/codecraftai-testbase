@@ -16,12 +16,6 @@ import tempfile
 import unittest
 from collections import OrderedDict
 
-import automojo.runtime.paths as runtime_paths
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-
 from automojo.errors.exceptions import SkipError
 
 from automojo.testbase.sequencing.sequencersessionscope import SequencerSessionScope
@@ -30,6 +24,7 @@ from automojo.testbase.sequencing.sequencertestscope import SequencerTestScope
 from automojo.testbase.sequencing.sequencertestsetupscope import SequencerTestSetupScope
 from automojo.testbase.testgroup import TestGroup
 from automojo.testbase.testref import TestRef
+from automojo.testbase.output.outputcontext import SimpleOutputContext
 
 
 class MockResult:
@@ -91,6 +86,8 @@ class MockSequencer:
         self._testtree = None
         self._created_results = []
         self._tree_nodes = {}
+        # The scope resolves its by-products directory via the sequencer's output context.
+        self.output_context = SimpleOutputContext(base_dir=tempfile.mkdtemp())
 
     def scope_id_create(self, ctx_name):
         parent = self._scope_stack[-1][1] if self._scope_stack else None
@@ -175,13 +172,6 @@ class TestSessionScopeSkipErrorHandling(unittest.TestCase):
     """
 
     def setUp(self):
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-        
         self.seq = MockSequencer()
         self.rec = MockRecorder()
         # Use real TestGroup and TestRef for proper isinstance checks
@@ -255,13 +245,6 @@ class TestModuleScopeSkipErrorHandling(unittest.TestCase):
     """
 
     def setUp(self):
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-        
         self.seq = MockSequencer()
         self.rec = MockRecorder()
 
@@ -345,27 +328,20 @@ class TestTestScopeExceptionHandling(unittest.TestCase):
     """
 
     def setUp(self):
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-        
         self.tempdir = tempfile.TemporaryDirectory()
-        
-        # Reset cached runtime paths
-        runtime_paths.DIR_TESTRESULTS_DIRECTORY = None
-        runtime_paths.DIR_TESTCASE_BYPRODUCTS_DIRECTORY = None
-        
-        this_app = ThisApplicationSingleton()
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_JOB_TYPE, JobType.TestRun)
-        this_app.override_variable_value(RuntimeVariablesDesc.AM_RESULT_PATH_FOR_TESTS, self.tempdir.name)
-        
+
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
+
         self.seq = MockSequencer()
         self.rec = MockRecorder()
 
     def tearDown(self):
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
         self.tempdir.cleanup()
 
     def test_test_scope_skip_error_marks_result_skipped(self):
@@ -475,13 +451,6 @@ class TestTestSetupScopeExceptionHandling(unittest.TestCase):
     """
 
     def setUp(self):
-        if not APP_PERSONA_ESTABLISHED:
-            establish_app_persona(
-                name="automojo-testbase",
-                logger_name="automojo-testbase",
-                log_basename="automojo-testbase"
-            )
-        
         self.seq = MockSequencer()
         self.rec = MockRecorder()
 

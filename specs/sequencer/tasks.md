@@ -148,7 +148,7 @@ This document tracks the implementation status of the Sequencer Scopes system an
 - [x] Implement test scope entry
   - scope_id_create call to get parent_scope_id and scope_id
   - Info logging for test scope entry with context_identifier and scope_id
-  - Byproducts folder path setup using get_path_for_testcase_by_products
+  - Byproducts folder path setup through self._sequencer.output_context.get_testcase_byproducts_dir(scope_id)
   - Activity stream filename setup as "activity.jsos"
   - TestResult node creation using create_test_result_node
   - Result preview using recorder's preview method
@@ -225,6 +225,22 @@ This document tracks the implementation status of the Sequencer Scopes system an
   - JSON conversion using as_json
   - File append with JSOS CHAR_RECORD_SEPERATOR prefix
   - _Requirements: 28.1, 28.2, 28.3, 28.4, 28.5_
+
+#### TestSequencer (`sequencing/testsequencer.py`)
+- [x] Inject the output context seam
+  - Constructor accepts optional output_context (IOutputContext), defaulting to SimpleOutputContext
+  - output_context exposed as a property
+  - Test results directory resolved via output_context.get_test_results_dir()
+  - Diagnostics directory resolved via output_context.get_diagnostics_dir(label)
+  - No use of get_path_for_*, RuntimeVariables, or ThisApplicationSingleton in the core
+  - SequencerTestScope reaches the by-products path through self._sequencer.output_context
+  - _Requirements: 36.1, 36.2, 36.3, 36.4, 36.5, 36.6, 36.7_
+
+- [x] Gate diagnostics capture through the environment module
+  - Pre-run gating via environment.diagnostics_prerun_enabled()
+  - Post-run gating via environment.diagnostics_postrun_enabled()
+  - Diagnostic output folder resolved via output_context.get_diagnostics_dir(label)
+  - _Requirements: 37.1, 37.2, 37.3, 37.4_
 
 #### Unit Tests
 - [x] SequencerTestScope unit tests (`test_sequencing_functions.py`)
@@ -443,6 +459,8 @@ _No tasks currently in progress._
 | 33.1-33.5 | ✅ Complete | Result recording timing |
 | 34.1-34.4 | ✅ Complete | Byproducts folder management |
 | 35.1-35.9 | ✅ Complete | Logging requirements |
+| 36.1-36.7 | ✅ Complete | `testsequencer.py::TestSequencer.__init__`, `output_context`, `sequencertestscope.py::SequencerTestScope.__enter__` |
+| 37.1-37.4 | ✅ Complete | `testsequencer.py::TestSequencer.diagnostic_capture_pre_testrun`, `diagnostic_capture_post_testrun` |
 
 ---
 

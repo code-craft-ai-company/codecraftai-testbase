@@ -31,21 +31,55 @@ that other `automojo-*` repositories rely on for running `test_*`-style
 functions, declaring resource factories, producing machine-processable result
 streams, and generating summaries suitable for agent-driven automation.
 
+The package is now **near-standalone**. The test-execution core
+(`TestJob`/`TestSequencer`, the recorders, and the entrypoints) imports none of
+`automojo-configuration`, `automojo-runtime`, or `automojo-this-app`. Its
+declared dependencies are `automojo-arcli`, `automojo-errors`,
+`automojo-interfaces`, `automojo-waiting`, and `automojo-xmodules`. The core
+reads its few execution knobs (`AM_DEBUG_*`, `AM_DIAGNOSTICS_*`, `AM_TESTROOT`,
+`AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`) directly from
+`os.environ` via the dependency-free `automojo.testbase.environment` module,
+rather than from the runtime/this-app variable machinery.
+
+Output locations and run metadata are resolved through injected seams rather
+than baked in: `TestJob` asks an `IOutputContext` (default
+`SimpleOutputContext`, which roots all artefacts under one base directory) for
+its directories and an `IRunMetadata` (default `StandaloneRunMetadata`) for run
+identity and timing. The default recorder is `StdoutResultRecorder`: it echoes
+the human-readable run summary to stdout, still writes the
+`testrun_results_stream.jsos` and `testrun_summary.json` artefacts when an
+output directory is given, and **skips** HTML rendering.
+
+The heavyweight reporting concerns — JSOS/JSON written to a presence-folder
+results directory, HTML summary rendering with templates and static resources,
+and CI/pipeline run metadata — now live in the separate
+`automojo-integration-runtime` package, whose `IntegratedTestJob` overrides the
+`_create_output_context`, `_create_run_metadata`, and `_create_recorder` hooks
+to plug in `RuntimeOutputContext`, `RuntimeRunMetadata`, and the HTML-capable
+`JsonResultRecorder`.
+
+> **Pending relocation note:** the test-execution core is decoupled, but
+> `testbase`'s CLI + bootstrap (`initialize.py`, `cli/`, `server/`) still import
+> `automojo-runtime` / `automojo-this-app` / `automojo-configuration`, and the
+> `pyproject.toml` still declares `automojo-runtime`, `automojo-this-app`, and
+> `automojo-configuration`. Those dependency drops are pending the CLI
+> relocation; do not treat them as already removed.
+
 The package is organised into a handful of cohesive subsystems:
-`sequencing/` and `tandem/` for test ordering and coordination, `results/`
-with its `recorders/`, `streaming/`, and `filtering/` submodules for writing
-and processing the `testrun_summary.json` and `testrun_results_stream.jsos`
-artefacts, `server/` for the result-server side of distributed runs,
-`mocking/` for the in-house `Mock`/`MockContext` mocking API, `properties/`
-for the built-in property-based testing engine, and a `cli/cmdtree/` tree
-implementing the `testbase` command-line tool (including the machine-readable
-`testbase agents` subcommand group). It is the foundation for
-`automojo-testplus`, which extends it with distributed multi-host test
-execution.
+`sequencing/` and `tandem/` for test ordering and coordination, `output/` for
+the `IOutputContext`/`IRunMetadata` seams, `results/` with its `recorders/`,
+`streaming/`, and `filtering/` submodules for writing and processing the
+`testrun_summary.json` and `testrun_results_stream.jsos` artefacts, `server/`
+for the result-server side of distributed runs, `mocking/` for the in-house
+`Mock`/`MockContext` mocking API, `properties/` for the built-in property-based
+testing engine, and a `cli/cmdtree/` tree implementing the `testbase`
+command-line tool (including the machine-readable `testbase agents` subcommand
+group). It is the foundation for `automojo-testplus`, which extends it with
+distributed multi-host test execution.
 
 # Testing Conventions
-The 'automojo-testbase' package repository utilizes the 'unittest' framework in order to test the functionality of the testframework components.  It also uses the 'testbase'
-test framework included in this repository to run tests which verify the functionality of that is delivered in this repository.
+The 'automojo-testbase' package repository self-tests with two layers. It uses the 'unittest' framework to bootstrap and verify the test-framework components themselves, and it uses the 'testbase'
+test framework included in this repository to run tests which verify the functionality that is delivered in this repository. With the core now near-standalone, those `testbase` self-tests exercise the default standalone seams (`SimpleOutputContext` / `StandaloneRunMetadata`) and the default `StdoutResultRecorder`, reading their execution knobs from `os.environ` via `automojo.testbase.environment`.
 
 ## Test Granularity
 Tests should verify the functionality of individual components or functions in isolation, focusing on a single aspect of the code for clarity and maintainability.

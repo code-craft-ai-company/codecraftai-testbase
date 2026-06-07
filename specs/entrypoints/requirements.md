@@ -2,14 +2,14 @@
 
 ## Introduction
 
-The Test Entry Points system provides standardized mechanisms for initiating test execution in the TestBase framework. The primary entry point, `generic_test_entrypoint`, is the DECOUPLED standalone core that lives in TestBase: it runs individual test modules directly for debugging, performs NO integration/activation initialization and NO this-app environment setup, and lets the test job it builds resolve output through injected seams (`IOutputContext` / recorder) rather than reading `env["output_directory"]` or runtime/this-app well-known paths. The standalone core handles test module name resolution and registration, Python path management for proper module imports, command-line argument parsing for test filtering, and test job creation and execution orchestration; it reads only core test-execution knobs from `os.environ` via the dependency-free `automojo.testbase.environment` module.
+The Test Entry Points system provides standardized mechanisms for initiating test execution in the TestBase framework. The primary entry point, `generic_test_entrypoint`, is the DECOUPLED standalone core that lives in TestBase: it runs individual test modules directly for debugging, performs NO integration/activation initialization and NO this-app environment setup, and lets the test job it builds resolve output through injected seams (`IOutputContext` / recorder) rather than reading `env["output_directory"]` or runtime/this-app well-known paths. The standalone core handles test module name resolution and registration, Python path management for proper module imports, command-line argument parsing for test filtering, and test job creation and execution orchestration; it reads only core test-execution knobs from `os.environ` via the dependency-free `ccai.testbase.environment` module.
 
-The integration counterpart, `integrated_test_entrypoint`, lives in `automojo-integration-runtime` (NOT in TestBase). It performs the this-app activation (persona + runtime-variable resolution + profile activation), then delegates to the same decoupled TestBase core with a `DefaultIntegratedTestJob`. Requirements that describe activation, runtime/results initialization, well-known output paths, or this-app environment context apply to the integration entry point, not the standalone core; they are retained below and explicitly scoped to `integrated_test_entrypoint`.
+The integration counterpart, `integrated_test_entrypoint`, lives in `codecraftai-integration-runtime` (NOT in TestBase). It performs the this-app activation (persona + runtime-variable resolution + profile activation), then delegates to the same decoupled TestBase core with a `DefaultIntegratedTestJob`. Requirements that describe activation, runtime/results initialization, well-known output paths, or this-app environment context apply to the integration entry point, not the standalone core; they are retained below and explicitly scoped to `integrated_test_entrypoint`.
 
 ## Glossary
 
-- **Generic_Test_Entry_Point**: The primary, DECOUPLED standalone entry point function (`generic_test_entrypoint`, in `automojo.testbase.entrypoints`) for running test modules as standalone scripts; performs no activation/this-app setup and resolves output through injected seams
-- **Integrated_Test_Entry_Point**: The integration entry point function (`integrated_test_entrypoint`, in `automojo.integrationruntime.entrypoints`, part of `automojo-integration-runtime`) that activates the application then delegates to the standalone core with a `DefaultIntegratedTestJob`
+- **Generic_Test_Entry_Point**: The primary, DECOUPLED standalone entry point function (`generic_test_entrypoint`, in `ccai.testbase.entrypoints`) for running test modules as standalone scripts; performs no activation/this-app setup and resolves output through injected seams
+- **Integrated_Test_Entry_Point**: The integration entry point function (`integrated_test_entrypoint`, in `ccai.integrationruntime.entrypoints`, part of `codecraftai-integration-runtime`) that activates the application then delegates to the standalone core with a `DefaultIntegratedTestJob`
 - **Output_Context**: The injected `IOutputContext` seam (default `SimpleOutputContext`) that resolves artefact locations under a single base directory
 - **Run_Metadata**: The injected `IRunMetadata` seam (default `StandaloneRunMetadata`) that supplies run identity (run id, title, timeout, start time)
 - **Result_Recorder**: The injected recorder (default `StdoutResultRecorder`) that emits a stdout summary, writes JSOS/JSON when an output dir is given, and skips HTML
@@ -33,7 +33,7 @@ The integration counterpart, `integrated_test_entrypoint`, lives in `automojo-in
 
 1. THE Generic_Test_Entry_Point SHALL be a function named `generic_test_entrypoint` that can be called from a test module's `__main__` block
 2. THE Generic_Test_Entry_Point SHALL accept an optional `job_type` parameter defaulting to `DefaultTestJob`
-3. THE Generic_Test_Entry_Point SHALL NOT perform any integration/activation initialization (no runtime activation, no profile activation, no result-resource initialization) and SHALL NOT import from `automojo.runtime` or `automojo.thisapp`
+3. THE Generic_Test_Entry_Point SHALL NOT perform any integration/activation initialization (no runtime activation, no profile activation, no result-resource initialization) and SHALL NOT import from `ccai.runtime` or `ccai.thisapp`
 4. WHEN the Generic_Test_Entry_Point is invoked, THE System SHALL load default options from configuration files (user-level and project-level) before parsing command-line arguments
 5. THE Generic_Test_Entry_Point SHALL rely on the test job's injected `IOutputContext` and Result_Recorder to resolve output location, rather than performing output setup itself
 6. WHEN execution completes, THE System SHALL exit with the result code returned by the test job
@@ -42,13 +42,13 @@ The integration counterpart, `integrated_test_entrypoint`, lives in `automojo-in
 
 **User Story:** As a framework developer, I want the integration entry point to initialize the runtime environment, so that all framework components are properly configured before test execution under the integration runtime.
 
-> Scope: This requirement applies to `integrated_test_entrypoint` in `automojo-integration-runtime`, NOT to the standalone `generic_test_entrypoint`. The standalone core performs none of this initialization.
+> Scope: This requirement applies to `integrated_test_entrypoint` in `codecraftai-integration-runtime`, NOT to the standalone `generic_test_entrypoint`. The standalone core performs none of this initialization.
 
 #### Acceptance Criteria
 
 1. WHEN the Integrated_Test_Entry_Point initializes, THE System SHALL call `initialize_integration_runtime()` to establish the application persona
-2. THE runtime initialization SHALL set the application name to "automojo"
-3. THE runtime initialization SHALL set the home directory to `~/automojo`
+2. THE runtime initialization SHALL set the application name to "ccai"
+3. THE runtime initialization SHALL set the home directory to `~/ccai`
 4. THE runtime initialization SHALL set the logger name prefix to "TB"
 5. THE runtime initialization SHALL set the log basename to "testrun"
 6. THE runtime initialization SHALL resolve all runtime variables from environment and configuration
@@ -57,7 +57,7 @@ The integration counterpart, `integrated_test_entrypoint`, lives in `automojo-in
 
 **User Story:** As a test developer, I want the integration entry point to initialize the results system, so that test results are properly recorded and stored under the presence folder.
 
-> Scope: This requirement applies to `integrated_test_entrypoint` in `automojo-integration-runtime`, NOT to the standalone `generic_test_entrypoint`. The standalone core records via `StdoutResultRecorder` and resolves artefacts through its injected `IOutputContext`.
+> Scope: This requirement applies to `integrated_test_entrypoint` in `codecraftai-integration-runtime`, NOT to the standalone `generic_test_entrypoint`. The standalone core records via `StdoutResultRecorder` and resolves artefacts through its injected `IOutputContext`.
 
 #### Acceptance Criteria
 
@@ -167,7 +167,7 @@ The integration counterpart, `integrated_test_entrypoint`, lives in `automojo-in
 
 1. THE Generic_Test_Entry_Point SHALL NOT set a "jobtype" or "output_directory" key in any application environment and SHALL NOT call `get_path_for_testresults()` or any other this-app well-known-path helper
 2. THE test job SHALL resolve the output location through its injected `IOutputContext` (default `SimpleOutputContext`), which roots artefacts under a single base directory
-3. THE `SimpleOutputContext` SHALL derive its base directory from the `AM_OUTPUT_DIRECTORY` core knob read from `os.environ` via `automojo.testbase.environment`
+3. THE `SimpleOutputContext` SHALL derive its base directory from the `AM_OUTPUT_DIRECTORY` core knob read from `os.environ` via `ccai.testbase.environment`
 4. WHEN an output directory is resolved, THE Result_Recorder (default `StdoutResultRecorder`) SHALL emit a stdout summary and SHALL write JSOS/JSON artefacts to that directory; the standalone core SHALL skip HTML rendering
 
 ### Requirement 13: Logger Configuration
@@ -177,7 +177,7 @@ The integration counterpart, `integrated_test_entrypoint`, lives in `automojo-in
 #### Acceptance Criteria
 
 1. THE Generic_Test_Entry_Point SHALL obtain an enhanced logger using `getEnhancedLogger()`
-2. THE System SHALL assign the logger to the `automojo.testbase` module's logger attribute
+2. THE System SHALL assign the logger to the `ccai.testbase` module's logger attribute
 3. THE logger SHALL be passed to the TestJob for use during execution
 
 ### Requirement 14: Custom Job Type Support
@@ -215,12 +215,12 @@ The integration counterpart, `integrated_test_entrypoint`, lives in `automojo-in
 
 ### Requirement 17: Core Environment Knob Access
 
-**User Story:** As a framework developer, I want the standalone entry point to read only the core test-execution knobs, so that the core stays decoupled from `automojo.thisapp` and the application context.
+**User Story:** As a framework developer, I want the standalone entry point to read only the core test-execution knobs, so that the core stays decoupled from `ccai.thisapp` and the application context.
 
 #### Acceptance Criteria
 
 1. THE Generic_Test_Entry_Point SHALL NOT obtain a `ThisApplicationSingleton()` and SHALL NOT look up an application context "/environment"
-2. THE Generic_Test_Entry_Point SHALL read core test-execution knobs (`AM_TESTROOT`, `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`, `AM_DEBUG_*`, `AM_DIAGNOSTICS_PRERUN/POSTRUN`) from `os.environ` through the dependency-free `automojo.testbase.environment` module
+2. THE Generic_Test_Entry_Point SHALL read core test-execution knobs (`AM_TESTROOT`, `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`, `AM_DEBUG_*`, `AM_DIAGNOSTICS_PRERUN/POSTRUN`) from `os.environ` through the dependency-free `ccai.testbase.environment` module
 3. THE Generic_Test_Entry_Point SHALL NOT set any "jobtype" or "output_directory" key in an application environment
-4. WHEN the integration runtime needs presence-folder paths or `RuntimeVariables`-sourced metadata, THOSE SHALL be supplied by `DefaultIntegratedTestJob` in `automojo-integration-runtime`, not by the standalone core
+4. WHEN the integration runtime needs presence-folder paths or `RuntimeVariables`-sourced metadata, THOSE SHALL be supplied by `DefaultIntegratedTestJob` in `codecraftai-integration-runtime`, not by the standalone core
 

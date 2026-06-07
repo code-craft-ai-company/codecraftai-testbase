@@ -9,7 +9,7 @@
         "API_BASE_URL": "https://api.staging.example.com"
     },
     "packages": {
-        "automojo-testbase": "1.2.3",
+        "codecraftai-testbase": "1.2.3",
         "pytest": "7.4.0",
         "requests": "2.31.0",
         "sqlalchemy": "2.0.20",

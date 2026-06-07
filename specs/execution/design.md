@@ -639,8 +639,8 @@ The Test Execution Engine generates a Python sequence document that encodes the 
 __traceback_format_policy__ = "Brief"
 
 import logging
-from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
-from automojo.testbase.constraints import ConstraintsCatalog
+from ccai.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+from ccai.testbase.constraints import ConstraintsCatalog
 
 logger = getEnhancedLogger()
 constraints_catalog = ConstraintsCatalog()
@@ -847,7 +847,7 @@ The execution engine reads configuration from runtime variables:
 ```python
 # Generic test entry point for debugging
 if __name__ == "__main__":
-    from automojo.testbase.entrypoints import generic_test_entrypoint
+    from ccai.testbase.entrypoints import generic_test_entrypoint
     generic_test_entrypoint()
 ```
 

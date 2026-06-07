@@ -310,7 +310,7 @@ This document tracks the implementation status of the Result Recording and Repor
   - record acquiring lock before updating counters
   - _Requirements: 41.1, 41.2, 41.3, 41.4, 41.5, 41.6_
 
-#### Unit Tests (`source/tests/automojo_tests/testbase/results/test_results_module.py`)
+#### Unit Tests (`source/tests/ccai_tests/testbase/results/test_results_module.py`)
 - [x] CatalogTreeTests
   - test_catalog_tree_creates_catalog_files
   - _Requirements: 31.3, 31.4, 31.5, 31.6, 31.7_

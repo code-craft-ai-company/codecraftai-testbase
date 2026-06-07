@@ -31,7 +31,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 packages_dir = os.path.join(script_dir, "..", "packages")
 sys.path.insert(0, packages_dir)
 
-from automojo.testbase.diagnostic_streaming import (
+from ccai.testbase.diagnostic_streaming import (
     DiagnosticStreamManager,
     DiagnosticStreamConfig,
     DiagnosticStreamProtocol,

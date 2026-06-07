@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "automojo-testbase"
-description = "Automation Mojo - TestBase"
+name = "codecraftai-testbase"
+description = "Code Craft AI - TestBase"
 version = "0.0.1"
 authors = []
 readme = "README.rst"
@@ -13,18 +13,18 @@ classifiers = [
 keywords = [
     "python"
 ]
-packages = [{include="automojo", from="source/packages"}]
+packages = [{include="ccai", from="source/packages"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-automojo-errors = { git = "https://github.com/automationmojo/automojo-errors.git", branch = "main" }
-automojo-arcli = { git = "https://github.com/automationmojo/automojo-arcli.git", branch = "main" }
-automojo-this-app = { git = "https://github.com/automationmojo/automojo-this-app.git", branch = "main" }
-automojo-configuration = { git = "https://github.com/automationmojo/automojo-configuration.git", branch = "main" }
-automojo-runtime = { git = "https://github.com/automationmojo/automojo-runtime.git", branch = "main" }
-automojo-interfaces = { git = "https://github.com/automationmojo/automojo-interfaces.git", branch = "main" }
-automojo-xmodules = { git = "https://github.com/automationmojo/automojo-xmodules.git", branch = "main" }
-automojo-waiting = { git = "https://github.com/automationmojo/automojo-waiting.git", branch = "main" }
+codecraftai-errors = { git = "https://github.com/automationmojo/codecraftai-errors.git", branch = "main" }
+codecraftai-arcli = { git = "https://github.com/automationmojo/codecraftai-arcli.git", branch = "main" }
+codecraftai-this-app = { git = "https://github.com/automationmojo/codecraftai-this-app.git", branch = "main" }
+codecraftai-configuration = { git = "https://github.com/automationmojo/codecraftai-configuration.git", branch = "main" }
+codecraftai-runtime = { git = "https://github.com/automationmojo/codecraftai-runtime.git", branch = "main" }
+codecraftai-interfaces = { git = "https://github.com/automationmojo/codecraftai-interfaces.git", branch = "main" }
+codecraftai-xmodules = { git = "https://github.com/automationmojo/codecraftai-xmodules.git", branch = "main" }
+codecraftai-waiting = { git = "https://github.com/automationmojo/codecraftai-waiting.git", branch = "main" }
 
 
 [tool.poetry.group.dev.dependencies]
@@ -33,7 +33,7 @@ hypothesis = "^6.100.0"
 [tool.poetry.group.dbio.dependencies]
 
 [tool.poetry.scripts]
-testbase = "automojo.testbase.cli.testbase_command:testbase_root_command"
+testbase = "ccai.testbase.cli.testbase_command:testbase_root_command"
 
 [build-system]
 requires = ["poetry-core"]

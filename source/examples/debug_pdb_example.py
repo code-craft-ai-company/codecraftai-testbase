@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating basic pdb debugging with TestBase.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates how to use the built-in Python debugger (pdb) with
 TestBase's well-known breakpoints. PDB provides terminal-based interactive
@@ -44,16 +44,16 @@ Example Output:
     The (Pdb) prompt indicates you're in the interactive debugger.
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
-from automojo.xmodules.debugging import (
+from ccai.xmodules.debugging import (
     DEBUGGER,
     debugger_wellknown_breakpoint_entry,
 )
-from automojo.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
+from ccai.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
 
 
 def example_pdb_breakpoint_entry():

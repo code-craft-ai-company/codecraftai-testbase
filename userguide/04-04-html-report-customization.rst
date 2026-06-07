@@ -660,7 +660,7 @@ Test invocation command, environment variables, and installed packages.
            "LOG_LEVEL": "DEBUG"
        },
        "packages": {
-           "automojo-testbase": "1.2.3",
+           "codecraftai-testbase": "1.2.3",
            "pytest": "7.4.0",
            "requests": "2.31.0"
        }
@@ -770,4 +770,4 @@ See Also
 --------
 
 - :doc:`04-03-testresults-and-artifacts` - Test result encoding and report rendering overview
-- ``source/packages/automojo/testbase/templates/v2/`` - Template source files
+- ``source/packages/ccai/testbase/templates/v2/`` - Template source files

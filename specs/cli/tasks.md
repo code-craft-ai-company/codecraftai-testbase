@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document tracks the implementation status of the Command Line Interface (CLI) system and identifies enhancement opportunities for future development. The CLI provides a hierarchical command structure for running test collections, querying test information, managing test jobs, launching testing services, and providing utility commands for automation pipelines. It is built on the `automojo.arcli` framework with decorator-based command definition and reusable option groups.
+This document tracks the implementation status of the Command Line Interface (CLI) system and identifies enhancement opportunities for future development. The CLI provides a hierarchical command structure for running test collections, querying test information, managing test jobs, launching testing services, and providing utility commands for automation pipelines. It is built on the `ccai.arcli` framework with decorator-based command definition and reusable option groups.
 
 ## Implementation Status
 
@@ -435,7 +435,7 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/cli/
+source/packages/ccai/testbase/cli/
 ├── __init__.py                    # Package initialization
 ├── options.py                     # Reusable option groups
 ├── testbase_command.py            # Root command entry point

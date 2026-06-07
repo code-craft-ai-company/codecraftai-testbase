@@ -4,7 +4,7 @@ Test Result Encoding and Report Rendering
 Audience
 --------
 
-QA engineers and developers maintaining ``automojo.testbase``.
+QA engineers and developers maintaining ``ccai.testbase``.
 
 
 1. Results Folder Layout
@@ -56,7 +56,7 @@ Preview
 .. code-block:: json
 
     {
-        "name": "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging",
+        "name": "ccai.tests.testbase.local.injection.test_constraints#test_activity_logging",
         "monikers": [],
         "pivots": {},
         "instance": "e6a3ad03-11e9-4a5d-841b-b22cf95c4a17",
@@ -73,7 +73,7 @@ Final Result
 .. code-block:: json
 
     {
-        "name": "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging",
+        "name": "ccai.tests.testbase.local.injection.test_constraints#test_activity_logging",
         "monikers": [],
         "pivots": {},
         "instance": "e6a3ad03-11e9-4a5d-841b-b22cf95c4a17",
@@ -105,7 +105,7 @@ Most output is *encoded* as JSON or YAML rather than emitted as pre-rendered tex
 3. Result Model Classes
 -----------------------
 
-The ``automojo.testbase.results.model`` package defines structures used in the JSON streams:
+The ``ccai.testbase.results.model`` package defines structures used in the JSON streams:
 
 +-------------------+---------------------------------------+
 | Class             | Purpose                               |
@@ -134,7 +134,7 @@ All classes implement ``as_dict`` or ``to_json`` helpers to produce the encoded 
 4. Result Types and Web Components
 ----------------------------------
 
-Each node in the result stream is tagged with a :class:`ResultType` value that identifies its role in the tree【F:source/packages/automojo/testbase/results/model/resulttype.py†L19-L33】.  The table below links these type codes to the Python classes that emit them and the WebComponents that render them.
+Each node in the result stream is tagged with a :class:`ResultType` value that identifies its role in the tree【F:source/packages/ccai/testbase/results/model/resulttype.py†L19-L33】.  The table below links these type codes to the Python classes that emit them and the WebComponents that render them.
 
 .. list-table::
    :header-rows: 1
@@ -145,23 +145,23 @@ Each node in the result stream is tagged with a :class:`ResultType` value that i
      - WebComponent
    * - ``JOB``
      - :class:`JobContainer`
-     - Root container created when a test run starts【F:source/packages/automojo/testbase/results/model/jobcontainer.py†L19-L31】
-     - ``<testsummary-banner>``【F:source/packages/automojo/testbase/templates/v2/static/javascript/testsummary-components.js†L8-L112】
+     - Root container created when a test run starts【F:source/packages/ccai/testbase/results/model/jobcontainer.py†L19-L31】
+     - ``<testsummary-banner>``【F:source/packages/ccai/testbase/templates/v2/static/javascript/testsummary-components.js†L8-L112】
    * - ``TEST_CONTAINER``
      - :class:`TestContainer`
-     - Generated for packages and modules to group tests【F:source/packages/automojo/testbase/results/model/testcontainer.py†L20-L34】
-     - ``TestSummaryResultGroup``【F:source/packages/automojo/testbase/templates/v2/static/javascript/testsummary-components.js†L771-L835】
+     - Generated for packages and modules to group tests【F:source/packages/ccai/testbase/results/model/testcontainer.py†L20-L34】
+     - ``TestSummaryResultGroup``【F:source/packages/ccai/testbase/templates/v2/static/javascript/testsummary-components.js†L771-L835】
    * - ``TEST``
      - :class:`TestResult`
-     - Emitted for each executed test case【F:source/packages/automojo/testbase/results/model/testresult.py†L29-L48】
-     - ``TestSummaryResultItem``【F:source/packages/automojo/testbase/templates/v2/static/javascript/testsummary-components.js†L875-L915】
+     - Emitted for each executed test case【F:source/packages/ccai/testbase/results/model/testresult.py†L29-L48】
+     - ``TestSummaryResultItem``【F:source/packages/ccai/testbase/templates/v2/static/javascript/testsummary-components.js†L875-L915】
    * - ``TASKING_GROUP``
      - :class:`TaskingGroup`
-     - Groups a set of asynchronous taskings【F:source/packages/automojo/testbase/results/model/taskinggroup.py†L27-L41】
+     - Groups a set of asynchronous taskings【F:source/packages/ccai/testbase/results/model/taskinggroup.py†L27-L41】
      - *(component pending)*
    * - ``TASKING``
      - :class:`TaskingResult`
-     - Result from an individual asynchronous task【F:source/packages/automojo/testbase/results/model/taskingresult.py†L41-L66】
+     - Result from an individual asynchronous task【F:source/packages/ccai/testbase/results/model/taskingresult.py†L41-L66】
      - *(component pending)*
 
 Example entries from ``testrun_results.jsos``【F:source/testroots/report-tests/result-tests/v2/example1/testrun_results.jsos†L2-L64】:
@@ -169,8 +169,8 @@ Example entries from ``testrun_results.jsos``【F:source/testroots/report-tests/
 .. code-block:: json
 
    { "name": "<session>", "instance": "73c241cd-dc48-444d-b4a7-d3607820cb3e", "parent": null, "rtype": "JOB" }
-   { "name": "automojo.tests", "instance": "7d164f1b-4275-48fd-97f9-07bc83b48381", "parent": "93e205cc-f586-497b-a9fb-13c6348be898", "rtype": "TEST_CONTAINER" }
-   { "name": "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging",
+   { "name": "ccai.tests", "instance": "7d164f1b-4275-48fd-97f9-07bc83b48381", "parent": "93e205cc-f586-497b-a9fb-13c6348be898", "rtype": "TEST_CONTAINER" }
+   { "name": "ccai.tests.testbase.local.injection.test_constraints#test_activity_logging",
      "monikers": [], "pivots": {}, "instance": "e6a3ad03-11e9-4a5d-841b-b22cf95c4a17",
      "parent": "2957cb90-098d-4103-bf6f-5e3296acb7a9", "rtype": "TEST",
      "result": "PASSED", "start": "2025-01-19T13:20:26.432775", "stop": "2025-01-19T13:20:30.445887" }
@@ -182,7 +182,7 @@ Tasking results appear when task groups are exercised【F:source/testroots/repor
    { "name": "Hello Group", "instance": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
      "parent": "4e478966-e5ce-4cea-9dfa-651c263435c5", "rtype": "TASKING_GROUP",
      "start": "2025-01-19T12:09:18.418822", "stop": "" }
-   { "name": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+   { "name": "ccai.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
      "instance": "e1d4b858-9ab3-40f7-9bbe-e3a3b7a921e9", "parent": "b6a7c6a8-0ec3-49cc-bcce-07de82a72993",
      "rtype": "TASKING", "result": "PASSED", "worker": "172.16.1.44", "start": "2025-01-19T12:09:20.073567", "stop": "2025-01-19T12:11:07.425047" }
 
@@ -240,7 +240,7 @@ testrun_results.jsos
        "rtype": "JOB"
    }
    {
-       "name": "automojo.tests.testbase.local.injection.test_constraints",
+       "name": "ccai.tests.testbase.local.injection.test_constraints",
        "instance": "2957cb90-098d-4103-bf6f-5e3296acb7a9",
        "parent": "bf59c389-5d80-4c3a-854b-3d15dfe86ef8",
        "rtype": "TEST_CONTAINER"
@@ -301,7 +301,7 @@ taskings/<uuid>/task-summary.json
 .. code-block:: json
 
    {
-       "name": "automojo.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
+       "name": "ccai.interop.protocols.tasker.examples.helloworldtasking@HelloWorldTasking",
        "id": "7c8aee68-e9fd-4f63-ae99-ba82c7ecabf6",
        "worker": "172.16.1.42",
        "start": "2025-01-19 12:09:23.338436",

@@ -6,13 +6,13 @@
     This module demonstrates how to use the expression parsing functionality
     in the TestBase framework for test discovery and filtering.
 
-    .. moduleauthor:: AutomationX
+    .. moduleauthor:: CodeCraftX
 """
 
 from types import ModuleType
 from typing import Optional
 
-from automojo.testbase.expressions import parse_test_include_expression
+from ccai.testbase.expressions import parse_test_include_expression
 
 
 # =============================================================================

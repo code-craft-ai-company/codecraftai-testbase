@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Command Line Interface (CLI) is the primary user-facing entry point for the TestBase framework. It provides a hierarchical command structure for running test collections, querying test information, managing test jobs, launching testing services, and providing utility commands for automation pipelines. The CLI is built on the `automojo.arcli` framework, which provides decorator-based command definition, reusable option groups, and automatic help generation. The CLI integrates with the TestBase runtime system, result recording, and dependency injection to provide a complete test execution experience from the command line.
+The Command Line Interface (CLI) is the primary user-facing entry point for the TestBase framework. It provides a hierarchical command structure for running test collections, querying test information, managing test jobs, launching testing services, and providing utility commands for automation pipelines. The CLI is built on the `ccai.arcli` framework, which provides decorator-based command definition, reusable option groups, and automatic help generation. The CLI integrates with the TestBase runtime system, result recording, and dependency injection to provide a complete test execution experience from the command line.
 
 ## Glossary
 

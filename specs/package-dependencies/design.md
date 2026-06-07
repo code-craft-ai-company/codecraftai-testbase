@@ -3,17 +3,17 @@
 ## Overview
 
 This document describes the PACKAGE-LEVEL (inter-package) dependency posture of the
-`automojo-testbase` package: where it sits within the automojo monorepo dependency tree,
+`codecraftai-testbase` package: where it sits within the ccai monorepo dependency tree,
 the decoupling already achieved, the seam architecture that enables that decoupling, the
 import-coupling that still remains, and the work required to reach the target dependency
-set. The overarching design goal is that `automojo-testbase` must be usable to TEST almost
-every other `automojo-*` package; to satisfy that goal the test-execution core must sit low
+set. The overarching design goal is that `codecraftai-testbase` must be usable to TEST almost
+every other `codecraftai-*` package; to satisfy that goal the test-execution core must sit low
 in the dependency tree and must not depend on the application, runtime, or configuration
 layers.
 
 The design is responsible for:
 
-- Defining the dependency-tree position of `automojo-testbase` relative to the foundation
+- Defining the dependency-tree position of `codecraftai-testbase` relative to the foundation
   packages below it and the application/runtime/configuration layers it must sit below
 - Recording the import-direction rule that keeps the tree acyclic
 - Documenting the as-built current dependency set (8 packages) and the target dependency
@@ -23,7 +23,7 @@ The design is responsible for:
 - Inventorying the remaining import-coupled CLI, bootstrap, and server files and their
   relocation destinations, and distinguishing them from files that only mention the higher
   layers in docstring negations
-- Describing the relationship to `automojo-integration-runtime`, where the rich seam
+- Describing the relationship to `codecraftai-integration-runtime`, where the rich seam
   variants live
 
 ### Scope / Not To Be Confused With
@@ -34,7 +34,7 @@ neighbouring testbase specifications whose names invite confusion:
 
 | Spec | Actual Topic | NOT this spec because |
 |------|--------------|------------------------|
-| [`specs/dependencies`](../dependencies/design.md) | The Dependency Injection System — the `InjectionRegistry` singleton, parameter and validator originations, the scope tree, and resource lifespans (Session/Package/Test/Task). Covers WHAT gets injected and HOW the injection registry resolves it at runtime. | It is about injectable resources resolved at runtime, NOT about which `automojo-*` packages `automojo-testbase` declares in `pyproject.toml`. |
+| [`specs/dependencies`](../dependencies/design.md) | The Dependency Injection System — the `InjectionRegistry` singleton, parameter and validator originations, the scope tree, and resource lifespans (Session/Package/Test/Task). Covers WHAT gets injected and HOW the injection registry resolves it at runtime. | It is about injectable resources resolved at runtime, NOT about which `codecraftai-*` packages `codecraftai-testbase` declares in `pyproject.toml`. |
 | [`specs/coupling`](../coupling/design.md) | The Coupling System — `IntegrationCoupling`, `ConfigurationCoupling`, and `ValidatorCoupling` and their integration with the Dependency Injection System. Covers HOW couplings register external resources and attach via the DI system. | It is about couplings attaching via DI, NOT about inter-package dependency edges. |
 
 When this document says "dependency" it means a Python package dependency edge in
@@ -44,7 +44,7 @@ When this document says "dependency" it means a Python package dependency edge i
 
 ### Dependency-Tree Position
 
-`automojo-testbase` must sit BELOW the application, runtime, and configuration layers and
+`codecraftai-testbase` must sit BELOW the application, runtime, and configuration layers and
 ABOVE only the foundation packages it depends on. The diagram below shows the TARGET
 position; the dashed edges are the drop-pending dependencies that still exist today and hold
 the package above the higher layers until the import-coupled surface is relocated (see
@@ -53,26 +53,26 @@ Requirement 2 and Requirement 7).
 ```mermaid
 graph TB
     subgraph "Application / Runtime / Configuration Layer (testbase must sit BELOW)"
-        TA[automojo-this-app<br/>owns runtime foundation]
-        CFG[automojo-configuration]
-        RT[automojo-runtime<br/>retired - folded into this-app]
+        TA[codecraftai-this-app<br/>owns runtime foundation]
+        CFG[codecraftai-configuration]
+        RT[codecraftai-runtime<br/>retired - folded into this-app]
     end
 
     subgraph "Integration Layer (builds ON testbase)"
-        IR[automojo-integration-runtime<br/>rich seam variants]
+        IR[codecraftai-integration-runtime<br/>rich seam variants]
     end
 
-    TB[automojo-testbase]
+    TB[codecraftai-testbase]
 
     subgraph "Foundation Layer (testbase sits ABOVE - TARGET deps)"
-        ARCLI[automojo-arcli]
-        ERR[automojo-errors]
-        IFACE[automojo-interfaces]
-        WAIT[automojo-waiting]
-        XMOD[automojo-xmodules]
+        ARCLI[codecraftai-arcli]
+        ERR[codecraftai-errors]
+        IFACE[codecraftai-interfaces]
+        WAIT[codecraftai-waiting]
+        XMOD[codecraftai-xmodules]
     end
 
-    EXT[automojo-extension<br/>NOT a testbase dep]
+    EXT[codecraftai-extension<br/>NOT a testbase dep]
 
     IR --> TB
     IR --> TA
@@ -103,14 +103,14 @@ The dependency tree is a directed acyclic graph in which an edge from package A 
 means A declares B in its `[tool.poetry.dependencies]` and A may `import` from B. The rule
 that keeps the tree acyclic and keeps testbase broadly usable is:
 
-> `automojo-testbase` MAY import from the foundation layer (arcli, errors, interfaces,
+> `codecraftai-testbase` MAY import from the foundation layer (arcli, errors, interfaces,
 > waiting, xmodules). It MUST NOT import from the application, runtime, or configuration
 > layers (this-app, configuration, runtime). The integration layer
-> (`automojo-integration-runtime`) imports FROM testbase, never the reverse.
+> (`codecraftai-integration-runtime`) imports FROM testbase, never the reverse.
 
 A consequence of this rule is the Permanent-Unittest Exclusion Set (Requirement 8): testbase
 must never be used to test the packages at or below it in the tree (errors, interfaces,
-waiting, xmodules, arcli) plus `automojo-extension`, because doing so would invert the
+waiting, xmodules, arcli) plus `codecraftai-extension`, because doing so would invert the
 import direction and create a cycle.
 
 ### As-Built vs Target Dependency Set
@@ -122,15 +122,15 @@ Requirement 9, the table below marks each row honestly as as-built or target.
 
 | Package | Current (8, as-built) | Target (5) | Status |
 |---------|:---:|:---:|--------|
-| `automojo-arcli` | yes | yes | retained |
-| `automojo-errors` | yes | yes | retained |
-| `automojo-interfaces` | yes | yes | retained |
-| `automojo-waiting` | yes | yes | retained |
-| `automojo-xmodules` | yes | yes | retained |
-| `automojo-this-app` | yes | no | **drop-pending** |
-| `automojo-configuration` | yes | no | **drop-pending** |
-| `automojo-runtime` | yes | no | **drop-pending** |
-| `automojo-extension` | no | no | never a dep (Requirement 8) |
+| `codecraftai-arcli` | yes | yes | retained |
+| `codecraftai-errors` | yes | yes | retained |
+| `codecraftai-interfaces` | yes | yes | retained |
+| `codecraftai-waiting` | yes | yes | retained |
+| `codecraftai-xmodules` | yes | yes | retained |
+| `codecraftai-this-app` | yes | no | **drop-pending** |
+| `codecraftai-configuration` | yes | no | **drop-pending** |
+| `codecraftai-runtime` | yes | no | **drop-pending** |
+| `codecraftai-extension` | no | no | never a dep (Requirement 8) |
 
 Python version constraint (both states): `>=3.10,<4.0` (Requirement 1, AC 2).
 
@@ -151,7 +151,7 @@ flowchart TD
 The decoupling MECHANISM is a set of four dependency-free SEAM modules that the
 test-execution core consumes in place of the runtime/this-app/configuration machinery it
 previously reached for directly. Each seam is an interface plus a standalone default
-implementation; the rich variant lives out-of-package in `automojo-integration-runtime`.
+implementation; the rich variant lives out-of-package in `codecraftai-integration-runtime`.
 
 ```mermaid
 classDiagram
@@ -203,7 +203,7 @@ from the process environment without consulting `RuntimeVariables` or
 | Aspect | Detail |
 |--------|--------|
 | Provides | Accessors for `AM_DEBUG_DEBUGGER`, `AM_DEBUG_BREAKPOINTS`, `AM_DIAGNOSTICS_PRERUN`, `AM_DIAGNOSTICS_POSTRUN`, `AM_TESTROOT`, `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT` |
-| Replaces | `automojo.runtime.runtimevariables` `RuntimeVariables` attribute access |
+| Replaces | `ccai.runtime.runtimevariables` `RuntimeVariables` attribute access |
 | Real imports of runtime/this-app/configuration | NONE — package names appear only in docstring negations |
 
 #### Component: IOutputContext + SimpleOutputContext (`output/outputcontext.py`)
@@ -215,7 +215,7 @@ presence-folder layouts are supplied out-of-package. Satisfies Requirement 5.
 | Aspect | Detail |
 |--------|--------|
 | Provides | `IOutputContext` seam + `SimpleOutputContext` default; `get_test_results_dir()`, `get_testcase_byproducts_dir(scope_id)`, `get_diagnostics_dir(label)`, `get_summary_template_source()`, `get_static_resource_source()`, `get_static_resource_destination()` |
-| Replaces | the `automojo.thisapp.paths` / runtime well-known `get_path_for_*` family of accessors |
+| Replaces | the `ccai.thisapp.paths` / runtime well-known `get_path_for_*` family of accessors |
 | Real imports of runtime/this-app/configuration | NONE — package names appear only in docstring negations |
 
 #### Component: IRunMetadata + StandaloneRunMetadata (`output/runmetadata.py`)
@@ -227,7 +227,7 @@ defaults rather than `RuntimeVariables`. Satisfies Requirement 5.
 | Aspect | Detail |
 |--------|--------|
 | Provides | `IRunMetadata` seam + `StandaloneRunMetadata` default; `run_id`, `apod`, `title`, `starttime`, `testrun_timeout`, `job_seed` properties and `build_info()`, `pipeline_info()`, `job_info()` methods |
-| Replaces | the `automojo.runtime.runtimevariables` `RuntimeVariables` descriptor set for CI/build/pipeline/job context |
+| Replaces | the `ccai.runtime.runtimevariables` `RuntimeVariables` descriptor set for CI/build/pipeline/job context |
 | Real imports of runtime/this-app/configuration | NONE — package names appear only in docstring negations |
 
 #### Component: StdoutResultRecorder (`results/recorders/stdoutresultrecorder.py`)
@@ -239,13 +239,13 @@ heavyweight JSON/HTML recorder as the default. Satisfies Requirement 5.
 | Aspect | Detail |
 |--------|--------|
 | Provides | `StdoutResultRecorder` default; JSOS/JSON artefacts (when an output dir is given) + stdout summary; no HTML |
-| Replaces | `automojo.testbase.results.recorders.jsonresultrecorder` `JsonResultRecorder` (HTML rendering) as the DEFAULT |
+| Replaces | `ccai.testbase.results.recorders.jsonresultrecorder` `JsonResultRecorder` (HTML rendering) as the DEFAULT |
 | Real imports of runtime/this-app/configuration | NONE |
 
 #### Component: Decoupled Test-Execution Core
 
 The dependency-free heart of the package consumes the seams above and contains zero real
-imports from `automojo.configuration`, `automojo.runtime`, or `automojo.thisapp` (Requirement
+imports from `ccai.configuration`, `ccai.runtime`, or `ccai.thisapp` (Requirement
 3). It comprises at minimum:
 
 | Core module | Role |
@@ -259,8 +259,8 @@ imports from `automojo.configuration`, `automojo.runtime`, or `automojo.thisapp`
 | `sequencing/testsequencer.py` | Sequencing engine |
 | `results/recorders/stdoutresultrecorder.py` | Default recorder |
 
-Verified clean: importing `automojo.testbase.testjob`, `automojo.testbase.sequencing.testsequencer`,
-`automojo.testbase.entrypoints`, or the default recorders pulls in ZERO modules from
+Verified clean: importing `ccai.testbase.testjob`, `ccai.testbase.sequencing.testsequencer`,
+`ccai.testbase.entrypoints`, or the default recorders pulls in ZERO modules from
 configuration, runtime, or this-app. Where these modules name the higher-layer packages, the
 mention is a docstring negation (e.g. "replaces `RuntimeVariables` reads"), never a real
 import.
@@ -269,7 +269,7 @@ import.
 
 The four seams above do not map one-to-one onto a single prior facility; each prior
 runtime/this-app facility is REPLACED by a distinct seam, and the rich variant of each seam is
-re-homed out-of-package in `automojo-integration-runtime` and bound back through the
+re-homed out-of-package in `codecraftai-integration-runtime` and bound back through the
 `IntegratedTestJob` hook overrides. The diagram below visualises that 1-to-many split (it
 complements, and should be read alongside, the tabular "Seam-to-Replacement Quick Reference" in
 the Appendix).
@@ -290,7 +290,7 @@ graph LR
         SREC[StdoutResultRecorder<br/>JSOS/JSON on --output, no HTML]
     end
 
-    subgraph "automojo-integration-runtime (rich variants, bound via IntegratedTestJob hooks)"
+    subgraph "codecraftai-integration-runtime (rich variants, bound via IntegratedTestJob hooks)"
         ROCTX[RuntimeOutputContext]
         RRMETA[RuntimeRunMetadata]
         JREC[JsonResultRecorder<br/>HTML]
@@ -322,14 +322,14 @@ the integration runtime. testbase never imports the rich variants.
 
 The core never branches on whether it is running standalone or under the integration runtime;
 it always consumes a seam. The standalone default is bound when nothing overrides it; the rich
-variant is bound by `IntegratedTestJob` hook overrides in `automojo-integration-runtime`.
+variant is bound by `IntegratedTestJob` hook overrides in `codecraftai-integration-runtime`.
 
 ```mermaid
 sequenceDiagram
     participant Core as Test-Execution Core
     participant Seam as IOutputContext / IRunMetadata / ResultRecorder
     participant Default as Standalone Default
-    participant Integration as automojo-integration-runtime
+    participant Integration as codecraftai-integration-runtime
 
     Core->>Seam: resolve artefact path / run identity / record result
     alt Standalone (testbase alone)
@@ -343,7 +343,7 @@ sequenceDiagram
 
 ### Import-Coupling Inventory
 
-The only files that still hold `automojo-testbase` above the runtime/this-app/configuration
+The only files that still hold `codecraftai-testbase` above the runtime/this-app/configuration
 layers are the CLI, bootstrap, and server surface. These are classified as import-coupled
 because they contain REAL `import` statements referencing those packages (Requirement 7, AC
 3). Each has a relocation destination; once relocated, the drop-pending dependencies can be
@@ -351,14 +351,14 @@ removed.
 
 | File | Real imports (runtime/this-app/configuration) | Relocation destination |
 |------|-----------------------------------------------|------------------------|
-| `initialize.py` | `automojo.thisapp.wellknown.ThisApplicationSingleton`; `automojo.thisapp.persona.establish_app_persona`; `automojo.runtime.enumerations.ActivationProfile`, `JobType`; `automojo.runtime.activation.activate_profile_job`; `automojo.runtime.runtimevariables.RuntimeVariables`, `RuntimeVariablesDesc`, `resolve_runtime_variables` | `automojo-integration-runtime` (bootstrap relocation, pending CLI refactor) |
-| `cli/testbase_command.py` | `automojo.thisapp.wellknown.ThisApplicationSingleton`; `automojo.runtime.runtimevariables.RuntimeVariablesDesc` | testbase-cli (standalone bootstrap layer, pending CLI relocation) |
-| `cli/utilities.py` | `automojo.runtime.runtimevariables.RuntimeVariables` | testbase-cli (fallback to `AM_TESTROOT` via `environment.py`) |
-| `cli/cmdtree/testing/run.py` | `automojo.runtime.runtimevariables.RuntimeVariables`; `automojo.runtime.optionoverrides.AM_RUNTIME_OPTION_OVERRIDES`; `automojo.thisapp.wellknown.ConfiguredSuperFactorySingleton` | testbase-cli (pending CLI relocation) |
-| `cli/cmdtree/testing/jobs.py` | `automojo.runtime.activation.activate_runtime`, `ActivationProfile`; `automojo.runtime.optionoverrides.AM_RUNTIME_OPTION_OVERRIDES`; `automojo.thisapp.wellknown.ConfiguredSuperFactorySingleton` | testbase-cli (pending CLI relocation) |
-| `cli/cmdtree/testing/query.py` | `automojo.runtime.optionoverrides.AM_RUNTIME_OPTION_OVERRIDES`; `automojo.thisapp.wellknown.ConfiguredSuperFactorySingleton` | testbase-cli (pending CLI relocation) |
-| `cli/cmdtree/services/results.py` | `automojo.thisapp.wellknown.ThisApplicationSingleton`; `automojo.runtime.activation.activate_profile_service`; `automojo.runtime.paths.get_presence_directory`; `automojo.runtime.runtimevariables.RuntimeVariablesDesc` | testbase-cli (pending CLI relocation) |
-| `server/resultserver.py` | `automojo.runtime.runtimevariables.RuntimeVariables`, `RuntimeVariablesDesc` | testbase-cli or standalone service (pending refactor) |
+| `initialize.py` | `ccai.thisapp.wellknown.ThisApplicationSingleton`; `ccai.thisapp.persona.establish_app_persona`; `ccai.runtime.enumerations.ActivationProfile`, `JobType`; `ccai.runtime.activation.activate_profile_job`; `ccai.runtime.runtimevariables.RuntimeVariables`, `RuntimeVariablesDesc`, `resolve_runtime_variables` | `codecraftai-integration-runtime` (bootstrap relocation, pending CLI refactor) |
+| `cli/testbase_command.py` | `ccai.thisapp.wellknown.ThisApplicationSingleton`; `ccai.runtime.runtimevariables.RuntimeVariablesDesc` | testbase-cli (standalone bootstrap layer, pending CLI relocation) |
+| `cli/utilities.py` | `ccai.runtime.runtimevariables.RuntimeVariables` | testbase-cli (fallback to `AM_TESTROOT` via `environment.py`) |
+| `cli/cmdtree/testing/run.py` | `ccai.runtime.runtimevariables.RuntimeVariables`; `ccai.runtime.optionoverrides.AM_RUNTIME_OPTION_OVERRIDES`; `ccai.thisapp.wellknown.ConfiguredSuperFactorySingleton` | testbase-cli (pending CLI relocation) |
+| `cli/cmdtree/testing/jobs.py` | `ccai.runtime.activation.activate_runtime`, `ActivationProfile`; `ccai.runtime.optionoverrides.AM_RUNTIME_OPTION_OVERRIDES`; `ccai.thisapp.wellknown.ConfiguredSuperFactorySingleton` | testbase-cli (pending CLI relocation) |
+| `cli/cmdtree/testing/query.py` | `ccai.runtime.optionoverrides.AM_RUNTIME_OPTION_OVERRIDES`; `ccai.thisapp.wellknown.ConfiguredSuperFactorySingleton` | testbase-cli (pending CLI relocation) |
+| `cli/cmdtree/services/results.py` | `ccai.thisapp.wellknown.ThisApplicationSingleton`; `ccai.runtime.activation.activate_profile_service`; `ccai.runtime.paths.get_presence_directory`; `ccai.runtime.runtimevariables.RuntimeVariablesDesc` | testbase-cli (pending CLI relocation) |
+| `server/resultserver.py` | `ccai.runtime.runtimevariables.RuntimeVariables`, `RuntimeVariablesDesc` | testbase-cli or standalone service (pending refactor) |
 
 #### Import-Coupled vs Docstring-Only Mention
 
@@ -387,7 +387,7 @@ not the heavyweight provider, inverting the dependency so testbase can sit below
 #### 2. Hook Override (Template Method) Pattern
 
 `TestJob` exposes hook points where the seam bindings are produced. `IntegratedTestJob` (in
-`automojo-integration-runtime`) overrides those hooks to bind `RuntimeOutputContext`,
+`codecraftai-integration-runtime`) overrides those hooks to bind `RuntimeOutputContext`,
 `RuntimeRunMetadata`, and `JsonResultRecorder`. The core never imports the rich variants; they
 are injected from above.
 
@@ -395,23 +395,23 @@ are injected from above.
 
 Every seam ships a zero-dependency default (`SimpleOutputContext`, `StandaloneRunMetadata`,
 `StdoutResultRecorder`) so the core is fully functional with no integration layer present —
-the precondition for testing almost every other `automojo-*` package.
+the precondition for testing almost every other `codecraftai-*` package.
 
 ### Integration Points
 
-#### With automojo-integration-runtime
+#### With codecraftai-integration-runtime
 
 The rich integration variants of all three seams live OUT of package, in
-`automojo-integration-runtime`, which builds ON TOP of testbase via `IntegratedTestJob` hook
+`codecraftai-integration-runtime`, which builds ON TOP of testbase via `IntegratedTestJob` hook
 overrides (Requirement 6). testbase never depends on the integration runtime; the edge points
 only one way.
 
 | Aspect | Detail |
 |--------|--------|
-| Declared dependencies of `automojo-integration-runtime` | `automojo-testbase`, `automojo-this-app`, `automojo-extension`, `automojo-errors`, `automojo-xmodules` (plus `debugpy`) |
+| Declared dependencies of `codecraftai-integration-runtime` | `codecraftai-testbase`, `codecraftai-this-app`, `codecraftai-extension`, `codecraftai-errors`, `codecraftai-xmodules` (plus `debugpy`) |
 | Variants supplied | `RuntimeOutputContext`, `RuntimeRunMetadata`, `JsonResultRecorder` (HTML) |
 | Mechanism | `IntegratedTestJob` hook overrides |
-| Runtime foundation ownership | `automojo-this-app` now OWNS the runtime foundation (`RuntimeVariables`, well-known paths, `ActivationProfile`/`JobType`, `activate_profile_*`) absorbed from the retired `automojo-runtime` |
+| Runtime foundation ownership | `codecraftai-this-app` now OWNS the runtime foundation (`RuntimeVariables`, well-known paths, `ActivationProfile`/`JobType`, `activate_profile_*`) absorbed from the retired `codecraftai-runtime` |
 
 The TestJob inheritance is, as-built, a set of SIBLINGS: `IntegratedTestJob` and
 `InteropLibraryTestJob` both extend `TestJob` directly. The linear chain
@@ -420,11 +420,11 @@ TARGET, not the current state (Requirement 9, AC 5-6).
 
 #### With the Permanent-Unittest Exclusion Set
 
-testbase must NOT be used to test, and must NOT sit above, the foundation set: `automojo-errors`,
-`automojo-interfaces`, `automojo-waiting`, `automojo-xmodules`, `automojo-arcli`, and
-`automojo-extension` (Requirement 8). Note the nuance: `automojo-extension` is in the EXCLUSION
+testbase must NOT be used to test, and must NOT sit above, the foundation set: `codecraftai-errors`,
+`codecraftai-interfaces`, `codecraftai-waiting`, `codecraftai-xmodules`, `codecraftai-arcli`, and
+`codecraftai-extension` (Requirement 8). Note the nuance: `codecraftai-extension` is in the EXCLUSION
 set and is NOT a testbase dependency. Where integration with the extension machinery is
-required, the attachment occurs in `automojo-integration-runtime`, never in testbase.
+required, the attachment occurs in `codecraftai-integration-runtime`, never in testbase.
 
 The rationale is structural, not a policy preference. Two distinct reasons place a package in the
 six-member exclusion set; the diagram below shows WHY each membership would otherwise close a
@@ -433,12 +433,12 @@ loop:
 ```mermaid
 graph TB
     subgraph "Reason 1 — testbase DEPENDS on these (testing them with testbase closes a cycle)"
-        TB1[automojo-testbase]
-        ARCLI[automojo-arcli]
-        ERR[automojo-errors]
-        IFACE[automojo-interfaces]
-        WAIT[automojo-waiting]
-        XMOD[automojo-xmodules]
+        TB1[codecraftai-testbase]
+        ARCLI[codecraftai-arcli]
+        ERR[codecraftai-errors]
+        IFACE[codecraftai-interfaces]
+        WAIT[codecraftai-waiting]
+        XMOD[codecraftai-xmodules]
 
         TB1 -->|depends on| ARCLI
         TB1 -->|depends on| ERR
@@ -450,8 +450,8 @@ graph TB
     end
 
     subgraph "Reason 2 — bootstrap chicken-and-egg"
-        EXT[automojo-extension<br/>loads testbase /<br/>integration-runtime factory plugins]
-        TB2[automojo-testbase /<br/>automojo-integration-runtime]
+        EXT[codecraftai-extension<br/>loads testbase /<br/>integration-runtime factory plugins]
+        TB2[codecraftai-testbase /<br/>codecraftai-integration-runtime]
 
         EXT -->|loads factory plugins for| TB2
         TB2 -. "test-with-testbase<br/>needs extension to bootstrap<br/>the very thing under test" .-> EXT
@@ -464,7 +464,7 @@ graph TB
 
 The dotted back-edges are the cycles that exclusion prevents. For arcli/errors/interfaces/waiting/xmodules
 the cycle is `package-under-test -> testbase -> package-under-test`, because testbase already declares
-those five as dependencies (see the As-Built vs Target Dependency Set). For `automojo-extension` the
+those five as dependencies (see the As-Built vs Target Dependency Set). For `codecraftai-extension` the
 problem is a bootstrap chicken-and-egg: extension is the extensibility mechanism that LOADS testbase's
 and integration-runtime's factory plugins, so using testbase to test extension would require extension
 to bootstrap the harness that is exercising it. extension is therefore in the EXCLUSION set but is NOT
@@ -480,14 +480,14 @@ version constraint:
 ```toml
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-automojo-errors = { git = "...", branch = "main" }
-automojo-arcli = { git = "...", branch = "main" }
-automojo-this-app = { git = "...", branch = "main" }       # drop-pending
-automojo-configuration = { git = "...", branch = "main" }  # drop-pending
-automojo-runtime = { git = "...", branch = "main" }        # drop-pending
-automojo-interfaces = { git = "...", branch = "main" }
-automojo-xmodules = { git = "...", branch = "main" }
-automojo-waiting = { git = "...", branch = "main" }
+codecraftai-errors = { git = "...", branch = "main" }
+codecraftai-arcli = { git = "...", branch = "main" }
+codecraftai-this-app = { git = "...", branch = "main" }       # drop-pending
+codecraftai-configuration = { git = "...", branch = "main" }  # drop-pending
+codecraftai-runtime = { git = "...", branch = "main" }        # drop-pending
+codecraftai-interfaces = { git = "...", branch = "main" }
+codecraftai-xmodules = { git = "...", branch = "main" }
+codecraftai-waiting = { git = "...", branch = "main" }
 ```
 
 #### Environment knobs (read via the dependency-free environment module)
@@ -536,13 +536,13 @@ will route the test-root read through the dependency-free accessor.
    the current set (8) today, and assert the target set (5) once the drop completes. Confirm
    the Python constraint is `>=3.10,<4.0`.
 2. **Import-direction assertion** — Static check that no module under the test-execution core
-   contains a real `import` of `automojo.configuration`, `automojo.runtime`, or
-   `automojo.thisapp`.
+   contains a real `import` of `ccai.configuration`, `ccai.runtime`, or
+   `ccai.thisapp`.
 
 ### Core Decoupling Smoke Tests
 
-1. **Core import smoke test** — `import automojo.testbase.testjob`,
-   `automojo.testbase.sequencing.testsequencer`, `automojo.testbase.entrypoints`, and the
+1. **Core import smoke test** — `import ccai.testbase.testjob`,
+   `ccai.testbase.sequencing.testsequencer`, `ccai.testbase.entrypoints`, and the
    default recorders must pull in ZERO configuration/runtime/this-app modules (assert via
    `sys.modules` inspection after a clean import).
 2. **Seam dependency-freedom** — Assert `environment.py`, `output/outputcontext.py`,
@@ -560,9 +560,9 @@ will route the test-root read through the dependency-free accessor.
 ### Integration-Variant Isolation
 
 1. **Out-of-package variants** — Confirm `RuntimeOutputContext`, `RuntimeRunMetadata`, and
-   `JsonResultRecorder` are sourced from `automojo-integration-runtime`, not from testbase.
-2. **No reverse edge** — Confirm `automojo-testbase` declares no dependency on
-   `automojo-integration-runtime` and no dependency on `automojo-extension`.
+   `JsonResultRecorder` are sourced from `codecraftai-integration-runtime`, not from testbase.
+2. **No reverse edge** — Confirm `codecraftai-testbase` declares no dependency on
+   `codecraftai-integration-runtime` and no dependency on `codecraftai-extension`.
 
 ## Appendix
 
@@ -580,10 +580,10 @@ will route the test-root read through the dependency-free accessor.
 
 | Seam module | Default | Replaces |
 |-------------|---------|----------|
-| `automojo.testbase.environment` | (module functions) | `RuntimeVariables` attribute reads |
-| `automojo.testbase.output.outputcontext` | `SimpleOutputContext` | `get_path_for_*` / well-known path family |
-| `automojo.testbase.output.runmetadata` | `StandaloneRunMetadata` | `RuntimeVariables` metadata descriptors |
-| `automojo.testbase.results.recorders.stdoutresultrecorder` | `StdoutResultRecorder` | `JsonResultRecorder` (HTML) as the default |
+| `ccai.testbase.environment` | (module functions) | `RuntimeVariables` attribute reads |
+| `ccai.testbase.output.outputcontext` | `SimpleOutputContext` | `get_path_for_*` / well-known path family |
+| `ccai.testbase.output.runmetadata` | `StandaloneRunMetadata` | `RuntimeVariables` metadata descriptors |
+| `ccai.testbase.results.recorders.stdoutresultrecorder` | `StdoutResultRecorder` | `JsonResultRecorder` (HTML) as the default |
 
 ### Related Specifications
 

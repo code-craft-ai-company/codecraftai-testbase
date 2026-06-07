@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating remote debugpy debugging with TestBase.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates how to use the debugpy remote debugging protocol
 with TestBase's well-known breakpoints. Debugpy enables IDE integration,
@@ -41,21 +41,21 @@ Example Output:
     use your IDE's debugging features (step, inspect variables, etc.).
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
 import logging
 
-from automojo.xmodules.debugging import (
+from ccai.xmodules.debugging import (
     DEBUGGER,
     DEFAULT_DEBUG_PORT,
     debugger_wellknown_breakpoint_entry,
     debugger_wellknown_breakpoint_code_append,
     in_vscode_debugger,
 )
-from automojo.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
+from ccai.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
 
 
 # Configure logging to see debug messages

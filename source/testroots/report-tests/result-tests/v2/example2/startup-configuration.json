@@ -155,7 +155,7 @@
   "math": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/lib-dynload/math.cpython-312-darwin.so",
   "mimetypes": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/mimetypes.py",
   "mmap": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/lib-dynload/mmap.cpython-312-darwin.so",
-  "automojo": null,
+  "ccai": null,
   "multiprocessing": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/__init__.py",
   "nacl": "/Users/myron/repos/mojo-interop/.venv/lib/python3.12/site-packages/nacl/__init__.py",
   "ntpath": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/ntpath.py",

@@ -540,7 +540,7 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── mocking.py              # Complete mocking framework implementation
 │   ├── MockType            # Enumeration of mock types
 │   ├── SideEffect          # Side effect wrapper class
@@ -563,7 +563,7 @@ source/packages/automojo/testbase/
 │   ├── create_tracked_class_patch  # Create and register class patch
 │   └── create_tracked_instance_patch # Create and register instance patch
 
-source/tests/automojo_tests/testbase/
+source/tests/ccai_tests/testbase/
 └── test_mocking.py         # Unit tests for mocking framework
 
 source/examples/

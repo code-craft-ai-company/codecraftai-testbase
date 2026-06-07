@@ -157,7 +157,7 @@ Test invocation details:
         "TEST_ENV": "staging"
     },
     "packages": {
-        "automojo-testbase": "1.2.3",
+        "codecraftai-testbase": "1.2.3",
         "pytest": "7.4.0"
     }
 }
@@ -190,4 +190,4 @@ Import failures during test discovery:
 
 - `userguide/04-03-testresults-and-artifacts.rst` - Test result encoding overview
 - `userguide/04-04-html-report-customization.rst` - Comprehensive customization guide
-- `source/packages/automojo/testbase/templates/v2/` - Template source files
+- `source/packages/ccai/testbase/templates/v2/` - Template source files

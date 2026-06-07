@@ -7,7 +7,7 @@ Distributed Test Execution
 Audience
 --------
 
-QA engineers and developers implementing distributed test execution with ``automojo.testbase``.
+QA engineers and developers implementing distributed test execution with ``ccai.testbase``.
 
 
 Overview
@@ -65,8 +65,8 @@ To create and start a concentrator server, you need a ``ResultRecorder`` instanc
 
 .. code-block:: python
 
-    from automojo.testbase.results.recorders.jsonresultrecorder import JsonResultRecorder
-    from automojo.testbase.results.concentrators.progressconcentratorservice import (
+    from ccai.testbase.results.recorders.jsonresultrecorder import JsonResultRecorder
+    from ccai.testbase.results.concentrators.progressconcentratorservice import (
         ProgressConcentratorServer
     )
 
@@ -143,9 +143,9 @@ Workers create ``ProgressInfo`` objects to represent their current state:
     from datetime import datetime
     import uuid
 
-    from automojo.testbase.results.model.progresscode import ProgressCode
-    from automojo.testbase.results.model.progressinfo import ProgressInfo
-    from automojo.testbase.results.model.progresstype import ProgressType
+    from ccai.testbase.results.model.progresscode import ProgressCode
+    from ccai.testbase.results.model.progressinfo import ProgressInfo
+    from ccai.testbase.results.model.progresstype import ProgressType
 
     # Create a progress update
     progress = ProgressInfo(
@@ -257,9 +257,9 @@ Here is a complete example of a worker submitting progress updates:
     import uuid
     from datetime import datetime
 
-    from automojo.testbase.results.model.progresscode import ProgressCode
-    from automojo.testbase.results.model.progressinfo import ProgressInfo
-    from automojo.testbase.results.model.progresstype import ProgressType
+    from ccai.testbase.results.model.progresscode import ProgressCode
+    from ccai.testbase.results.model.progressinfo import ProgressInfo
+    from ccai.testbase.results.model.progresstype import ProgressType
 
 
     def run_worker_task(concentrator_url: str, worker_id: str):
@@ -313,7 +313,7 @@ Configure forwarding using the ``ForwardingInfo`` dataclass:
 
 .. code-block:: python
 
-    from automojo.testbase.results.model.forwardinginfo import ForwardingInfo
+    from ccai.testbase.results.model.forwardinginfo import ForwardingInfo
 
     forwarding_info = ForwardingInfo(
         forwarding_interval=5.0,  # Forward every 5 seconds
@@ -344,8 +344,8 @@ Pass the ``ForwardingInfo`` to the server constructor:
 
 .. code-block:: python
 
-    from automojo.testbase.results.model.forwardinginfo import ForwardingInfo
-    from automojo.testbase.results.concentrators.progressconcentratorservice import (
+    from ccai.testbase.results.model.forwardinginfo import ForwardingInfo
+    from ccai.testbase.results.concentrators.progressconcentratorservice import (
         ProgressConcentratorServer
     )
 

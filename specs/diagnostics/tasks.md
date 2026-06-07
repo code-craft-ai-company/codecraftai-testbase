@@ -36,7 +36,7 @@ This document tracks the implementation status of the Diagnostics System and ide
 - [x] Implement environment knob setting from CLI options
   - Set AM_DIAGNOSTICS_PRERUN (in `os.environ`) when `--prerun-diagnostic` is specified
   - Set AM_DIAGNOSTICS_POSTRUN (in `os.environ`) when `--postrun-diagnostic` is specified
-  - Flags read back via `automojo.testbase.environment` (NOT RuntimeVariables)
+  - Flags read back via `ccai.testbase.environment` (NOT RuntimeVariables)
   - _Requirements: 3.5, 3.6, 11.1, 11.2, 11.3, 11.4, 11.5_
 
 #### IntegrationCoupling Diagnostic Interface (`coupling/integrationcoupling.py`)
@@ -334,7 +334,7 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── diagnostics.py              # DiagnosticLabel and RuntimeConfigPaths constants
 ├── diagnostic_streaming.py     # Diagnostic streaming to external systems
 ├── environment.py              # AM_DIAGNOSTICS_PRERUN/POSTRUN enable-flag accessors (os.environ)
@@ -348,7 +348,7 @@ source/packages/automojo/testbase/
 └── sequencing/
     └── testsequencer.py        # Diagnostic capture implementation
 
-source/tests/automojo_tests/testbase/
+source/tests/ccai_tests/testbase/
 ├── test_diagnostics.py         # Unit tests for diagnostics (planned)
 └── test_diagnostic_streaming.py # Unit tests for diagnostic streaming
 
@@ -357,4 +357,4 @@ source/examples/
 └── debug_diagnostics_streaming.py # Example usage of diagnostic streaming
 ```
 
-> The presence-folder-rooted diagnostics path is an integration concern, not a testbase-core concern. It is provided by `RuntimeOutputContext.get_diagnostics_dir` in `automojo-integration-runtime` (wired through `IntegratedTestJob`), which delegates to the well-known presence-folder paths. The testbase core only knows the injected `IOutputContext` seam.
+> The presence-folder-rooted diagnostics path is an integration concern, not a testbase-core concern. It is provided by `RuntimeOutputContext.get_diagnostics_dir` in `codecraftai-integration-runtime` (wired through `IntegratedTestJob`), which delegates to the well-known presence-folder paths. The testbase core only knows the injected `IOutputContext` seam.

@@ -16,7 +16,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Members accessible as class attributes without instantiation
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-#### DEBUGGER Enum (`automojo.xmodules.debugging`)
+#### DEBUGGER Enum (`ccai.xmodules.debugging`)
 - [x] Implement `DEBUGGER` enumeration class
   - Inherit from both `str` and `Enum` for string comparison support
   - Define `PDB` member with value "pdb"
@@ -45,7 +45,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Variable set when `--breakpoint` option is specified
   - _Requirements: 3.6_
 
-#### VS Code Debugger Detection (`automojo.xmodules.debugging`)
+#### VS Code Debugger Detection (`ccai.xmodules.debugging`)
 - [x] Implement `in_vscode_debugger` function
   - Return boolean indicating VS Code debugger presence
   - Iterate through stack frames to detect pydevd.py
@@ -53,7 +53,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Return False when pydevd.py not found
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-#### Runtime Breakpoint Entry Function (`automojo.xmodules.debugging`)
+#### Runtime Breakpoint Entry Function (`ccai.xmodules.debugging`)
 - [x] Implement `debugger_wellknown_breakpoint_entry` function
   - Accept `debugger` parameter for backend selection
   - Accept `breakpoint_name` parameter for breakpoint identification
@@ -63,7 +63,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Invoke debugpy.breakpoint() for debugpy debugger
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-#### Debugpy Remote Debugging Setup (`automojo.xmodules.debugging`)
+#### Debugpy Remote Debugging Setup (`ccai.xmodules.debugging`)
 - [x] Implement debugpy listen and wait functionality
   - Call debugpy.listen() when running under VS Code debugger
   - Call debugpy.wait_for_client() before breakpoint
@@ -72,7 +72,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Skip listen/wait when not under VS Code debugger
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-#### Breakpoint Code Generation Function (`automojo.xmodules.debugging`)
+#### Breakpoint Code Generation Function (`ccai.xmodules.debugging`)
 - [x] Implement `debugger_wellknown_breakpoint_code_append` function
   - Accept `debugger` parameter for backend selection
   - Accept `breakpoint_name` parameter for breakpoint identification
@@ -82,7 +82,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Do not append code when breakpoint not in configured list
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
 
-#### PDB Code Generation (`automojo.xmodules.debugging`)
+#### PDB Code Generation (`ccai.xmodules.debugging`)
 - [x] Generate pdb breakpoint code
   - Append blank line for readability
   - Append comment explaining the breakpoint
@@ -91,7 +91,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Use provided indentation for all lines
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-#### Debugpy Code Generation (`automojo.xmodules.debugging`)
+#### Debugpy Code Generation (`ccai.xmodules.debugging`)
 - [x] Generate debugpy breakpoint code
   - Append blank line for readability
   - Append comment explaining the breakpoint
@@ -102,7 +102,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Use provided indentation for all lines
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
 
-#### DebugPyAssistant Background Thread (`automojo.xmodules.debugging`)
+#### DebugPyAssistant Background Thread (`ccai.xmodules.debugging`)
 - [x] Implement `DebugPyAssistant` class
   - Create daemon thread on initialization
   - Expose debugpy endpoint for remote debugging
@@ -112,7 +112,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Daemon thread terminates with main program
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
 
-#### DebugPyAssistant Connection Handling (`automojo.xmodules.debugging`)
+#### DebugPyAssistant Connection Handling (`ccai.xmodules.debugging`)
 - [x] Implement connection handling loop
   - Call debugpy.listen() on startup
   - Loop waiting for client connections
@@ -122,7 +122,7 @@ This document tracks the implementation status of the Debugging Support system a
   - Use 2 second polling interval
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6_
 
-#### DebugPyAssistant Properties (`automojo.xmodules.debugging`)
+#### DebugPyAssistant Properties (`ccai.xmodules.debugging`)
 - [x] Implement read-only properties
   - Provide `endpoint` property returning (host, port) tuple
   - Provide `thread` property returning Thread object
@@ -356,16 +356,16 @@ _No tasks currently in progress._
 | Requirement | Status | Implementation Location |
 |-------------|--------|------------------------|
 | 1.1-1.5 | ✅ Complete | `breakpoints.py::WELLKNOWN_BREAKPOINTS` |
-| 2.1-2.5 | ✅ Complete | `automojo.xmodules.debugging::DEBUGGER` |
+| 2.1-2.5 | ✅ Complete | `ccai.xmodules.debugging::DEBUGGER` |
 | 3.1-3.4 | ✅ Complete | `cli/options.py::DiagnosticOptionGroup` |
 | 3.5-3.6 | ✅ Complete | Runtime variable setting mechanism |
-| 4.1-4.5 | ✅ Complete | `automojo.xmodules.debugging::in_vscode_debugger` |
-| 5.1-5.7 | ✅ Complete | `automojo.xmodules.debugging::debugger_wellknown_breakpoint_entry` |
+| 4.1-4.5 | ✅ Complete | `ccai.xmodules.debugging::in_vscode_debugger` |
+| 5.1-5.7 | ✅ Complete | `ccai.xmodules.debugging::debugger_wellknown_breakpoint_entry` |
 | 6.1-6.5 | ✅ Complete | Debugpy listen/wait implementation |
-| 7.1-7.7 | ✅ Complete | `automojo.xmodules.debugging::debugger_wellknown_breakpoint_code_append` |
+| 7.1-7.7 | ✅ Complete | `ccai.xmodules.debugging::debugger_wellknown_breakpoint_code_append` |
 | 8.1-8.5 | ✅ Complete | PDB code generation |
 | 9.1-9.7 | ✅ Complete | Debugpy code generation |
-| 10.1-10.6 | ✅ Complete | `automojo.xmodules.debugging::DebugPyAssistant` |
+| 10.1-10.6 | ✅ Complete | `ccai.xmodules.debugging::DebugPyAssistant` |
 | 11.1-11.6 | ✅ Complete | DebugPyAssistant connection handling |
 | 12.1-12.3 | ✅ Complete | DebugPyAssistant properties |
 | 13.1-13.5 | ✅ Complete | `sequencing/testsequencer.py` integration |
@@ -409,7 +409,7 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── breakpoints.py              # WELLKNOWN_BREAKPOINTS enum
 ├── debuglogging.py             # Breakpoint logging infrastructure
 │                               # - DEBUG_LOG_LEVEL enum
@@ -440,7 +440,7 @@ source/packages/automojo/testbase/
 └── sequencing/
     └── testsequencer.py        # Breakpoint code generation integration
 
-.venv/src/automojo-xmodules/source/packages/automojo/xmodules/
+.venv/src/codecraftai-xmodules/source/packages/ccai/xmodules/
 └── debugging.py                # Core debugging infrastructure
                                 # - DEBUGGER enum
                                 # - debugger_wellknown_breakpoint_entry()
@@ -448,7 +448,7 @@ source/packages/automojo/testbase/
                                 # - DebugPyAssistant class
                                 # - in_vscode_debugger()
 
-source/tests/automojo_tests/testbase/
+source/tests/ccai_tests/testbase/
 ├── test_debugging.py           # Unit tests for debugging (planned)
 ├── test_debuglogging.py        # Unit tests for debug logging
 └── test_debugports.py          # Unit tests for debug port utilities

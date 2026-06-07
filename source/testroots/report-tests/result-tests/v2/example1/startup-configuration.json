@@ -146,7 +146,7 @@
   "lzma": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/lzma.py",
   "math": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/lib-dynload/math.cpython-312-darwin.so",
   "mimetypes": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/mimetypes.py",
-  "automojo": null,
+  "ccai": null,
   "ntpath": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/ntpath.py",
   "numbers": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/numbers.py",
   "opcode": "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/opcode.py",

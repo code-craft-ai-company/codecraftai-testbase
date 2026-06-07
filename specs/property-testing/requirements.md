@@ -32,7 +32,7 @@ for tasking-based tests.
 
 #### Acceptance Criteria
 
-1. THE framework SHALL provide a `@given` decorator in the `automojo.testbase.properties` module
+1. THE framework SHALL provide a `@given` decorator in the `ccai.testbase.properties` module
 2. THE `@given` decorator SHALL accept keyword arguments mapping parameter names to `Strategy` instances
 3. WHEN a test function is decorated with `@given`, THE parameters listed in the decorator SHALL receive randomly generated values during execution
 4. WHEN a test function has parameters NOT listed in `@given`, THOSE parameters SHALL be resolved through the normal TestBase injection system
@@ -59,7 +59,7 @@ for tasking-based tests.
 
 #### Acceptance Criteria
 
-1. THE `automojo.testbase.properties.strategies` module SHALL provide the following built-in strategy functions:
+1. THE `ccai.testbase.properties.strategies` module SHALL provide the following built-in strategy functions:
    - `integers(min_value, max_value)` — generates random integers within a range
    - `floats(min_value, max_value)` — generates random floating-point numbers within a range
    - `text(alphabet, min_size, max_size)` — generates random strings
@@ -190,7 +190,7 @@ for tasking-based tests.
 1. THE property testing implementation SHALL NOT import or depend on Hypothesis or any other third-party property testing library
 2. ALL random value generation SHALL use the `random` module from the Python standard library
 3. ALL string generation SHALL use the `string` module from the Python standard library
-4. THE property testing module SHALL be self-contained within `automojo.testbase.properties`
+4. THE property testing module SHALL be self-contained within `ccai.testbase.properties`
 
 ### Requirement 13: Seed-Based Reproducibility
 
@@ -264,7 +264,7 @@ for tasking-based tests.
 
 #### Acceptance Criteria
 
-1. THE `automojo.testbase.properties` module SHALL provide an `assume(condition)` function
+1. THE `ccai.testbase.properties` module SHALL provide an `assume(condition)` function
 2. WHEN `assume()` is called with a falsy condition, THE function SHALL raise an `UnsatisfiedAssumption` exception
 3. WHEN `assume()` is called with a truthy condition, THE function SHALL return without side effects
 4. THE `PropertyRunner` SHALL catch `UnsatisfiedAssumption` exceptions during example execution and skip that example without recording a failure

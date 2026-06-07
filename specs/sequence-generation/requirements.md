@@ -50,7 +50,7 @@ The Test Sequence Document Generation system is responsible for creating executa
 1. THE generated document SHALL begin with a docstring indicating it is code-generated and should not be manually edited
 2. THE generated document SHALL set `__traceback_format_policy__` to "Brief" for debugging support
 3. THE generated document SHALL import the logging module and getEnhancedLogger
-4. THE generated document SHALL import ConstraintsCatalog from automojo.testbase.constraints
+4. THE generated document SHALL import ConstraintsCatalog from ccai.testbase.constraints
 5. THE generated document SHALL instantiate a module-level logger using getEnhancedLogger()
 6. THE generated document SHALL instantiate a module-level constraints_catalog using ConstraintsCatalog()
 

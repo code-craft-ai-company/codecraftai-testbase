@@ -1,5 +1,5 @@
 """
-    .. module:: automojo.testbase.examples.mocking_examples
+    .. module:: ccai.testbase.examples.mocking_examples
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Comprehensive usage examples for the TestBase mocking framework.
 
@@ -12,11 +12,11 @@
     4. Recursive mock patterns
     5. Strict attribute mode usage
 
-    .. moduleauthor:: AutomationX
+    .. moduleauthor:: CodeCraftX
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
@@ -24,7 +24,7 @@ from typing import Generator
 import os
 import types
 
-from automojo.testbase.mocking import (
+from ccai.testbase.mocking import (
     Mock,
     MockContext,
     MockType,

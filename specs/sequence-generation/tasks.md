@@ -13,7 +13,7 @@ This document tracks the implementation status of the Test Sequence Document Gen
   - Include docstring indicating code-generated file
   - Set `__traceback_format_policy__` to "Brief"
   - Import logging and getEnhancedLogger
-  - Import ConstraintsCatalog from automojo.testbase.constraints
+  - Import ConstraintsCatalog from ccai.testbase.constraints
   - Instantiate module-level logger
   - Instantiate module-level constraints_catalog
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
@@ -623,7 +623,7 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── sequencing/
 │   └── testsequencer.py        # TestSequencer with document generation methods
 ├── constraints.py              # ConstraintsCatalog for constraint lookups
@@ -632,7 +632,7 @@ source/packages/automojo/testbase/
 ├── testgroup.py                # TestGroup node type
 └── testref.py                  # TestRef node type
 
-source/tests/automojo_tests/testbase/
+source/tests/ccai_tests/testbase/
 └── test_sequence_generation.py # Unit tests for sequence generation (planned)
 
 source/examples/

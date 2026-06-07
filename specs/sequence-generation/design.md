@@ -129,9 +129,9 @@ __traceback_format_policy__ = "Brief"
 
 import logging
 
-from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+from ccai.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
-from automojo.testbase.constraints import ConstraintsCatalog
+from ccai.testbase.constraints import ConstraintsCatalog
 
 logger = getEnhancedLogger()
 
@@ -657,8 +657,8 @@ __traceback_format_policy__ = "Brief"
 
 import logging
 
-from automojo.xmodules.xlogging.enhancedloggers import getEnhancedLogger
-from automojo.testbase.constraints import ConstraintsCatalog
+from ccai.xmodules.xlogging.enhancedloggers import getEnhancedLogger
+from ccai.testbase.constraints import ConstraintsCatalog
 
 logger = getEnhancedLogger()
 constraints_catalog = ConstraintsCatalog()

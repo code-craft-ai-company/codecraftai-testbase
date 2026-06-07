@@ -10,7 +10,7 @@ The Command Line Interface (CLI) is the primary user-facing entry point for the 
 - Launching testing services (e.g., result server)
 - Providing utility commands for automation pipelines
 
-The CLI is built on the `automojo.arcli` framework, which provides decorator-based command definition, option groups for reusable parameters, and automatic help generation.
+The CLI is built on the `ccai.arcli` framework, which provides decorator-based command definition, option groups for reusable parameters, and automatic help generation.
 
 ## Architecture
 
@@ -493,7 +493,7 @@ flowchart TD
 
 #### 1. Decorator Pattern
 
-Commands and options are defined using decorators from `automojo.arcli`:
+Commands and options are defined using decorators from `ccai.arcli`:
 
 ```python
 @arcli.option('-v', '--verbose', default=0, mode=OptionMode.Counter)
@@ -798,7 +798,7 @@ testbase utilities timestamp
 ## File Structure
 
 ```
-source/packages/automojo/testbase/cli/
+source/packages/ccai/testbase/cli/
 ├── __init__.py                    # Package initialization
 ├── options.py                     # Reusable option groups
 ├── testbase_command.py            # Root command entry point

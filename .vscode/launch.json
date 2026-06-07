@@ -31,13 +31,13 @@
             "name": "Python: Internal Tests - Run",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/source/packages/automojo/testbase/cli/testbase_command.py",
+            "program": "${workspaceFolder}/source/packages/ccai/testbase/cli/testbase_command.py",
             "envFile": "${workspaceFolder}/.env",
             "args": [
                 "testing",
                 "run",
-                "--root=${workspaceFolder}/source/testroots/automojo",
-                "--includes=automojo.tests"
+                "--root=${workspaceFolder}/source/testroots/ccai",
+                "--includes=ccai.tests"
             ],
             "console": "integratedTerminal",
             "justMyCode": false
@@ -46,13 +46,13 @@
             "name": "Python: Internal Tests - Query",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/source/packages/automojo/testbase/cli/testbase_command.py",
+            "program": "${workspaceFolder}/source/packages/ccai/testbase/cli/testbase_command.py",
             "envFile": "${workspaceFolder}/.env",
             "args": [
                 "testing",
                 "query",
-                "--root=${workspaceFolder}/source/testroots/automojo",
-                "--includes=automojo.tests"
+                "--root=${workspaceFolder}/source/testroots/ccai",
+                "--includes=ccai.tests"
             ],
             "console": "integratedTerminal",
             "justMyCode": false
@@ -61,7 +61,7 @@
             "name": "Python: Test Results",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/source/packages/automojo/testbase/cli/testbase_command.py",
+            "program": "${workspaceFolder}/source/packages/ccai/testbase/cli/testbase_command.py",
             "envFile": "${workspaceFolder}/.env",
             "args": [
                 "services",
@@ -74,7 +74,7 @@
             "name": "Python: Test Rendering",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/source/packages/automojo/testbase/cli/testbase_command.py",
+            "program": "${workspaceFolder}/source/packages/ccai/testbase/cli/testbase_command.py",
             "envFile": "${workspaceFolder}/.env",
             "args": [
                 "services",

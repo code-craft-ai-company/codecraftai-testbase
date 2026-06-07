@@ -1,8 +1,8 @@
 =======================
-Automation Mojo TestBase
+Code Craft AI TestBase
 =======================
 
-Automation Mojo TestBase is a Python testing framework designed for automation testing with an emphasis on debuggability, readability, and resource-managed test execution. The framework provides structured discovery, dependency injection, sequencing, and results recording capabilities so complex test suites can remain isolated, extensible, and easy to troubleshoot.
+Code Craft AI TestBase is a Python testing framework designed for automation testing with an emphasis on debuggability, readability, and resource-managed test execution. The framework provides structured discovery, dependency injection, sequencing, and results recording capabilities so complex test suites can remain isolated, extensible, and easy to troubleshoot.
 
 Highlights
 ==========
@@ -59,7 +59,7 @@ Run TestBase tests:
 
 .. code-block:: bash
 
-   testbase testing run --root "source/testbase" --include automojo
+   testbase testing run --root "source/testbase" --include ccai
 
 Standards and Conventions
 =========================

@@ -316,7 +316,7 @@ The DebugPyAssistant is typically used programmatically:
 
 .. code-block:: python
 
-    from automojo.xmodules.debugging import DebugPyAssistant
+    from ccai.xmodules.debugging import DebugPyAssistant
 
     # Create the assistant with default settings
     # Default endpoint: ("0.0.0.0", 5679)
@@ -471,6 +471,6 @@ Best Practices
 See Also
 ========
 
-- :mod:`automojo.xmodules.debugging` - Core debugging infrastructure
-- :class:`automojo.testbase.breakpoints.WELLKNOWN_BREAKPOINTS` - Breakpoint enumeration
-- :class:`automojo.testbase.cli.options.DiagnosticOptionGroup` - CLI options for debugging
+- :mod:`ccai.xmodules.debugging` - Core debugging infrastructure
+- :class:`ccai.testbase.breakpoints.WELLKNOWN_BREAKPOINTS` - Breakpoint enumeration
+- :class:`ccai.testbase.cli.options.DiagnosticOptionGroup` - CLI options for debugging

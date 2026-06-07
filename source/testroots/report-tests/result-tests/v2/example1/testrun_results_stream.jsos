@@ -6,43 +6,43 @@
     "rtype": "JOB"
 }
 {
-    "name": "automojo",
+    "name": "ccai",
     "instance": "93e205cc-f586-497b-a9fb-13c6348be898",
     "parent": "73c241cd-dc48-444d-b4a7-d3607820cb3e",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests",
+    "name": "ccai.tests",
     "instance": "7d164f1b-4275-48fd-97f9-07bc83b48381",
     "parent": "93e205cc-f586-497b-a9fb-13c6348be898",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests.testplus",
+    "name": "ccai.tests.testplus",
     "instance": "f99f7f06-df6b-4519-9442-16c867c3209d",
     "parent": "7d164f1b-4275-48fd-97f9-07bc83b48381",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests.testbase.local",
+    "name": "ccai.tests.testbase.local",
     "instance": "1e9d2c77-eed2-4518-934f-9aef58f29df4",
     "parent": "f99f7f06-df6b-4519-9442-16c867c3209d",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests.testbase.local.injection",
+    "name": "ccai.tests.testbase.local.injection",
     "instance": "bf59c389-5d80-4c3a-854b-3d15dfe86ef8",
     "parent": "1e9d2c77-eed2-4518-934f-9aef58f29df4",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests.testbase.local.injection.test_constraints",
+    "name": "ccai.tests.testbase.local.injection.test_constraints",
     "instance": "2957cb90-098d-4103-bf6f-5e3296acb7a9",
     "parent": "bf59c389-5d80-4c3a-854b-3d15dfe86ef8",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging",
+    "name": "ccai.tests.testbase.local.injection.test_constraints#test_activity_logging",
     "monikers": [],
     "pivots": {},
     "instance": "e6a3ad03-11e9-4a5d-841b-b22cf95c4a17",
@@ -53,7 +53,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging",
+    "name": "ccai.tests.testbase.local.injection.test_constraints#test_activity_logging",
     "monikers": [],
     "pivots": {},
     "instance": "e6a3ad03-11e9-4a5d-841b-b22cf95c4a17",
@@ -69,7 +69,7 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.injection.test_constraints#test_constraint_constrained_parameter",
+    "name": "ccai.tests.testbase.local.injection.test_constraints#test_constraint_constrained_parameter",
     "monikers": [],
     "pivots": {},
     "instance": "b538bdc3-2632-452d-b306-04fb1b9edc35",
@@ -80,7 +80,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.injection.test_constraints#test_constraint_constrained_parameter",
+    "name": "ccai.tests.testbase.local.injection.test_constraints#test_constraint_constrained_parameter",
     "monikers": [],
     "pivots": {},
     "instance": "b538bdc3-2632-452d-b306-04fb1b9edc35",
@@ -96,7 +96,7 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.injection.test_constraints#test_tscope_parameter",
+    "name": "ccai.tests.testbase.local.injection.test_constraints#test_tscope_parameter",
     "monikers": [],
     "pivots": {},
     "instance": "371aaf2c-de19-47ee-8c86-6f01848c56b5",
@@ -107,7 +107,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.injection.test_constraints#test_tscope_parameter",
+    "name": "ccai.tests.testbase.local.injection.test_constraints#test_tscope_parameter",
     "monikers": [],
     "pivots": {},
     "instance": "371aaf2c-de19-47ee-8c86-6f01848c56b5",
@@ -123,13 +123,13 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.test_error_formatting",
+    "name": "ccai.tests.testbase.local.test_error_formatting",
     "instance": "2362073a-f576-42d5-bd7b-0bfd9df77207",
     "parent": "1e9d2c77-eed2-4518-934f-9aef58f29df4",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests.testbase.local.test_error_formatting#test_intentional_error",
+    "name": "ccai.tests.testbase.local.test_error_formatting#test_intentional_error",
     "monikers": [],
     "pivots": {},
     "instance": "c2b12399-128a-45aa-abe4-c13be6a19d3a",
@@ -140,7 +140,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.test_error_formatting#test_intentional_error",
+    "name": "ccai.tests.testbase.local.test_error_formatting#test_intentional_error",
     "monikers": [],
     "pivots": {},
     "instance": "c2b12399-128a-45aa-abe4-c13be6a19d3a",
@@ -348,7 +348,7 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.test_error_formatting#test_intentional_failure",
+    "name": "ccai.tests.testbase.local.test_error_formatting#test_intentional_failure",
     "monikers": [],
     "pivots": {},
     "instance": "03b0b981-e20b-4285-9293-aaeb5f1226da",
@@ -359,7 +359,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.test_error_formatting#test_intentional_failure",
+    "name": "ccai.tests.testbase.local.test_error_formatting#test_intentional_failure",
     "monikers": [],
     "pivots": {},
     "instance": "03b0b981-e20b-4285-9293-aaeb5f1226da",
@@ -578,13 +578,13 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.test_function_signatures",
+    "name": "ccai.tests.testbase.local.test_function_signatures",
     "instance": "f621a2bf-f0ff-4cb0-9eb6-5b53053b2d20",
     "parent": "1e9d2c77-eed2-4518-934f-9aef58f29df4",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests.testbase.local.test_function_signatures#test_no_parameters",
+    "name": "ccai.tests.testbase.local.test_function_signatures#test_no_parameters",
     "monikers": [],
     "pivots": {},
     "instance": "9125d0de-9dae-4db3-85e4-b6cd8c047069",
@@ -595,7 +595,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.test_function_signatures#test_no_parameters",
+    "name": "ccai.tests.testbase.local.test_function_signatures#test_no_parameters",
     "monikers": [],
     "pivots": {},
     "instance": "9125d0de-9dae-4db3-85e4-b6cd8c047069",
@@ -611,13 +611,13 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection",
+    "name": "ccai.tests.testbase.local.test_validator_injection",
     "instance": "a0932652-60be-4efc-bf39-e11aabb628f6",
     "parent": "1e9d2c77-eed2-4518-934f-9aef58f29df4",
     "rtype": "TEST_CONTAINER"
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection#test_no_parameters",
+    "name": "ccai.tests.testbase.local.test_validator_injection#test_no_parameters",
     "monikers": [],
     "pivots": {},
     "instance": "a2d1f480-1209-4353-a232-81f00b27a96c",
@@ -628,7 +628,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection#test_no_parameters_vcheck",
+    "name": "ccai.tests.testbase.local.test_validator_injection#test_no_parameters_vcheck",
     "monikers": [],
     "pivots": {},
     "instance": "87172e7b-f216-4a03-bca0-fe1b44c92cda",
@@ -639,7 +639,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection#test_no_parameters_vlcheck",
+    "name": "ccai.tests.testbase.local.test_validator_injection#test_no_parameters_vlcheck",
     "monikers": [],
     "pivots": {},
     "instance": "d53898fc-7094-4d4b-a740-642d809a2b74",
@@ -650,7 +650,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection#test_no_parameters_vticheck",
+    "name": "ccai.tests.testbase.local.test_validator_injection#test_no_parameters_vticheck",
     "monikers": [],
     "pivots": {},
     "instance": "8df284c4-fd60-41b6-aa6c-d2671fb76c9d",
@@ -661,7 +661,7 @@
     "stop": ""
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection#test_no_parameters_vticheck",
+    "name": "ccai.tests.testbase.local.test_validator_injection#test_no_parameters_vticheck",
     "monikers": [],
     "pivots": {},
     "instance": "8df284c4-fd60-41b6-aa6c-d2671fb76c9d",
@@ -677,7 +677,7 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection#test_no_parameters_vlcheck",
+    "name": "ccai.tests.testbase.local.test_validator_injection#test_no_parameters_vlcheck",
     "monikers": [],
     "pivots": {},
     "instance": "d53898fc-7094-4d4b-a740-642d809a2b74",
@@ -693,7 +693,7 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection#test_no_parameters_vcheck",
+    "name": "ccai.tests.testbase.local.test_validator_injection#test_no_parameters_vcheck",
     "monikers": [],
     "pivots": {},
     "instance": "87172e7b-f216-4a03-bca0-fe1b44c92cda",
@@ -709,7 +709,7 @@
     }
 }
 {
-    "name": "automojo.tests.testbase.local.test_validator_injection#test_no_parameters",
+    "name": "ccai.tests.testbase.local.test_validator_injection#test_no_parameters",
     "monikers": [],
     "pivots": {},
     "instance": "a2d1f480-1209-4353-a232-81f00b27a96c",

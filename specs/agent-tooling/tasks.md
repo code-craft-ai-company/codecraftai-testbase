@@ -242,7 +242,7 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/cli/
+source/packages/ccai/testbase/cli/
 └── cmdtree/
     └── agents/
         ├── __init__.py              # Agents group definition
@@ -262,7 +262,7 @@ source/packages/automojo/testbase/cli/
             ├── __init__.py          # Config subgroup definition
             └── extract.py           # Config extract command
 
-source/tests/automojo_tests/testbase/cli/agents/
+source/tests/ccai_tests/testbase/cli/agents/
 ├── __init__.py
 ├── test_jsosparser.py
 ├── test_compact_formatter.py

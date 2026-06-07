@@ -4,8 +4,8 @@
 
 The Test Entry Points system provides standardized mechanisms for initiating test execution in the TestBase framework. There are two distinct entry points:
 
-- **`generic_test_entrypoint`** — the DECOUPLED standalone core that lives in TestBase (`automojo.testbase.entrypoints`). It runs an individual test module directly for debugging, performs NO integration/activation initialization and NO this-app environment setup, and lets the `TestJob` it builds resolve output through injected seams (`IOutputContext` / recorder) rather than reading `env["output_directory"]` or runtime/this-app well-known paths.
-- **`integrated_test_entrypoint`** — the integration counterpart that lives in `automojo-integration-runtime` (`automojo.integrationruntime.entrypoints`), NOT in TestBase. It performs the this-app activation (persona + runtime-variable resolution + `activate_profile_job`), then delegates to the same decoupled TestBase core with a `DefaultIntegratedTestJob` (an `IntegratedTestJob`-derived type).
+- **`generic_test_entrypoint`** — the DECOUPLED standalone core that lives in TestBase (`ccai.testbase.entrypoints`). It runs an individual test module directly for debugging, performs NO integration/activation initialization and NO this-app environment setup, and lets the `TestJob` it builds resolve output through injected seams (`IOutputContext` / recorder) rather than reading `env["output_directory"]` or runtime/this-app well-known paths.
+- **`integrated_test_entrypoint`** — the integration counterpart that lives in `codecraftai-integration-runtime` (`ccai.integrationruntime.entrypoints`), NOT in TestBase. It performs the this-app activation (persona + runtime-variable resolution + `activate_profile_job`), then delegates to the same decoupled TestBase core with a `DefaultIntegratedTestJob` (an `IntegratedTestJob`-derived type).
 
 This document describes the TestBase standalone core; the integration entry point is summarized in the Integration Points section for context.
 
@@ -57,7 +57,7 @@ graph TB
 
     subgraph "Configuration Layer"
         AP2[ArgumentParser]
-        ENV[automojo.testbase.environment]
+        ENV[ccai.testbase.environment]
     end
 
     GTE --> FTR
@@ -82,13 +82,13 @@ graph TB
     ITE -->|"delegates (job_type=DefaultIntegratedTestJob)"| GTE
 ```
 
-The integration entry point (`integrated_test_entrypoint`, in `automojo-integration-runtime`) is the only place where activation initialization happens; it delegates into the decoupled `generic_test_entrypoint` after activating. The standalone core never touches `automojo.runtime` or `automojo.thisapp`.
+The integration entry point (`integrated_test_entrypoint`, in `codecraftai-integration-runtime`) is the only place where activation initialization happens; it delegates into the decoupled `generic_test_entrypoint` after activating. The standalone core never touches `ccai.runtime` or `ccai.thisapp`.
 
 ### Components
 
 #### 1. Generic Test Entry Point (`generic_test_entrypoint`)
 
-The primary, DECOUPLED standalone entry point function for running test modules as standalone scripts. This is the recommended way to enable debugging of individual test files. It performs NO integration/activation initialization and NO this-app environment setup; it imports nothing from `automojo.runtime` / `automojo.thisapp`. Output location and run identity are resolved by the `TestJob` it builds through injected seams (`IOutputContext` / `IRunMetadata` / recorder), not by reading `env["output_directory"]` or well-known runtime/this-app paths.
+The primary, DECOUPLED standalone entry point function for running test modules as standalone scripts. This is the recommended way to enable debugging of individual test files. It performs NO integration/activation initialization and NO this-app environment setup; it imports nothing from `ccai.runtime` / `ccai.thisapp`. Output location and run identity are resolved by the `TestJob` it builds through injected seams (`IOutputContext` / `IRunMetadata` / recorder), not by reading `env["output_directory"]` or well-known runtime/this-app paths.
 
 ```mermaid
 classDiagram
@@ -118,7 +118,7 @@ classDiagram
 | Injection Renaming | Updates resource origins from `__main__` to proper module name |
 | Job Execution | Creates and executes the test job; output is resolved by the job's injected `IOutputContext` / recorder |
 
-**Explicitly NOT a responsibility of the standalone core:** runtime initialization, profile activation, results-resource initialization, or any this-app environment configuration. Those belong to `integrated_test_entrypoint` in `automojo-integration-runtime` (see Integration Points).
+**Explicitly NOT a responsibility of the standalone core:** runtime initialization, profile activation, results-resource initialization, or any this-app environment configuration. Those belong to `integrated_test_entrypoint` in `codecraftai-integration-runtime` (see Integration Points).
 
 **Command Line Arguments:**
 
@@ -129,11 +129,11 @@ classDiagram
 | `--console-level` | | Logging level for console output | `INFO` |
 | `--logfile-level` | | Logging level for logfile output | `DEBUG` |
 
-#### 2. Integration Initialization (in `automojo-integration-runtime`)
+#### 2. Integration Initialization (in `codecraftai-integration-runtime`)
 
-Activation initialization is NOT part of the standalone core. It is performed by `integrated_test_entrypoint`, which calls `initialize_integration_runtime` (establishes the application persona — name "automojo", home `~/automojo`, "TB" logger prefix, "testrun" log basename — and resolves runtime variables) and `initialize_integration_results` (configures the static-resource source/destination directories and the HTML summary template, and activates the `JobType.TestRun` profile). These live in `automojo.integrationruntime.initialize`. The standalone `generic_test_entrypoint` invokes none of them.
+Activation initialization is NOT part of the standalone core. It is performed by `integrated_test_entrypoint`, which calls `initialize_integration_runtime` (establishes the application persona — name "ccai", home `~/ccai`, "TB" logger prefix, "testrun" log basename — and resolves runtime variables) and `initialize_integration_results` (configures the static-resource source/destination directories and the HTML summary template, and activates the `JobType.TestRun` profile). These live in `ccai.integrationruntime.initialize`. The standalone `generic_test_entrypoint` invokes none of them.
 
-> Historical note: the legacy `automojo.testbase.initialize` module (`initialize_testbase_runtime` / `initialize_testbase_results`) still exists on disk but is no longer called by the standalone entry point; its runtime/this-app coupling is the reason this responsibility was moved to the integration entry point.
+> Historical note: the legacy `ccai.testbase.initialize` module (`initialize_testbase_runtime` / `initialize_testbase_results`) still exists on disk but is no longer called by the standalone entry point; its runtime/this-app coupling is the reason this responsibility was moved to the integration entry point.
 
 #### 3. Output Resolution via Injected Seams
 
@@ -145,7 +145,7 @@ The standalone core does not configure output directories itself. The `TestJob` 
 | `IRunMetadata` | `StandaloneRunMetadata` | Supplies run id, start time, title, timeout, and build/pipeline/job info |
 | `ResultRecorder` | `StdoutResultRecorder` | Emits a stdout summary; writes JSOS/JSON when an output dir is given; SKIPS HTML |
 
-The integration variants (presence-folder paths via `RuntimeOutputContext`, `RuntimeVariables`-sourced `RuntimeRunMetadata`, and JSOS-to-disk plus HTML via `JsonResultRecorder`) are supplied by `DefaultIntegratedTestJob` in `automojo-integration-runtime` by overriding these same hooks. Core test-execution knobs (`AM_TESTROOT`, `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`, `AM_DEBUG_*`, `AM_DIAGNOSTICS_PRERUN/POSTRUN`) are read directly from `os.environ` through the dependency-free `automojo.testbase.environment` module.
+The integration variants (presence-folder paths via `RuntimeOutputContext`, `RuntimeVariables`-sourced `RuntimeRunMetadata`, and JSOS-to-disk plus HTML via `JsonResultRecorder`) are supplied by `DefaultIntegratedTestJob` in `codecraftai-integration-runtime` by overriding these same hooks. Core test-execution knobs (`AM_TESTROOT`, `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`, `AM_DEBUG_*`, `AM_DIAGNOSTICS_PRERUN/POSTRUN`) are read directly from `os.environ` through the dependency-free `ccai.testbase.environment` module.
 
 #### 4. Module Resolution Functions
 
@@ -333,7 +333,7 @@ with job_type(logger, testroot, includes=includes, excludes=excludes, test_modul
 
 ### With the Integration Entry Point (`integrated_test_entrypoint`)
 
-The standalone core is wrapped — not duplicated — by the integration entry point that lives in `automojo-integration-runtime`. The integration entry point performs activation and then delegates into the same decoupled core:
+The standalone core is wrapped — not duplicated — by the integration entry point that lives in `codecraftai-integration-runtime`. The integration entry point performs activation and then delegates into the same decoupled core:
 
 ```mermaid
 sequenceDiagram
@@ -414,7 +414,7 @@ The entry point configures logging through the enhanced logger:
 
 ```python
 logger = getEnhancedLogger()
-tpmod = sys.modules["automojo.testbase"]
+tpmod = sys.modules["ccai.testbase"]
 tpmod.logger = logger
 ```
 
@@ -422,7 +422,7 @@ tpmod.logger = logger
 
 ### Environment Variables
 
-The standalone core reads core test-execution knobs directly from `os.environ` through the dependency-free `automojo.testbase.environment` module (it does NOT go through `RuntimeVariables` or this-app):
+The standalone core reads core test-execution knobs directly from `os.environ` through the dependency-free `ccai.testbase.environment` module (it does NOT go through `RuntimeVariables` or this-app):
 
 | Variable | Purpose |
 |----------|---------|
@@ -433,7 +433,7 @@ The standalone core reads core test-execution knobs directly from `os.environ` t
 | `AM_DEBUG_DEBUGGER`, `AM_DEBUG_BREAKPOINTS` | Debugger selection and breakpoint list |
 | `AM_DIAGNOSTICS_PRERUN`, `AM_DIAGNOSTICS_POSTRUN` | Enable pre-/post-run diagnostic capture |
 
-Presence-folder paths and `RuntimeVariables`/this-app-sourced values are NOT consumed by the standalone core; they are introduced by `DefaultIntegratedTestJob` in `automojo-integration-runtime`.
+Presence-folder paths and `RuntimeVariables`/this-app-sourced values are NOT consumed by the standalone core; they are introduced by `DefaultIntegratedTestJob` in `codecraftai-integration-runtime`.
 
 ### Test Root Marker
 
@@ -504,7 +504,7 @@ Add to the bottom of any test module:
 ```python
 # test_example.py
 
-from automojo.testbase.declaration import testcontainer, test
+from ccai.testbase.declaration import testcontainer, test
 
 @testcontainer()
 class TestExample:
@@ -515,7 +515,7 @@ class TestExample:
 
 # Enable direct execution for debugging
 if __name__ == "__main__":
-    from automojo.testbase.entrypoints import generic_test_entrypoint
+    from ccai.testbase.entrypoints import generic_test_entrypoint
     generic_test_entrypoint()
 ```
 
@@ -524,7 +524,7 @@ if __name__ == "__main__":
 Use a custom test job for specialized execution:
 
 ```python
-from automojo.testbase.testjob import TestJob
+from ccai.testbase.testjob import TestJob
 
 class CustomTestJob(TestJob):
     name = "Custom Test Suite"
@@ -535,7 +535,7 @@ class CustomTestJob(TestJob):
         return CustomSequencer(...)
 
 if __name__ == "__main__":
-    from automojo.testbase.entrypoints import generic_test_entrypoint
+    from ccai.testbase.entrypoints import generic_test_entrypoint
     generic_test_entrypoint(job_type=CustomTestJob)
 ```
 
@@ -566,7 +566,7 @@ python test_module.py --console-level WARNING --logfile-level DEBUG
 
 ```
 # TestBase (standalone core)
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── entrypoints.py          # generic_test_entrypoint (decoupled standalone core)
 ├── environment.py          # Dependency-free os.environ knob accessors (AM_TESTROOT, etc.)
 ├── utilities.py            # Module resolution utilities
@@ -580,13 +580,13 @@ source/packages/automojo/testbase/
     └── injectionregistry.py     # Resource origin management
 
 # Integration entry point (separate package/repo)
-source/packages/automojo/integrationruntime/
+source/packages/ccai/integrationruntime/
 ├── entrypoints.py          # integrated_test_entrypoint (activation + delegation)
 ├── initialize.py           # initialize_integration_runtime / initialize_integration_results
 └── integratedtestjob.py    # DefaultIntegratedTestJob (RuntimeOutputContext / JsonResultRecorder + HTML)
 ```
 
-> Note: `automojo.testbase.initialize` (legacy `initialize_testbase_runtime` / `initialize_testbase_results`) still exists on disk but is no longer used by the standalone entry point.
+> Note: `ccai.testbase.initialize` (legacy `initialize_testbase_runtime` / `initialize_testbase_results`) still exists on disk but is no longer used by the standalone entry point.
 
 ## Testing Strategy
 

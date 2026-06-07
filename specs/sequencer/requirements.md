@@ -30,7 +30,7 @@ The Sequencer Scopes system provides hierarchical execution context management f
 - **TracebackDetail**: A structured representation of exception traceback information
 - **JSOS**: JSON Separated Object Stream format used for activity recording
 - **IOutputContext**: The injected seam through which the sequencer resolves run artefact locations (test results, diagnostics, per-testcase by-products). The default implementation is `SimpleOutputContext`, which roots artefacts under a single base directory. Replaces the use of `get_path_for_*`, `RuntimeVariables`, and `ThisApplicationSingleton` in the sequencer core.
-- **environment**: The dependency-free `automojo.testbase.environment` module that reads core env knobs (including `AM_DIAGNOSTICS_PRERUN` / `AM_DIAGNOSTICS_POSTRUN`) from `os.environ`, providing gating helpers such as `diagnostics_prerun_enabled()` and `diagnostics_postrun_enabled()`.
+- **environment**: The dependency-free `ccai.testbase.environment` module that reads core env knobs (including `AM_DIAGNOSTICS_PRERUN` / `AM_DIAGNOSTICS_POSTRUN`) from `os.environ`, providing gating helpers such as `diagnostics_prerun_enabled()` and `diagnostics_postrun_enabled()`.
 
 ## Requirements
 

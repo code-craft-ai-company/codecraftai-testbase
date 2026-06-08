@@ -395,7 +395,7 @@ When the sequence document generator encounters a function with `_property_`, it
 test_scope_name = "test_sort_is_idempotent"
 with sequencer.enter_test_scope_context(test_scope_name) as tscope:
     from mypackage.test_sorting import test_sort_is_idempotent
-    from automojo.testbase.properties.propertyrunner import PropertyRunner
+    from ccai.testbase.properties.propertyrunner import PropertyRunner
 
     prop_meta = test_sort_is_idempotent._property_
     runner = PropertyRunner(
@@ -614,7 +614,7 @@ of `PropertyRunner` in unit tests rather than going through the full sequencer p
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── properties/
 │   ├── __init__.py              # Exports: given, expect_exception, assume, strategies
 │   ├── decorators.py            # @given decorator, expect_exception decorator
@@ -638,7 +638,7 @@ source/packages/automojo/testbase/
                                  #          TestSummaryPropertyMetadata web components;
                                  #          Update TestSummaryResultItem.syncData()
 
-source/tests/automojo_tests/testbase/properties/
+source/tests/ccai_tests/testbase/properties/
 ├── __init__.py
 ├── test_strategies.py
 ├── test_propertyrunner.py

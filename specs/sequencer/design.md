@@ -528,10 +528,10 @@ directory) and exposed as the `output_context` property.
 during `__enter__`, then derives the `activity.jsos` stream filename from it. The rich
 integration variants (presence-folder paths, `RuntimeVariables`-sourced metadata) are
 supplied by binding a different `IOutputContext` implementation (e.g. `RuntimeOutputContext`)
-in `automojo-integration-runtime`; the sequencer core itself stays dependency-free.
+in `codecraftai-integration-runtime`; the sequencer core itself stays dependency-free.
 
 `AM_DIAGNOSTICS_PRERUN` / `AM_DIAGNOSTICS_POSTRUN` gating is read through the dependency-free
-`automojo.testbase.environment` module (`environment.diagnostics_prerun_enabled()` /
+`ccai.testbase.environment` module (`environment.diagnostics_prerun_enabled()` /
 `environment.diagnostics_postrun_enabled()`) rather than `RuntimeVariables`.
 
 ### With TestSequencer
@@ -663,7 +663,7 @@ flowchart TD
 The system uses `TracebackDetail` for structured exception information:
 
 ```python
-from automojo.errors.xtraceback import create_traceback_detail, format_traceback_detail
+from ccai.errors.xtraceback import create_traceback_detail, format_traceback_detail
 
 tb_detail = create_traceback_detail(ex_inst)
 errmsg_lines = format_traceback_detail(tb_detail)

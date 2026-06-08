@@ -365,11 +365,11 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── expressions.py              # parse_test_include_expression function
 └── testcollector.py            # TestCollector using expression parser
 
-source/tests/automojo_tests/testbase/
+source/tests/ccai_tests/testbase/
 └── test_expressions.py         # Unit tests for expression parsing
 
 source/examples/

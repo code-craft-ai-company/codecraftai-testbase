@@ -454,12 +454,12 @@ ERROR: <description>
 
 ```bash
 # Extract summary from a test run
-testbase agents summary extract --summary-file=~/automojo/results/testresults/2026-02-24T2204S46/testrun_summary.json
+testbase agents summary extract --summary-file=~/ccai/results/testresults/2026-02-24T2204S46/testrun_summary.json
 
 # Compare two runs for regressions
 testbase agents summary compare \
-    --baseline=~/automojo/results/testresults/run1/testrun_summary.json \
-    --current=~/automojo/results/testresults/run2/testrun_summary.json
+    --baseline=~/ccai/results/testresults/run1/testrun_summary.json \
+    --current=~/ccai/results/testresults/run2/testrun_summary.json
 ```
 
 ### Test Result Operations
@@ -468,7 +468,7 @@ testbase agents summary compare \
 # Extract a specific test result
 testbase agents testresult extract \
     --results-file=./testrun_results_stream.jsos \
-    --testname="automojo.tests.testbase.injection.test_constraints#test_activity_logging"
+    --testname="ccai.tests.testbase.injection.test_constraints#test_activity_logging"
 
 # List all test results
 testbase agents testresult list --results-file=./testrun_results_stream.jsos
@@ -490,7 +490,7 @@ testbase agents config extract --config-file=./startup-configuration.json
 ## File Structure
 
 ```
-source/packages/automojo/testbase/cli/
+source/packages/ccai/testbase/cli/
 └── cmdtree/
     └── agents/
         ├── __init__.py              # Agents group definition
@@ -510,7 +510,7 @@ source/packages/automojo/testbase/cli/
             ├── __init__.py          # Config subgroup definition
             └── extract.py           # Config extract command
 
-source/tests/automojo_tests/testbase/cli/agents/
+source/tests/ccai_tests/testbase/cli/agents/
 ├── __init__.py
 ├── test_jsosparser.py
 ├── test_compact_formatter.py

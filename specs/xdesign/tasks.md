@@ -6,26 +6,26 @@ This document outlines the tasks required to create specification documents (des
 
 | # | Feature Area | Spec Directory | Source Location |
 |---|--------------|----------------|-----------------|
-| 1 | Test Declaration and Registration | `specs/declaration/` | `source/packages/automojo/testbase/declaration/` |
-| 2 | Dependency Injection System | `specs/dependencies/` | `source/packages/automojo/testbase/injection/` |
-| 3 | Test Verification/Assertions | `specs/verifications/` | `source/packages/automojo/testbase/verification.py` |
-| 4 | Test Markers and Metadata | `specs/markers/` | `source/packages/automojo/testbase/markers.py` |
-| 5 | Feature Tagging System | `specs/feature-tagging/` | `source/packages/automojo/testbase/features.py` |
-| 6 | Constraints System | `specs/constraints/` | `source/packages/automojo/testbase/constraints/` |
-| 7 | Coupling System | `specs/coupling/` | `source/packages/automojo/testbase/coupling/` |
-| 8 | Test Execution Engine | `specs/execution/` | `source/packages/automojo/testbase/execution/` |
-| 9 | Sequencer Scopes | `specs/sequencer/` | `source/packages/automojo/testbase/sequencing/` |
-| 10 | Result Recording and Reporting | `specs/results/` | `source/packages/automojo/testbase/results/` |
-| 11 | Build and Pipeline Integration | `specs/continuous-integration/` | `source/packages/automojo/testbase/buildinfo.py` |
-| 12 | Command Line Interface | `specs/cli/` | `source/packages/automojo/testbase/cli/` |
-| 13 | Test Entry Points | `specs/entrypoints/` | `source/packages/automojo/testbase/entrypoints/` |
-| 14 | Mocking Framework | `specs/mocking/` | `source/packages/automojo/testbase/mocking/` |
-| 15 | Diagnostics System | `specs/diagnostics/` | `source/packages/automojo/testbase/diagnostics/` |
-| 16 | Test Sequence Document Generation | `specs/sequence-generation/` | `source/packages/automojo/testbase/sequencedoc/` |
-| 17 | Expression Parsing | `specs/expression-parsing/` | `source/packages/automojo/testbase/expressions/` |
-| 18 | Debugging Support | `specs/debugging/` | `source/packages/automojo/testbase/debugging/` |
-| 19 | HTML Report Templates | `specs/html-rendering/` | `source/packages/automojo/testbase/templates/` |
-| 20 | Result Concentrators | `specs/result-aggregation/` | `source/packages/automojo/testbase/concentrators/` |
+| 1 | Test Declaration and Registration | `specs/declaration/` | `source/packages/ccai/testbase/declaration/` |
+| 2 | Dependency Injection System | `specs/dependencies/` | `source/packages/ccai/testbase/injection/` |
+| 3 | Test Verification/Assertions | `specs/verifications/` | `source/packages/ccai/testbase/verification.py` |
+| 4 | Test Markers and Metadata | `specs/markers/` | `source/packages/ccai/testbase/markers.py` |
+| 5 | Feature Tagging System | `specs/feature-tagging/` | `source/packages/ccai/testbase/features.py` |
+| 6 | Constraints System | `specs/constraints/` | `source/packages/ccai/testbase/constraints/` |
+| 7 | Coupling System | `specs/coupling/` | `source/packages/ccai/testbase/coupling/` |
+| 8 | Test Execution Engine | `specs/execution/` | `source/packages/ccai/testbase/execution/` |
+| 9 | Sequencer Scopes | `specs/sequencer/` | `source/packages/ccai/testbase/sequencing/` |
+| 10 | Result Recording and Reporting | `specs/results/` | `source/packages/ccai/testbase/results/` |
+| 11 | Build and Pipeline Integration | `specs/continuous-integration/` | `source/packages/ccai/testbase/buildinfo.py` |
+| 12 | Command Line Interface | `specs/cli/` | `source/packages/ccai/testbase/cli/` |
+| 13 | Test Entry Points | `specs/entrypoints/` | `source/packages/ccai/testbase/entrypoints/` |
+| 14 | Mocking Framework | `specs/mocking/` | `source/packages/ccai/testbase/mocking/` |
+| 15 | Diagnostics System | `specs/diagnostics/` | `source/packages/ccai/testbase/diagnostics/` |
+| 16 | Test Sequence Document Generation | `specs/sequence-generation/` | `source/packages/ccai/testbase/sequencedoc/` |
+| 17 | Expression Parsing | `specs/expression-parsing/` | `source/packages/ccai/testbase/expressions/` |
+| 18 | Debugging Support | `specs/debugging/` | `source/packages/ccai/testbase/debugging/` |
+| 19 | HTML Report Templates | `specs/html-rendering/` | `source/packages/ccai/testbase/templates/` |
+| 20 | Result Concentrators | `specs/result-aggregation/` | `source/packages/ccai/testbase/concentrators/` |
 
 ---
 
@@ -34,10 +34,10 @@ This document outlines the tasks required to create specification documents (des
 ### Task 1: Test Declaration and Registration
 **Directory:** `specs/declaration/`
 **Source Files:**
-- `source/packages/automojo/testbase/declaration/__init__.py`
-- `source/packages/automojo/testbase/declaration/registrations.py`
-- `source/packages/automojo/testbase/declaration/testcontainer.py`
-- `source/packages/automojo/testbase/declaration/testref.py`
+- `source/packages/ccai/testbase/declaration/__init__.py`
+- `source/packages/ccai/testbase/declaration/registrations.py`
+- `source/packages/ccai/testbase/declaration/testcontainer.py`
+- `source/packages/ccai/testbase/declaration/testref.py`
 
 **Deliverables:**
 - [x] `specs/declaration/design.md` - Architecture of test registration decorators, TestContainer, TestRef
@@ -49,9 +49,9 @@ This document outlines the tasks required to create specification documents (des
 ### Task 2: Dependency Injection System
 **Directory:** `specs/dependencies/`
 **Source Files:**
-- `source/packages/automojo/testbase/injection/__init__.py`
-- `source/packages/automojo/testbase/injection/injectionregistry.py`
-- `source/packages/automojo/testbase/injection/injectableref.py`
+- `source/packages/ccai/testbase/injection/__init__.py`
+- `source/packages/ccai/testbase/injection/injectionregistry.py`
+- `source/packages/ccai/testbase/injection/injectableref.py`
 
 **Deliverables:**
 - [x] `specs/dependencies/design.md` - Injection registry architecture, injectable references
@@ -63,7 +63,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 3: Test Verification/Assertions
 **Directory:** `specs/verifications/`
 **Source Files:**
-- `source/packages/automojo/testbase/verification.py`
+- `source/packages/ccai/testbase/verification.py`
 
 **Deliverables:**
 - [x] `specs/verifications/design.md` - Verification function design, assertion patterns
@@ -75,7 +75,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 4: Test Markers and Metadata
 **Directory:** `specs/markers/`
 **Source Files:**
-- `source/packages/automojo/testbase/markers.py`
+- `source/packages/ccai/testbase/markers.py`
 
 **Deliverables:**
 - [x] `specs/markers/design.md` - Marker system architecture
@@ -87,7 +87,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 5: Feature Tagging System
 **Directory:** `specs/feature-tagging/`
 **Source Files:**
-- `source/packages/automojo/testbase/features.py`
+- `source/packages/ccai/testbase/features.py`
 
 **Deliverables:**
 - [x] `specs/feature-tagging/design.md` - Feature tagging architecture
@@ -99,7 +99,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 6: Constraints System
 **Directory:** `specs/constraints/`
 **Source Files:**
-- `source/packages/automojo/testbase/constraints.py`
+- `source/packages/ccai/testbase/constraints.py`
 
 **Deliverables:**
 - [x] `specs/constraints/design.md` - Constraint base classes, scope management
@@ -111,9 +111,9 @@ This document outlines the tasks required to create specification documents (des
 ### Task 7: Coupling System
 **Directory:** `specs/coupling/`
 **Source Files:**
-- `source/packages/automojo/testbase/coupling/__init__.py`
-- `source/packages/automojo/testbase/coupling/integrationcoupling.py`
-- `source/packages/automojo/testbase/coupling/scopecoupling.py`
+- `source/packages/ccai/testbase/coupling/__init__.py`
+- `source/packages/ccai/testbase/coupling/integrationcoupling.py`
+- `source/packages/ccai/testbase/coupling/scopecoupling.py`
 
 **Deliverables:**
 - [x] `specs/coupling/design.md` - Integration coupling, scope coupling architecture
@@ -125,9 +125,9 @@ This document outlines the tasks required to create specification documents (des
 ### Task 8: Test Execution Engine
 **Directory:** `specs/execution/`
 **Source Files:**
-- `source/packages/automojo/testbase/execution/__init__.py`
-- `source/packages/automojo/testbase/execution/testexecutor.py`
-- `source/packages/automojo/testbase/execution/testrunner.py`
+- `source/packages/ccai/testbase/execution/__init__.py`
+- `source/packages/ccai/testbase/execution/testexecutor.py`
+- `source/packages/ccai/testbase/execution/testrunner.py`
 
 **Deliverables:**
 - [x] `specs/execution/design.md` - Test executor, runner architecture
@@ -139,9 +139,9 @@ This document outlines the tasks required to create specification documents (des
 ### Task 9: Sequencer Scopes
 **Directory:** `specs/sequencer/`
 **Source Files:**
-- `source/packages/automojo/testbase/sequencing/__init__.py`
-- `source/packages/automojo/testbase/sequencing/sequencer.py`
-- `source/packages/automojo/testbase/sequencing/sequencerscope.py`
+- `source/packages/ccai/testbase/sequencing/__init__.py`
+- `source/packages/ccai/testbase/sequencing/sequencer.py`
+- `source/packages/ccai/testbase/sequencing/sequencerscope.py`
 
 **Deliverables:**
 - [x] `specs/sequencer/design.md` - Sequencer architecture, scope management
@@ -153,9 +153,9 @@ This document outlines the tasks required to create specification documents (des
 ### Task 10: Result Recording and Reporting
 **Directory:** `specs/results/`
 **Source Files:**
-- `source/packages/automojo/testbase/results/__init__.py`
-- `source/packages/automojo/testbase/results/resultrecorder.py`
-- `source/packages/automojo/testbase/results/resultcontainer.py`
+- `source/packages/ccai/testbase/results/__init__.py`
+- `source/packages/ccai/testbase/results/resultrecorder.py`
+- `source/packages/ccai/testbase/results/resultcontainer.py`
 
 **Deliverables:**
 - [x] `specs/results/design.md` - Result recording, container architecture
@@ -167,7 +167,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 11: Build and Pipeline Integration
 **Directory:** `specs/continuous-integration/`
 **Source Files:**
-- `source/packages/automojo/testbase/buildinfo.py`
+- `source/packages/ccai/testbase/buildinfo.py`
 
 **Deliverables:**
 - [x] `specs/continuous-integration/design.md` - Build info extraction design
@@ -179,9 +179,9 @@ This document outlines the tasks required to create specification documents (des
 ### Task 12: Command Line Interface
 **Directory:** `specs/cli/`
 **Source Files:**
-- `source/packages/automojo/testbase/cli/__init__.py`
-- `source/packages/automojo/testbase/cli/cmdtree.py`
-- `source/packages/automojo/testbase/cli/testbasecommand.py`
+- `source/packages/ccai/testbase/cli/__init__.py`
+- `source/packages/ccai/testbase/cli/cmdtree.py`
+- `source/packages/ccai/testbase/cli/testbasecommand.py`
 
 **Deliverables:**
 - [x] `specs/cli/design.md` - CLI command tree architecture
@@ -193,7 +193,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 13: Test Entry Points
 **Directory:** `specs/entrypoints/`
 **Source Files:**
-- `source/packages/automojo/testbase/entrypoints.py`
+- `source/packages/ccai/testbase/entrypoints.py`
 
 **Deliverables:**
 - [x] `specs/entrypoints/design.md` - Entry point architecture
@@ -205,7 +205,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 14: Mocking Framework
 **Directory:** `specs/mocking/`
 **Source Files:**
-- `source/packages/automojo/testbase/mocking.py`
+- `source/packages/ccai/testbase/mocking.py`
 
 **Deliverables:**
 - [x] `specs/mocking/design.md` - Mocking registry architecture
@@ -217,7 +217,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 15: Diagnostics System
 **Directory:** `specs/diagnostics/`
 **Source Files:**
-- `source/packages/automojo/testbase/diagnostics.py`
+- `source/packages/ccai/testbase/diagnostics.py`
 
 **Deliverables:**
 - [x] `specs/diagnostics/design.md` - Diagnostics architecture
@@ -229,7 +229,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 16: Test Sequence Document Generation
 **Directory:** `specs/sequence-generation/`
 **Source Files:**
-- `source/packages/automojo/testbase/sequencing/testsequencer.py`
+- `source/packages/ccai/testbase/sequencing/testsequencer.py`
 
 **Deliverables:**
 - [x] `specs/sequence-generation/design.md` - Sequence doc generator architecture
@@ -241,7 +241,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 17: Expression Parsing
 **Directory:** `specs/expression-parsing/`
 **Source Files:**
-- `source/packages/automojo/testbase/expressions.py`
+- `source/packages/ccai/testbase/expressions.py`
 
 **Deliverables:**
 - [x] `specs/expression-parsing/design.md` - Expression parser architecture
@@ -253,8 +253,8 @@ This document outlines the tasks required to create specification documents (des
 ### Task 18: Debugging Support
 **Directory:** `specs/debugging/`
 **Source Files:**
-- `source/packages/automojo/testbase/breakpoints.py`
-- `.venv/src/automojo-xmodules/source/packages/automojo/xmodules/debugging.py`
+- `source/packages/ccai/testbase/breakpoints.py`
+- `.venv/src/codecraftai-xmodules/source/packages/ccai/xmodules/debugging.py`
 
 **Deliverables:**
 - [x] `specs/debugging/design.md` - Debug context architecture
@@ -266,7 +266,7 @@ This document outlines the tasks required to create specification documents (des
 ### Task 19: HTML Report Templates
 **Directory:** `specs/html-rendering/`
 **Source Files:**
-- `source/packages/automojo/testbase/templates/` (HTML/Jinja templates)
+- `source/packages/ccai/testbase/templates/` (HTML/Jinja templates)
 
 **Deliverables:**
 - [x] `specs/html-rendering/design.md` - Template rendering architecture
@@ -278,8 +278,8 @@ This document outlines the tasks required to create specification documents (des
 ### Task 20: Result Concentrators
 **Directory:** `specs/result-aggregation/`
 **Source Files:**
-- `source/packages/automojo/testbase/concentrators/__init__.py`
-- `source/packages/automojo/testbase/concentrators/resultconcentrator.py`
+- `source/packages/ccai/testbase/concentrators/__init__.py`
+- `source/packages/ccai/testbase/concentrators/resultconcentrator.py`
 
 **Deliverables:**
 - [x] `specs/result-aggregation/design.md` - Result concentrator architecture

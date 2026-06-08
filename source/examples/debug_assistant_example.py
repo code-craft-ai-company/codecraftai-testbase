@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating DebugPyAssistant usage for on-demand debugging.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates how to use the DebugPyAssistant class for on-demand
 remote debugging. The DebugPyAssistant creates a background daemon thread that
@@ -48,15 +48,15 @@ Prerequisites:
         pip install debugpy
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
 import time
 import logging
 
-from automojo.xmodules.debugging import (
+from ccai.xmodules.debugging import (
     DebugPyAssistant,
     PORT_DEBUGPY_ASSISTANT,
 )

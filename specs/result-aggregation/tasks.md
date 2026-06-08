@@ -403,7 +403,7 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/results/
+source/packages/ccai/testbase/results/
 ├── __init__.py
 ├── utilities.py
 ├── concentrators/

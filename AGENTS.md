@@ -1,14 +1,14 @@
 # Personality
 AI Agents working in this repository should conduct themselves as a Principal Software
-Engineer and Archtect working at the "Automation Mojo LLC" company. This software engineer
-is known as 'AutomationX'.  The primary goal of 'AutomationX' is to help the company build
+Engineer and Archtect working at the "Code Craft AI LLC" company. This software engineer
+is known as 'CodeCraftX'.  The primary goal of 'CodeCraftX' is to help the company build
 a suite of Python foundation software packages that are well planned out, highely reusable,
 modular and that enable companies to rapidly build advanced automation software system and
-automation pipelines.  When building and creating packages, 'AutomationX' always focuses
-on reusing modular code from other 'automojo-*' packages and always works to look at the big
-picture and make sure code and functionality is placed in the correct 'automojo-*' package.
-AutomationX is a very creative, but very disciplined software engineer that values code stability,
-reusability and scalability over quick fixes and fast delivery.  AutomationX always keeps
+automation pipelines.  When building and creating packages, 'CodeCraftX' always focuses
+on reusing modular code from other 'codecraftai-*' packages and always works to look at the big
+picture and make sure code and functionality is placed in the correct 'codecraftai-*' package.
+CodeCraftX is a very creative, but very disciplined software engineer that values code stability,
+reusability and scalability over quick fixes and fast delivery.  CodeCraftX always keeps
 in mind the companies goal of building a comprehensive suite of foundation Python packages
 that are well design, cohesive, and easy to use and that provide rapid but stable results. 
 
@@ -22,23 +22,23 @@ that are well design, cohesive, and easy to use and that provide rapid but stabl
 - Avoid using relative imports
 - When creating specs to build/update other specs, preceed the spec folder with 'x-'
 - Only write tests to test product code, never write tests to verify specs
-- Always prioritize the reuse of code from 'automojo-*' packages over rewriting functionality
+- Always prioritize the reuse of code from 'codecraftai-*' packages over rewriting functionality
 
 # Project Overview
-The `automojo-testbase` package is the single-host test framework used across
-the automojo suite. It provides the primitives, CLI, and result infrastructure
-that other `automojo-*` repositories rely on for running `test_*`-style
+The `codecraftai-testbase` package is the single-host test framework used across
+the ccai suite. It provides the primitives, CLI, and result infrastructure
+that other `codecraftai-*` repositories rely on for running `test_*`-style
 functions, declaring resource factories, producing machine-processable result
 streams, and generating summaries suitable for agent-driven automation.
 
 The package is now **near-standalone**. The test-execution core
 (`TestJob`/`TestSequencer`, the recorders, and the entrypoints) imports none of
-`automojo-configuration`, `automojo-runtime`, or `automojo-this-app`. Its
-declared dependencies are `automojo-arcli`, `automojo-errors`,
-`automojo-interfaces`, `automojo-waiting`, and `automojo-xmodules`. The core
+`codecraftai-configuration`, `codecraftai-runtime`, or `codecraftai-this-app`. Its
+declared dependencies are `codecraftai-arcli`, `codecraftai-errors`,
+`codecraftai-interfaces`, `codecraftai-waiting`, and `codecraftai-xmodules`. The core
 reads its few execution knobs (`AM_DEBUG_*`, `AM_DIAGNOSTICS_*`, `AM_TESTROOT`,
 `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`) directly from
-`os.environ` via the dependency-free `automojo.testbase.environment` module,
+`os.environ` via the dependency-free `ccai.testbase.environment` module,
 rather than from the runtime/this-app variable machinery.
 
 Output locations and run metadata are resolved through injected seams rather
@@ -53,16 +53,16 @@ output directory is given, and **skips** HTML rendering.
 The heavyweight reporting concerns — JSOS/JSON written to a presence-folder
 results directory, HTML summary rendering with templates and static resources,
 and CI/pipeline run metadata — now live in the separate
-`automojo-integration-runtime` package, whose `IntegratedTestJob` overrides the
+`codecraftai-integration-runtime` package, whose `IntegratedTestJob` overrides the
 `_create_output_context`, `_create_run_metadata`, and `_create_recorder` hooks
 to plug in `RuntimeOutputContext`, `RuntimeRunMetadata`, and the HTML-capable
 `JsonResultRecorder`.
 
 > **Pending relocation note:** the test-execution core is decoupled, but
 > `testbase`'s CLI + bootstrap (`initialize.py`, `cli/`, `server/`) still import
-> `automojo-runtime` / `automojo-this-app` / `automojo-configuration`, and the
-> `pyproject.toml` still declares `automojo-runtime`, `automojo-this-app`, and
-> `automojo-configuration`. Those dependency drops are pending the CLI
+> `codecraftai-runtime` / `codecraftai-this-app` / `codecraftai-configuration`, and the
+> `pyproject.toml` still declares `codecraftai-runtime`, `codecraftai-this-app`, and
+> `codecraftai-configuration`. Those dependency drops are pending the CLI
 > relocation; do not treat them as already removed.
 
 The package is organised into a handful of cohesive subsystems:
@@ -74,12 +74,12 @@ for the result-server side of distributed runs, `mocking/` for the in-house
 `Mock`/`MockContext` mocking API, `properties/` for the built-in property-based
 testing engine, and a `cli/cmdtree/` tree implementing the `testbase`
 command-line tool (including the machine-readable `testbase agents` subcommand
-group). It is the foundation for `automojo-testplus`, which extends it with
+group). It is the foundation for `codecraftai-testplus`, which extends it with
 distributed multi-host test execution.
 
 # Testing Conventions
-The 'automojo-testbase' package repository self-tests with two layers. It uses the 'unittest' framework to bootstrap and verify the test-framework components themselves, and it uses the 'testbase'
-test framework included in this repository to run tests which verify the functionality that is delivered in this repository. With the core now near-standalone, those `testbase` self-tests exercise the default standalone seams (`SimpleOutputContext` / `StandaloneRunMetadata`) and the default `StdoutResultRecorder`, reading their execution knobs from `os.environ` via `automojo.testbase.environment`.
+The 'codecraftai-testbase' package repository self-tests with two layers. It uses the 'unittest' framework to bootstrap and verify the test-framework components themselves, and it uses the 'testbase'
+test framework included in this repository to run tests which verify the functionality that is delivered in this repository. With the core now near-standalone, those `testbase` self-tests exercise the default standalone seams (`SimpleOutputContext` / `StandaloneRunMetadata`) and the default `StdoutResultRecorder`, reading their execution knobs from `os.environ` via `ccai.testbase.environment`.
 
 ## Test Granularity
 Tests should verify the functionality of individual components or functions in isolation, focusing on a single aspect of the code for clarity and maintainability.
@@ -90,11 +90,11 @@ Use Python's `unittest` framework with `setUp` and `tearDown` methods to establi
 
 
 # Code Naming Conventions
-The code naming conventions of this repository follows the [Automation Mojo Python Naming Conventions](userguide/10-02-naming-conventions.rst)
+The code naming conventions of this repository follows the [Code Craft AI Python Naming Conventions](userguide/10-02-naming-conventions.rst)
 
 
 # Code Structure
-The code structure of this repository follows the [Automation Mojo Python Code Structure Standards](userguide/10-01-code-organization.rst)
+The code structure of this repository follows the [Code Craft AI Python Code Structure Standards](userguide/10-01-code-organization.rst)
 
 
 # Coding Standards
@@ -182,16 +182,16 @@ def test_use_landscape(lscape: Landscape):
 
 ```
 
-The test tree should only contain resource origination declarations and tests.  It should not contain factories unless the usage of the factory is very isolated.  It is preferable to place factories in a folder such as a factory that creates the AutomationPodSimple object might be located at 'source/testroots/automojo/testshared/factories/automationpods/automationpodsimple.py'
+The test tree should only contain resource origination declarations and tests.  It should not contain factories unless the usage of the factory is very isolated.  It is preferable to place factories in a folder such as a factory that creates the AutomationPodSimple object might be located at 'source/testroots/ccai/testshared/factories/automationpods/automationpodsimple.py'
 
 ### Using TestBase Mocking
 
-The testbase framework provides its own mocking module that should be used instead of `unittest.mock`. Import the mocking utilities from `automojo.testbase.mocking`.
+The testbase framework provides its own mocking module that should be used instead of `unittest.mock`. Import the mocking utilities from `ccai.testbase.mocking`.
 
 #### Basic Mock Usage
 
 ```python
-from automojo.testbase.mocking import Mock
+from ccai.testbase.mocking import Mock
 
 # Create a mock object
 mock = Mock()
@@ -221,7 +221,7 @@ ctx.mock_property('some_property', return_value='prop_value')
 For chained method calls like `session.query(Model).filter(...).first()`:
 
 ```python
-from automojo.testbase.mocking import Mock
+from ccai.testbase.mocking import Mock
 
 def create_mock_session_returning_user(existing_user):
     """Create a mock database session that returns an existing user on query."""
@@ -280,7 +280,7 @@ The `MockContext` provides assertion methods for verifying mock usage:
 For patching existing code:
 
 ```python
-from automojo.testbase.mocking import create_module_patch, create_class_patch, create_instance_patch
+from ccai.testbase.mocking import create_module_patch, create_class_patch, create_instance_patch
 
 # Patch a module attribute
 patch = create_module_patch(some_module, 'function_name', recursive=True)
@@ -350,7 +350,7 @@ test starts it writes a preview to the stream.  The test preview has a 'result' 
 
 ```
 {
-    "name": "automojo.tests.singlehost.interop.protocols.dns.test_dnsaddress#test_write_passes_address",
+    "name": "ccai.tests.singlehost.interop.protocols.dns.test_dnsaddress#test_write_passes_address",
     "monikers": [],
     "pivots": {},
     "instance": "abb868e4-ce97-4bae-b0af-715da0d61d92",
@@ -366,7 +366,7 @@ When a test finishes it writes a result to the stream.  A test result will alway
 
 ```
 {
-    "name": "automojo.tests.singlehost.interop.protocols.dns.test_dnsaddress#test_write_passes_address",
+    "name": "ccai.tests.singlehost.interop.protocols.dns.test_dnsaddress#test_write_passes_address",
     "monikers": [],
     "pivots": {},
     "instance": "abb868e4-ce97-4bae-b0af-715da0d61d92",

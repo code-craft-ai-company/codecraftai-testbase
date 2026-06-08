@@ -512,7 +512,7 @@ testbase testing run --root ./tests --debugger debugpy \
 ### Programmatic Breakpoint Entry
 
 ```python
-from automojo.xmodules.debugging import debugger_wellknown_breakpoint_entry, DEBUGGER
+from ccai.xmodules.debugging import debugger_wellknown_breakpoint_entry, DEBUGGER
 
 # Trigger a breakpoint if configured
 debugger_wellknown_breakpoint_entry(
@@ -525,7 +525,7 @@ debugger_wellknown_breakpoint_entry(
 ### Using DebugPyAssistant
 
 ```python
-from automojo.xmodules.debugging import DebugPyAssistant
+from ccai.xmodules.debugging import DebugPyAssistant
 
 # Start a background debug endpoint
 assistant = DebugPyAssistant(
@@ -540,7 +540,7 @@ assistant = DebugPyAssistant(
 ### Checking VS Code Debugger Status
 
 ```python
-from automojo.xmodules.debugging import in_vscode_debugger
+from ccai.xmodules.debugging import in_vscode_debugger
 
 if in_vscode_debugger():
     print("Running under VS Code debugger")
@@ -551,14 +551,14 @@ else:
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── breakpoints.py              # WELLKNOWN_BREAKPOINTS enum
 ├── cli/
 │   └── options.py              # DiagnosticOptionGroup with debugger options
 └── sequencing/
     └── testsequencer.py        # Breakpoint code generation integration
 
-.venv/src/automojo-xmodules/source/packages/automojo/xmodules/
+.venv/src/codecraftai-xmodules/source/packages/ccai/xmodules/
 └── debugging.py                # Core debugging infrastructure
                                 # - DEBUGGER enum
                                 # - debugger_wellknown_breakpoint_entry()

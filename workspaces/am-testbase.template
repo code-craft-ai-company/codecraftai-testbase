@@ -1,8 +1,8 @@
 {
     "folders": [
         {
-            "name": "automojo",
-            "path": "${TMPLT:HOME}/automojo"
+            "name": "ccai",
+            "path": "${TMPLT:HOME}/ccai"
         },
         {
             "name": "testbase",

@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating diagnostic level usage patterns with TestBase.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates how to use diagnostic levels to control the verbosity
 of captured diagnostic information. The diagnostic level parameter (1-9) allows
@@ -36,8 +36,8 @@ See Also:
     - debug_diagnostics_cli.py: CLI diagnostic options usage
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 

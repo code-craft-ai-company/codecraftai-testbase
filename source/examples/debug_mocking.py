@@ -1,6 +1,6 @@
 
 
-from automojo.testbase.mocking import Mock, SideEffect, create_module_patch, create_class_patch, create_instance_patch
+from ccai.testbase.mocking import Mock, SideEffect, create_module_patch, create_class_patch, create_instance_patch
 import os # For module patching example
 
 def replace_me():
@@ -106,7 +106,7 @@ def debug_mock_property_access():
     obj = SomeClass()
     
     # Using the new PropertyMock for property getter/setter mocking
-    from automojo.testbase.mocking import PropertyMock, create_property_mock
+    from ccai.testbase.mocking import PropertyMock, create_property_mock
     
     # Create a PropertyMock with getter return value
     prop_mock = create_property_mock(getter_return_value="Mocked Property Value")

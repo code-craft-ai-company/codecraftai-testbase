@@ -26,7 +26,7 @@ graph TB
     end
     
     subgraph "Configuration Layer"
-        ENV[automojo.testbase.environment]
+        ENV[ccai.testbase.environment]
         DOG[DiagnosticOptionGroup]
     end
     
@@ -362,7 +362,7 @@ DEFAULT_DO_NOT_DESCEND_DIRS = [
 
 ### Environment Knobs
 
-The pre/post-run diagnostic ENABLE flags are read through the dependency-free `automojo.testbase.environment` module, which resolves these knobs directly from `os.environ`. The core does NOT read them via `RuntimeVariables`.
+The pre/post-run diagnostic ENABLE flags are read through the dependency-free `ccai.testbase.environment` module, which resolves these knobs directly from `os.environ`. The core does NOT read them via `RuntimeVariables`.
 
 | Variable | Accessor | Type | Description |
 |----------|----------|------|-------------|
@@ -381,7 +381,7 @@ The diagnostic level parameter controls the verbosity of captured diagnostics:
 
 ### File System Structure
 
-The diagnostics output directory is resolved through the injected `IOutputContext` seam rather than well-known-path helpers. The default `SimpleOutputContext.get_diagnostics_dir(label)` roots diagnostics under the single output base dir (`<test_results_dir>/diagnostics/<label>/`). The presence-folder-rooted variant is an integration concern provided by `RuntimeOutputContext.get_diagnostics_dir` in `automojo-integration-runtime`, which delegates to the well-known presence-folder paths.
+The diagnostics output directory is resolved through the injected `IOutputContext` seam rather than well-known-path helpers. The default `SimpleOutputContext.get_diagnostics_dir(label)` roots diagnostics under the single output base dir (`<test_results_dir>/diagnostics/<label>/`). The presence-folder-rooted variant is an integration concern provided by `RuntimeOutputContext.get_diagnostics_dir` in `codecraftai-integration-runtime`, which delegates to the well-known presence-folder paths.
 
 ```
 <test_results_dir>/
@@ -441,7 +441,7 @@ testbase testing run --root ./tests --prerun-diagnostic --postrun-diagnostic
 ### Implementing Custom Diagnostic Capture
 
 ```python
-from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
+from ccai.testbase.coupling.integrationcoupling import IntegrationCoupling
 import os
 import json
 
@@ -485,7 +485,7 @@ class MyServiceCoupling(IntegrationCoupling):
 ### Accessing Diagnostic Labels
 
 ```python
-from automojo.testbase.diagnostics import DiagnosticLabel
+from ccai.testbase.diagnostics import DiagnosticLabel
 
 def process_diagnostics(label: str):
     if label == DiagnosticLabel.PRERUN_DIAGNOSTIC:
@@ -497,7 +497,7 @@ def process_diagnostics(label: str):
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── diagnostics.py              # DiagnosticLabel and RuntimeConfigPaths
 ├── environment.py              # AM_DIAGNOSTICS_PRERUN/POSTRUN enable-flag accessors (os.environ)
 ├── testjob.py                  # TestJob with diagnostic fire methods
@@ -511,7 +511,7 @@ source/packages/automojo/testbase/
     └── testsequencer.py        # Diagnostic capture implementation
 ```
 
-> The presence-folder-rooted diagnostics path is an integration concern. It lives in `automojo-integration-runtime` as `RuntimeOutputContext.get_diagnostics_dir` (wired through `IntegratedTestJob`), which delegates to the well-known presence-folder paths. The testbase core resolves diagnostics only through the injected `IOutputContext` seam.
+> The presence-folder-rooted diagnostics path is an integration concern. It lives in `codecraftai-integration-runtime` as `RuntimeOutputContext.get_diagnostics_dir` (wired through `IntegratedTestJob`), which delegates to the well-known presence-folder paths. The testbase core resolves diagnostics only through the injected `IOutputContext` seam.
 
 ## Testing Strategy
 
@@ -551,7 +551,7 @@ source/packages/automojo/testbase/
 2. **CLI Integration**
    - Test `--prerun-diagnostic` flag
    - Test `--postrun-diagnostic` flag
-   - Verify the AM_DIAGNOSTICS_PRERUN/POSTRUN environment knobs are set correctly (and read back via `automojo.testbase.environment`)
+   - Verify the AM_DIAGNOSTICS_PRERUN/POSTRUN environment knobs are set correctly (and read back via `ccai.testbase.environment`)
 
 ### Test Categories
 

@@ -38,7 +38,7 @@ def scope_mojo(sequencer):
     This is the entry point for the 'mojo' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo") as msc:
+    with sequencer.enter_module_scope_context("ccai") as msc:
         scope_mojo_tests(sequencer)
 
     return
@@ -48,7 +48,7 @@ def scope_mojo_tests(sequencer):
     This is the entry point for the 'mojo_tests' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo.tests") as msc:
+    with sequencer.enter_module_scope_context("ccai.tests") as msc:
         scope_mojo_tests_testplus(sequencer)
 
     return
@@ -58,7 +58,7 @@ def scope_mojo_tests_testplus(sequencer):
     This is the entry point for the 'mojo_tests_testplus' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo.tests.testplus") as msc:
+    with sequencer.enter_module_scope_context("ccai.tests.testplus") as msc:
         scope_mojo_tests_testplus_local(sequencer)
 
     return
@@ -68,7 +68,7 @@ def scope_mojo_tests_testplus_local(sequencer):
     This is the entry point for the 'mojo_tests_testplus_local' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo.tests.testbase.local") as msc:
+    with sequencer.enter_module_scope_context("ccai.tests.testbase.local") as msc:
         scope_mojo_tests_testplus_local_injection(sequencer)
         scope_mojo_tests_testplus_local_test_error_formatting(sequencer)
         scope_mojo_tests_testplus_local_test_function_signatures(sequencer)
@@ -81,7 +81,7 @@ def scope_mojo_tests_testplus_local_injection(sequencer):
     This is the entry point for the 'mojo_tests_testplus_local_injection' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo.tests.testbase.local.injection") as msc:
+    with sequencer.enter_module_scope_context("ccai.tests.testbase.local.injection") as msc:
         for blah in create_blah():
             scope_mojo_tests_testplus_local_injection_test_constraints(sequencer, blah)
 
@@ -92,10 +92,10 @@ def scope_mojo_tests_testplus_local_injection_test_constraints(sequencer, blah):
     This is the entry point for the 'mojo_tests_testplus_local_injection_test_constraints' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo.tests.testbase.local.injection.test_constraints") as msc:
+    with sequencer.enter_module_scope_context("ccai.tests.testbase.local.injection.test_constraints") as msc:
         # ================ Test Scope: mojo.tests.testbase.local.injection.test_constraints#test_activity_logging ================
 
-        test_scope_name = "automojo.tests.testbase.local.injection.test_constraints#test_activity_logging"
+        test_scope_name = "ccai.tests.testbase.local.injection.test_constraints#test_activity_logging"
 
         with sequencer.enter_test_scope_context(test_scope_name) as tscope:
             from mojo.tests.testbase.local.injection.test_constraints import test_activity_logging
@@ -103,7 +103,7 @@ def scope_mojo_tests_testplus_local_injection_test_constraints(sequencer, blah):
 
         # ================ Test Scope: mojo.tests.testbase.local.injection.test_constraints#test_constraint_constrained_parameter ================
 
-        test_scope_name = "automojo.tests.testbase.local.injection.test_constraints#test_constraint_constrained_parameter"
+        test_scope_name = "ccai.tests.testbase.local.injection.test_constraints#test_constraint_constrained_parameter"
 
         with sequencer.enter_test_scope_context(test_scope_name) as tscope:
             from mojo.tests.testbase.local.injection.test_constraints import test_constraint_constrained_parameter
@@ -111,7 +111,7 @@ def scope_mojo_tests_testplus_local_injection_test_constraints(sequencer, blah):
 
         # ================ Test Scope: mojo.tests.testbase.local.injection.test_constraints#test_tscope_parameter ================
 
-        test_scope_name = "automojo.tests.testbase.local.injection.test_constraints#test_tscope_parameter"
+        test_scope_name = "ccai.tests.testbase.local.injection.test_constraints#test_tscope_parameter"
 
         with sequencer.enter_test_scope_context(test_scope_name) as tscope:
             from mojo.tests.testbase.local.injection.test_constraints import test_tscope_parameter
@@ -125,10 +125,10 @@ def scope_mojo_tests_testplus_local_test_error_formatting(sequencer):
     This is the entry point for the 'mojo_tests_testplus_local_test_error_formatting' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo.tests.testbase.local.test_error_formatting") as msc:
+    with sequencer.enter_module_scope_context("ccai.tests.testbase.local.test_error_formatting") as msc:
         # ================ Test Scope: mojo.tests.testbase.local.test_error_formatting#test_intentional_error ================
 
-        test_scope_name = "automojo.tests.testbase.local.test_error_formatting#test_intentional_error"
+        test_scope_name = "ccai.tests.testbase.local.test_error_formatting#test_intentional_error"
 
         with sequencer.enter_test_scope_context(test_scope_name) as tscope:
             from mojo.tests.testbase.local.test_error_formatting import test_intentional_error
@@ -136,7 +136,7 @@ def scope_mojo_tests_testplus_local_test_error_formatting(sequencer):
 
         # ================ Test Scope: mojo.tests.testbase.local.test_error_formatting#test_intentional_failure ================
 
-        test_scope_name = "automojo.tests.testbase.local.test_error_formatting#test_intentional_failure"
+        test_scope_name = "ccai.tests.testbase.local.test_error_formatting#test_intentional_failure"
 
         with sequencer.enter_test_scope_context(test_scope_name) as tscope:
             from mojo.tests.testbase.local.test_error_formatting import test_intentional_failure
@@ -150,10 +150,10 @@ def scope_mojo_tests_testplus_local_test_function_signatures(sequencer):
     This is the entry point for the 'mojo_tests_testplus_local_test_function_signatures' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo.tests.testbase.local.test_function_signatures") as msc:
+    with sequencer.enter_module_scope_context("ccai.tests.testbase.local.test_function_signatures") as msc:
         # ================ Test Scope: mojo.tests.testbase.local.test_function_signatures#test_no_parameters ================
 
-        test_scope_name = "automojo.tests.testbase.local.test_function_signatures#test_no_parameters"
+        test_scope_name = "ccai.tests.testbase.local.test_function_signatures#test_no_parameters"
 
         with sequencer.enter_test_scope_context(test_scope_name) as tscope:
             from mojo.tests.testbase.local.test_function_signatures import test_no_parameters
@@ -167,10 +167,10 @@ def scope_mojo_tests_testplus_local_test_validator_injection(sequencer):
     This is the entry point for the 'mojo_tests_testplus_local_test_validator_injection' test scope.
     """
 
-    with sequencer.enter_module_scope_context("automojo.tests.testbase.local.test_validator_injection") as msc:
+    with sequencer.enter_module_scope_context("ccai.tests.testbase.local.test_validator_injection") as msc:
         # ================ Test Scope: mojo.tests.testbase.local.test_validator_injection#test_no_parameters ================
 
-        test_scope_name = "automojo.tests.testbase.local.test_validator_injection#test_no_parameters"
+        test_scope_name = "ccai.tests.testbase.local.test_validator_injection#test_no_parameters"
 
         with sequencer.enter_test_scope_context(test_scope_name) as tscope:
 

@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating basic sequence document generation.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates the basic usage of the TestSequencer to generate
 a sequence document from a test tree. The sequence document is a Python
@@ -13,12 +13,12 @@ Usage:
     python -m source.examples.debug_sequence_generation_basic
 
 Requirements:
-    - The automojo.testbase package must be installed
+    - The ccai.testbase package must be installed
     - The example should be run from the repository root
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
@@ -26,17 +26,17 @@ import collections
 import os
 import tempfile
 
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-import automojo.runtime.paths as runtime_paths
+from ccai.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
+from ccai.thisapp.wellknown import ThisApplicationSingleton
+from ccai.runtime.enumerations import JobType
+from ccai.runtime.runtimevariables import RuntimeVariablesDesc
+import ccai.runtime.paths as runtime_paths
 
-from automojo.testbase.testgroup import TestGroup
-from automojo.testbase.testref import TestRef
-from automojo.testbase.injection.injectionregistry import injection_registry
-from automojo.testbase.injection.injectionscope import InjectionScope
-from automojo.testbase.sequencing.testsequencer import TestSequencer
+from ccai.testbase.testgroup import TestGroup
+from ccai.testbase.testref import TestRef
+from ccai.testbase.injection.injectionregistry import injection_registry
+from ccai.testbase.injection.injectionscope import InjectionScope
+from ccai.testbase.sequencing.testsequencer import TestSequencer
 
 
 # ============================================================================
@@ -408,9 +408,9 @@ def main_debug_sequence_generation_basic():
     # Establish the application persona if not already done
     if not APP_PERSONA_ESTABLISHED:
         establish_app_persona(
-            name="automojo-testbase",
-            logger_name="automojo-testbase",
-            log_basename="automojo-testbase"
+            name="codecraftai-testbase",
+            logger_name="codecraftai-testbase",
+            log_basename="codecraftai-testbase"
         )
     
     print("\n" + "=" * 70)

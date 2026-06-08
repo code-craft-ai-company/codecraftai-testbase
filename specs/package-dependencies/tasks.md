@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document tracks the implementation status of the `automojo-testbase` PACKAGE-LEVEL
+This document tracks the implementation status of the `codecraftai-testbase` PACKAGE-LEVEL
 (inter-package) dependency posture and identifies the remaining work required to reach the
 target dependency set. It records the decoupling that has already been delivered (the
 dependency-free test-execution core, the four seam modules, the dependency-free environment
 accessor, the standalone default recorder, the relocation of the runtime foundation into
-`automojo-this-app`, and the out-of-package integration variants in
-`automojo-integration-runtime`), and it tracks honestly the work that is still pending (the
+`codecraftai-this-app`, and the out-of-package integration variants in
+`codecraftai-integration-runtime`), and it tracks honestly the work that is still pending (the
 CLI / bootstrap / server relocation, the integration-contract test relocation, the removal of
 the drop-pending dependencies from `pyproject.toml`, and the downstream lockfile cascade).
 
@@ -23,21 +23,21 @@ declared in `pyproject.toml`, never an injectable resource or a coupling.
 
 #### Decoupled Test-Execution Core (`testjob.py`, `testgroup.py`, `verification.py`, `markers.py`, `constraints.py`, `entrypoints.py`, `sequencing/testsequencer.py`, default recorders)
 - [x] Remove all real imports of the application/runtime/configuration layers from the core
-  - Zero real imports of `automojo.configuration`, `automojo.runtime`, or `automojo.thisapp`
+  - Zero real imports of `ccai.configuration`, `ccai.runtime`, or `ccai.thisapp`
   - Any remaining mentions of those package names appear only in docstring negations
   - Core consumes the seams in place of the heavyweight providers
   - _Requirements: 3.1, 3.2, 3.4_
 - [x] Prove core import isolation via import smoke tests
-  - `import automojo.testbase.testjob` pulls in zero configuration/runtime/this-app modules
-  - `import automojo.testbase.sequencing.testsequencer` pulls in zero higher-layer modules
-  - `import automojo.testbase.entrypoints` pulls in zero higher-layer modules
+  - `import ccai.testbase.testjob` pulls in zero configuration/runtime/this-app modules
+  - `import ccai.testbase.sequencing.testsequencer` pulls in zero higher-layer modules
+  - `import ccai.testbase.entrypoints` pulls in zero higher-layer modules
   - Importing the default recorders pulls in zero higher-layer modules
   - _Requirements: 3.3, 3.5_
 
 #### Dependency-Free Environment Accessor (`environment.py`)
 - [x] Implement the dependency-free `os.environ` accessor module
   - Reads core environment knobs directly from `os.environ`
-  - No real import of `automojo.runtime`, `automojo.thisapp`, or `automojo.configuration`
+  - No real import of `ccai.runtime`, `ccai.thisapp`, or `ccai.configuration`
   - Replaces `RuntimeVariables` attribute access for the core
   - _Requirements: 4.1, 4.2, 4.4, 4.5_
 - [x] Expose the core environment knob accessors
@@ -72,17 +72,17 @@ declared in `pyproject.toml`, never an injectable resource or a coupling.
   - Replaces the heavyweight `JsonResultRecorder` (HTML) as the DEFAULT
   - _Requirements: 5.3, 5.4, 5.5, 5.6_
 
-#### Out-of-Package Integration Variants (`automojo-integration-runtime`)
-- [x] Stand up `automojo-integration-runtime` building ON TOP of testbase
+#### Out-of-Package Integration Variants (`codecraftai-integration-runtime`)
+- [x] Stand up `codecraftai-integration-runtime` building ON TOP of testbase
   - Supplies `RuntimeOutputContext`, `RuntimeRunMetadata`, `JsonResultRecorder` (HTML)
   - Variants bound via `IntegratedTestJob` hook overrides, not by core branching
-  - Declares `automojo-testbase`, `automojo-this-app`, `automojo-extension`, `automojo-errors`, `automojo-xmodules` (plus `debugpy`)
-  - `automojo-testbase` declares no reverse dependency on `automojo-integration-runtime`
-  - `automojo-testbase` declares no dependency on `automojo-extension`
+  - Declares `codecraftai-testbase`, `codecraftai-this-app`, `codecraftai-extension`, `codecraftai-errors`, `codecraftai-xmodules` (plus `debugpy`)
+  - `codecraftai-testbase` declares no reverse dependency on `codecraftai-integration-runtime`
+  - `codecraftai-testbase` declares no dependency on `codecraftai-extension`
   - _Requirements: 6.1, 6.2, 6.3, 6.5, 8.5, 8.6_
-- [x] Move the runtime foundation into `automojo-this-app`
-  - `automojo-this-app` now OWNS `RuntimeVariables`, well-known paths, `ActivationProfile`/`JobType`, `activate_profile_*`
-  - Foundation absorbed from the retired `automojo-runtime` package
+- [x] Move the runtime foundation into `codecraftai-this-app`
+  - `codecraftai-this-app` now OWNS `RuntimeVariables`, well-known paths, `ActivationProfile`/`JobType`, `activate_profile_*`
+  - Foundation absorbed from the retired `codecraftai-runtime` package
   - _Requirements: 6.4_
 
 #### Import-Coupling Inventory (documentation of the as-built coupling boundary)
@@ -103,7 +103,7 @@ declared in `pyproject.toml`, never an injectable resource or a coupling.
   - _Requirements: 1.2, 2.1, 2.2, 9.1, 9.2, 9.3_
 - [x] Document the Permanent-Unittest Exclusion Set and the extension nuance
   - Exclusion set: errors, interfaces, waiting, xmodules, arcli, extension
-  - `automojo-extension` recorded as a member of the exclusion set and NOT a testbase dependency
+  - `codecraftai-extension` recorded as a member of the exclusion set and NOT a testbase dependency
   - _Requirements: 8.1, 8.4, 8.5, 8.6_
 - [x] Record the TestJob chain as-built (siblings) rather than the linear Phase-5 target
   - `IntegratedTestJob` and `InteropLibraryTestJob` documented as current siblings extending `TestJob` directly
@@ -116,11 +116,11 @@ declared in `pyproject.toml`, never an injectable resource or a coupling.
 
 #### CLI / Bootstrap / Server Relocation (standalone-vs-integration split)
 - [ ] Split the CLI into a standalone testbase-cli and an integration bootstrap
-  - Move `initialize.py` bootstrap into `automojo-integration-runtime`
+  - Move `initialize.py` bootstrap into `codecraftai-integration-runtime`
   - Move the import-coupled CLI surface (`cli/testbase_command.py`, `cli/utilities.py`, `cli/cmdtree/testing/run.py`, `cli/cmdtree/testing/jobs.py`, `cli/cmdtree/testing/query.py`, `cli/cmdtree/services/results.py`) to the standalone bootstrap layer
   - `cli/utilities.py` falls back to `AM_TESTROOT` via `environment.py` instead of `RuntimeVariables`
   - Relocate or refactor `server/resultserver.py` off `RuntimeVariables`/`RuntimeVariablesDesc`
-  - On completion, no file under `automojo-testbase` retains a real import of `automojo.runtime`, `automojo.thisapp`, or `automojo.configuration`
+  - On completion, no file under `codecraftai-testbase` retains a real import of `ccai.runtime`, `ccai.thisapp`, or `ccai.configuration`
   - _Requirements: 7.5, 9.3, 9.4_
 
 ---
@@ -129,13 +129,13 @@ declared in `pyproject.toml`, never an injectable resource or a coupling.
 
 #### Integration-Contract Test Relocation
 - [ ] Move tests that exercise runtime / this-app / configuration behavior out of testbase
-  - Relocate integration-contract tests into `automojo-integration-runtime`
+  - Relocate integration-contract tests into `codecraftai-integration-runtime`
   - Leave behind only tests that exercise the dependency-free core and the standalone seam defaults
   - Ensure the relocated tests do not re-introduce a higher-layer import edge into testbase
   - _Requirements: 2.4, 9.4_
 
 #### Drop the Drop-Pending Dependencies from `pyproject.toml`
-- [ ] Remove `automojo-this-app`, `automojo-configuration`, and `automojo-runtime` from `[tool.poetry.dependencies]`
+- [ ] Remove `codecraftai-this-app`, `codecraftai-configuration`, and `codecraftai-runtime` from `[tool.poetry.dependencies]`
   - Predicated on the CLI relocation and integration-contract test relocation completing first
   - Leaves the target 5-dependency set: arcli, errors, interfaces, waiting, xmodules
   - Preserve the Python version constraint `>=3.10,<4.0`
@@ -159,8 +159,8 @@ declared in `pyproject.toml`, never an injectable resource or a coupling.
   - Confirm the Docstring-Only Mention files contain no real import of the higher layers
   - _Requirements: 3.1, 7.1, 7.2, 7.3, 7.4_
 - [ ] Add an integration-variant isolation guard
-  - Confirm `RuntimeOutputContext`, `RuntimeRunMetadata`, `JsonResultRecorder` are sourced from `automojo-integration-runtime`, not testbase
-  - Confirm testbase declares no dependency on `automojo-integration-runtime` and none on `automojo-extension`
+  - Confirm `RuntimeOutputContext`, `RuntimeRunMetadata`, `JsonResultRecorder` are sourced from `codecraftai-integration-runtime`, not testbase
+  - Confirm testbase declares no dependency on `codecraftai-integration-runtime` and none on `codecraftai-extension`
   - _Requirements: 6.1, 6.5, 8.5, 8.6_
 
 #### Phase-5 TestJob Linearization (deferred target)
@@ -183,23 +183,23 @@ item is unchecked because none of this phase has been performed yet.
 - [ ] Keep the standalone testbase CLI minimal on the dependency-free core
   - The standalone testbase CLI keeps `testbase run` / `testbase query` on `DefaultTestJob` + the stdout recorder
   - The standalone CLI sources `AM_TESTROOT` and the core knobs from `environment.py`, never `RuntimeVariables`
-- [ ] Move the rich CLI surface into a new `automojo-integration` CLI in `automojo-integration-runtime`
+- [ ] Move the rich CLI surface into a new `codecraftai-integration` CLI in `codecraftai-integration-runtime`
   - Relocate the rich `testing` / `run` / `query` / `jobs` command tree, the `services`, the `server`, and `optionoverrides`
   - Relocate the `initialize.py` bootstrap alongside the rich CLI surface
-- [ ] On completion, no file under `automojo-testbase` retains a real import of `automojo.runtime`, `automojo.thisapp`, or `automojo.configuration`
+- [ ] On completion, no file under `codecraftai-testbase` retains a real import of `ccai.runtime`, `ccai.thisapp`, or `ccai.configuration`
   - See the In Progress task "CLI / Bootstrap / Server Relocation" for the per-file inventory
   - _Requirements: 7.5, 9.3, 9.4_
 
 #### Phase B — Relocate the integration-contract tests
 - [ ] Move the ~18 RuntimeVariables / presence / CI integration-contract tests dropped from testbase onto `IntegratedTestJob`
-  - Rehome them into `automojo-integration-runtime` where the real `RuntimeVariables` / this-app facilities live
+  - Rehome them into `codecraftai-integration-runtime` where the real `RuntimeVariables` / this-app facilities live
   - Leave behind in testbase only tests exercising the dependency-free core and the standalone seam defaults
   - Ensure the relocated tests do not re-introduce a higher-layer import edge into testbase
   - See the Planned task "Integration-Contract Test Relocation"
   - _Requirements: 2.4, 9.4_
 
 #### Phase C — Drop the drop-pending edges and run the lockfile cascade
-- [ ] Remove `automojo-this-app`, `automojo-configuration`, and `automojo-runtime` from testbase `pyproject.toml`
+- [ ] Remove `codecraftai-this-app`, `codecraftai-configuration`, and `codecraftai-runtime` from testbase `pyproject.toml`
   - Gated on Phase A and Phase B completing first
   - Leaves the target 5-dependency set: arcli, errors, interfaces, waiting, xmodules
   - Preserve the Python version constraint `>=3.10,<4.0`
@@ -224,7 +224,7 @@ the drop.
 | # | Package | Change | Lock |
 |---|---------|--------|------|
 | 1 | this-app | Absorb the runtime modules; add `xmodules` | `poetry lock` (pending) |
-| 2 | integration-runtime | Name `automojo-integration-runtime`; deps `testbase`, `this-app`, `extension`, `errors`, `xmodules` | `poetry lock` (pending) |
+| 2 | integration-runtime | Name `codecraftai-integration-runtime`; deps `testbase`, `this-app`, `extension`, `errors`, `xmodules` | `poetry lock` (pending) |
 | 3 | testbase | Remove `configuration`, `runtime`, `this-app` -> target set `arcli`, `errors`, `interfaces`, `waiting`, `xmodules` | `poetry lock` (pending) |
 | 4 | storage-database | Drop phantom `runtime` dep | `poetry lock` (pending) |
 | 5 | webservice-flask | `runtime` -> `this-app` | `poetry lock` (pending) |
@@ -264,7 +264,7 @@ _Requirements: 2.4_
 
 1. **Target-Set Enforcement**
    - After the drop, lock the target 5-dependency set with a guard that forbids re-adding the higher layers
-   - Add a guard that forbids adding `automojo-extension` as a direct testbase dependency
+   - Add a guard that forbids adding `codecraftai-extension` as a direct testbase dependency
 
 2. **Exclusion-Set Tooling**
    - Provide a helper that flags any attempt to use testbase to test a Permanent-Unittest Exclusion Set package
@@ -273,7 +273,7 @@ _Requirements: 2.4_
 ### Long-term Improvements
 
 1. **Monorepo Dependency-Graph Validation**
-   - Static acyclicity check across all `automojo-*` packages
+   - Static acyclicity check across all `codecraftai-*` packages
    - Automated detection of import-direction inversions before merge
 
 2. **Phase-5 Linearization**
@@ -308,9 +308,9 @@ _Requirements: 2.4_
 | 5.3-5.4 | ✅ Complete | `results/recorders/stdoutresultrecorder.py::StdoutResultRecorder` |
 | 5.5 | ✅ Complete | Seam modules; zero real higher-layer imports |
 | 5.6 | ✅ Complete | Seams replace RuntimeVariables / `get_path_for_*` / JSON-HTML default |
-| 6.1-6.2 | ✅ Complete | `automojo-integration-runtime` variants via `IntegratedTestJob` hooks |
-| 6.3 | ✅ Complete | `automojo-integration-runtime` `pyproject.toml` dependencies |
-| 6.4 | ✅ Complete | `automojo-this-app` owns the absorbed runtime foundation |
+| 6.1-6.2 | ✅ Complete | `codecraftai-integration-runtime` variants via `IntegratedTestJob` hooks |
+| 6.3 | ✅ Complete | `codecraftai-integration-runtime` `pyproject.toml` dependencies |
+| 6.4 | ✅ Complete | `codecraftai-this-app` owns the absorbed runtime foundation |
 | 6.5 | ✅ Complete | `pyproject.toml` (no reverse edge to integration-runtime) |
 | 7.1-7.2 | ✅ Complete | Import-Coupling Inventory (design doc) |
 | 7.3 | ✅ Complete | Real-import classification rule (design doc) |
@@ -320,7 +320,7 @@ _Requirements: 2.4_
 | 8.2-8.3 | ✅ Complete | Import-direction rule (design doc) |
 | 8.4 | ✅ Complete | Extension recorded as exclusion-set member |
 | 8.5 | ✅ Complete | `pyproject.toml` (extension not a dependency) |
-| 8.6 | ✅ Complete | Extension attaches in `automojo-integration-runtime` |
+| 8.6 | ✅ Complete | Extension attaches in `codecraftai-integration-runtime` |
 | 9.1 | ✅ Complete | Core decoupling / seams / environment marked as-built |
 | 9.2 | ✅ Complete | Drop-pending removal marked pending |
 | 9.3 | ⬜ Pending | CLI/bootstrap/server relocation marked pending |
@@ -337,8 +337,8 @@ _Requirements: 2.4_
 | Dependency-free environment accessor | ✅ Complete |
 | Output / run-identity / recorder seams | ✅ Complete |
 | Standalone default recorder | ✅ Complete |
-| Runtime foundation moved into `automojo-this-app` | ✅ Complete |
-| Out-of-package integration variants (`automojo-integration-runtime`) | ✅ Complete |
+| Runtime foundation moved into `codecraftai-this-app` | ✅ Complete |
+| Out-of-package integration variants (`codecraftai-integration-runtime`) | ✅ Complete |
 | Import-coupling inventory documented | ✅ Complete |
 | CLI / bootstrap / server relocation | ⚠️ In Progress |
 | Integration-contract test relocation | ⬜ Pending |
@@ -352,8 +352,8 @@ _Requirements: 2.4_
 
 ## Known Limitations
 
-1. **Drop-Pending Edges Remain**: `automojo-testbase` still declares `automojo-this-app`,
-   `automojo-configuration`, and `automojo-runtime` today; the target 5-dependency set is not
+1. **Drop-Pending Edges Remain**: `codecraftai-testbase` still declares `codecraftai-this-app`,
+   `codecraftai-configuration`, and `codecraftai-runtime` today; the target 5-dependency set is not
    yet reached.
 2. **CLI / Bootstrap / Server Still Coupled**: `initialize.py`, the five CLI files, and
    `server/resultserver.py` retain real imports of the higher layers and hold testbase above

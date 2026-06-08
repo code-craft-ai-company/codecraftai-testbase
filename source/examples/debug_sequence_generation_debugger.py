@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating sequence document generation with debugger breakpoints.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates how the TestSequencer generates sequence documents
 that include debugger breakpoint integration. When debugging is configured,
@@ -13,12 +13,12 @@ Usage:
     python -m source.examples.debug_sequence_generation_debugger
 
 Requirements:
-    - The automojo.testbase package must be installed
+    - The ccai.testbase package must be installed
     - The example should be run from the repository root
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
@@ -27,19 +27,19 @@ import os
 import tempfile
 from unittest.mock import patch
 
-from automojo.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from automojo.thisapp.wellknown import ThisApplicationSingleton
-from automojo.runtime.enumerations import JobType
-from automojo.runtime.runtimevariables import RuntimeVariablesDesc
-import automojo.runtime.paths as runtime_paths
+from ccai.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
+from ccai.thisapp.wellknown import ThisApplicationSingleton
+from ccai.runtime.enumerations import JobType
+from ccai.runtime.runtimevariables import RuntimeVariablesDesc
+import ccai.runtime.paths as runtime_paths
 
-from automojo.testbase.testgroup import TestGroup
-from automojo.testbase.testref import TestRef
-from automojo.testbase.injection.injectionregistry import injection_registry
-from automojo.testbase.injection.injectionscope import InjectionScope
-from automojo.testbase.sequencing.testsequencer import TestSequencer
-from automojo.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
-from automojo.xmodules.debugging import DEBUGGER
+from ccai.testbase.testgroup import TestGroup
+from ccai.testbase.testref import TestRef
+from ccai.testbase.injection.injectionregistry import injection_registry
+from ccai.testbase.injection.injectionscope import InjectionScope
+from ccai.testbase.sequencing.testsequencer import TestSequencer
+from ccai.testbase.breakpoints import WELLKNOWN_BREAKPOINTS
+from ccai.xmodules.debugging import DEBUGGER
 
 
 # ============================================================================
@@ -247,8 +247,8 @@ session scope context.
             output_file = os.path.join(tempdir, "pdb_debugger.py")
             
             # Patch the runtime variables to enable PDB debugging
-            with patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.PDB):
-                with patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START]):
+            with patch('ccai.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.PDB):
+                with patch('ccai.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START]):
                     sequencer.generate_testrun_sequence_document(output_file)
             
             with open(output_file, 'r') as f:
@@ -333,8 +333,8 @@ The debugpy breakpoint code includes:
             output_file = os.path.join(tempdir, "debugpy_debugger.py")
             
             # Patch the runtime variables to enable debugpy debugging
-            with patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.DEBUGPY):
-                with patch('automojo.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START]):
+            with patch('ccai.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_DEBUGGER', DEBUGGER.DEBUGPY):
+                with patch('ccai.runtime.runtimevariables.RuntimeVariables.AM_DEBUG_BREAKPOINTS', [WELLKNOWN_BREAKPOINTS.TESTRUN_START]):
                     sequencer.generate_testrun_sequence_document(output_file)
             
             with open(output_file, 'r') as f:
@@ -469,9 +469,9 @@ def main_debug_sequence_generation_debugger():
     """
     if not APP_PERSONA_ESTABLISHED:
         establish_app_persona(
-            name="automojo-testbase",
-            logger_name="automojo-testbase",
-            log_basename="automojo-testbase"
+            name="codecraftai-testbase",
+            logger_name="codecraftai-testbase",
+            log_basename="codecraftai-testbase"
         )
     
     print("\n" + "=" * 70)

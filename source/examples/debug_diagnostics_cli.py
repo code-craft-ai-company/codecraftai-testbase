@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating CLI diagnostic options usage with TestBase.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates how to use the command-line interface (CLI) options
 for controlling diagnostic capture during test execution. The DiagnosticOptionGroup
@@ -43,12 +43,12 @@ See Also:
     - debug_diagnostics_levels.py: Diagnostic level usage patterns
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
-from automojo.testbase.diagnostics import DiagnosticLabel, RuntimeConfigPaths
+from ccai.testbase.diagnostics import DiagnosticLabel, RuntimeConfigPaths
 
 
 def example_cli_options_overview():

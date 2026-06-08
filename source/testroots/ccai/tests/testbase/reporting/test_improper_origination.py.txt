@@ -1,0 +1,20 @@
+
+
+import ccai.testbase as testbase
+
+
+@testbase.register.resource_factory()
+def create_blah() -> str:
+    return "blah"
+
+
+# NOTE: This tests the improper origination of a parameter.  The code here should be using @testbase.attach.parameter() instead.
+@testbase.originate.parameter(create_blah, identifier='blah')
+def test_improper_origination(blah: str):
+    testbase.logger.info(f"test_constraint_constrained_parameter: blah={blah}.")
+    return
+
+
+if __name__ == "__main__":
+    from ccai.testbase.entrypoints import generic_test_entrypoint
+    generic_test_entrypoint()

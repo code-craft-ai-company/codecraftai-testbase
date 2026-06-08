@@ -19,8 +19,8 @@ The Framework Initialization system provides the bootstrap sequence for the Test
 
 #### Acceptance Criteria
 
-1. THE `initialize_testbase_runtime()` function SHALL establish the application persona with name `"automojo"`.
-2. THE function SHALL set the home directory to `~/automojo` (user's home directory).
+1. THE `initialize_testbase_runtime()` function SHALL establish the application persona with name `"ccai"`.
+2. THE function SHALL set the home directory to `~/ccai` (user's home directory).
 3. THE function SHALL set the logger name prefix to `"TB"`.
 4. THE function SHALL set the log basename to `"testrun"`.
 5. THE function SHALL call `resolve_runtime_variables()` to resolve all runtime variables from environment and configuration.

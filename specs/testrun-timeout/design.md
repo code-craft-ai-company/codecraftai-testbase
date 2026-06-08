@@ -28,13 +28,13 @@ flowchart TD
 
 ```mermaid
 graph TB
-    subgraph "automojo-runtime (external dependency)"
+    subgraph "codecraftai-runtime (external dependency)"
         RVD["RuntimeVariablesDesc.AM_TESTRUN_TIMEOUT"]
         RV["RuntimeVariables.AM_TESTRUN_TIMEOUT"]
         OV["AM_RUNTIME_OPTION_OVERRIDES.override_testrun_timeout()"]
     end
 
-    subgraph "automojo-testbase"
+    subgraph "codecraftai-testbase"
         subgraph "CLI Layer"
             TOG["TimeoutOptionGroup"]
             RUN["run.py --timeout handling"]
@@ -81,7 +81,7 @@ class TestRunTimeoutError(Exception):
         return self._timeout_seconds
 ```
 
-### 2. Runtime Variable Additions (`automojo-runtime`)
+### 2. Runtime Variable Additions (`codecraftai-runtime`)
 
 Add `AM_TESTRUN_TIMEOUT` to the existing runtime variable infrastructure:
 
@@ -164,7 +164,7 @@ The `TestRunTimeoutError` will be raised inside the `SequencerSessionScope` cont
 | CLI integration (run) | `testbase/cli/cmdtree/testing/run.py` |
 | CLI integration (jobs run) | `testbase/cli/cmdtree/testing/jobs.py` |
 | `TestJob` timeout logic | `testbase/testjob.py` |
-| Runtime variable/override | `automojo-runtime` (external) |
+| Runtime variable/override | `codecraftai-runtime` (external) |
 
 ## Testing Strategy
 

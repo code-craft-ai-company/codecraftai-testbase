@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating basic diagnostic capture usage with TestBase.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates the basic usage of the TestBase diagnostic capture system.
 The diagnostic system enables capturing diagnostic information at key points during
@@ -44,12 +44,12 @@ See Also:
     - debug_diagnostics_levels.py: Diagnostic level usage patterns
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
-from automojo.testbase.diagnostics import DiagnosticLabel, RuntimeConfigPaths
+from ccai.testbase.diagnostics import DiagnosticLabel, RuntimeConfigPaths
 
 
 def example_diagnostic_labels():

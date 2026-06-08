@@ -3,7 +3,7 @@
     :platform: Darwin, Linux, Unix, Windows
     :synopsis: Example demonstrating custom integration diagnostic implementation.
 
-.. moduleauthor:: AutomationX
+.. moduleauthor:: CodeCraftX
 
 This example demonstrates how to implement custom diagnostic capture logic
 in an IntegrationCoupling subclass. Each integration type can capture
@@ -27,8 +27,8 @@ See Also:
     - debug_diagnostics_levels.py: Diagnostic level usage patterns
 """
 
-__author__ = "AutomationX"
-__copyright__ = "Copyright 2025, Automation Mojo LLC"
+__author__ = "CodeCraftX"
+__copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
@@ -37,11 +37,11 @@ import json
 import tempfile
 from typing import Dict, Any, List, Tuple
 
-from automojo.testbase.diagnostics import DiagnosticLabel
+from ccai.testbase.diagnostics import DiagnosticLabel
 
 
 # Note: In a real implementation, you would import IntegrationCoupling:
-# from automojo.testbase.coupling.integrationcoupling import IntegrationCoupling
+# from ccai.testbase.coupling.integrationcoupling import IntegrationCoupling
 
 
 class ExampleServiceCoupling:

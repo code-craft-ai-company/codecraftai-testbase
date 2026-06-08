@@ -491,8 +491,8 @@ requests.post(forwarding_url, json=summary, headers=headers)
 ### Example Configuration
 
 ```python
-from automojo.testbase.results.model.forwardinginfo import ForwardingInfo
-from automojo.testbase.results.concentrators.progressconcentratorservice import (
+from ccai.testbase.results.model.forwardinginfo import ForwardingInfo
+from ccai.testbase.results.concentrators.progressconcentratorservice import (
     ProgressConcentratorServer
 )
 

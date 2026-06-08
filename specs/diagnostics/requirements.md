@@ -140,7 +140,7 @@ The Diagnostics System provides a framework for capturing diagnostic information
 
 ### Requirement 11: Environment Variable Integration
 
-**User Story:** As a framework developer, I want diagnostic settings controlled via environment knobs read through the dependency-free `automojo.testbase.environment` module, so that diagnostic behavior can be configured programmatically without coupling the core to RuntimeVariables.
+**User Story:** As a framework developer, I want diagnostic settings controlled via environment knobs read through the dependency-free `ccai.testbase.environment` module, so that diagnostic behavior can be configured programmatically without coupling the core to RuntimeVariables.
 
 #### Acceptance Criteria
 

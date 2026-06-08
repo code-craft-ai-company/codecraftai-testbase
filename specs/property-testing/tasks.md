@@ -352,7 +352,7 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 ## File Structure
 
 ```
-source/packages/automojo/testbase/
+source/packages/ccai/testbase/
 ├── properties/                       # [NEW] Property testing package
 │   ├── __init__.py                   # Exports: given, expect_exception, assume, strategies
 │   ├── decorators.py                 # @given decorator, expect_exception decorator
@@ -375,7 +375,7 @@ source/packages/automojo/testbase/
     └── testsummary-components.js     # [MODIFY] Add TestSummaryCheckGroup, TestSummaryCheckResult,
                                      #          TestSummaryPropertyMetadata; update TestSummaryResultItem
 
-source/tests/automojo_tests/testbase/properties/  # [NEW] Test package
+source/tests/ccai_tests/testbase/properties/  # [NEW] Test package
 ├── __init__.py
 ├── test_strategies.py
 ├── test_propertyrunner.py

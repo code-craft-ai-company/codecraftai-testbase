@@ -7,7 +7,7 @@ The Configuration File Loading system provides a hierarchical configuration mech
 ## Glossary
 
 - **EntryPointConfiguration**: A container class holding configuration values (includes, excludes, console_level, logfile_level)
-- **User_Config**: Configuration file located at `~/.automojo/testbase.yaml` or `~/.automojo/testbase.yml`
+- **User_Config**: Configuration file located at `~/.ccai/testbase.yaml` or `~/.ccai/testbase.yml`
 - **Project_Config**: Configuration file located at `.testbase.yaml` or `.testbase.yml` in the current directory or any parent directory
 - **Configuration_Precedence**: The order in which configuration sources override each other: CLI > Project > User > Defaults
 
@@ -31,10 +31,10 @@ The Configuration File Loading system provides a hierarchical configuration mech
 
 #### Acceptance Criteria
 
-1. THE system SHALL search for configuration files at `~/.automojo/testbase.yaml` and `~/.automojo/testbase.yml`.
+1. THE system SHALL search for configuration files at `~/.ccai/testbase.yaml` and `~/.ccai/testbase.yml`.
 2. THE system SHALL use the first file found (`.yaml` before `.yml`).
 3. IF no user configuration file exists, THE system SHALL return an empty configuration.
-4. IF the `.automojo` directory does not exist, THE system SHALL return an empty configuration without error.
+4. IF the `.ccai` directory does not exist, THE system SHALL return an empty configuration without error.
 
 ### Requirement 3: Project-Level Configuration Discovery
 

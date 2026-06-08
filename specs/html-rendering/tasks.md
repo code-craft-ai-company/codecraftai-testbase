@@ -661,7 +661,7 @@ _No tasks currently in progress._
 ## File Structure
 
 ```
-source/packages/automojo/testbase/templates/
+source/packages/ccai/testbase/templates/
 └── v2/
     ├── testsummary.html              # Main entry point
     ├── tabs/

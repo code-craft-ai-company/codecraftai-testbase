@@ -138,3 +138,6 @@ dmypy.json
 
 # macOS Finder metadata
 .DS_Store
+
+# Stray literal "~" dir created by tests writing to an unexpanded ~ path
+/~/

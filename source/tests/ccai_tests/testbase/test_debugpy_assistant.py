@@ -78,20 +78,20 @@ class DebugPyAssistantTests(unittest.TestCase):
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_default_endpoint(self):
         """
-        Verify default endpoint is ("0.0.0.0", 5679).
-        
+        Verify default endpoint is ("127.0.0.1", 5679).
+
         Requirement 10.5
         """
         import sys
         mock_debugpy = sys.modules['debugpy']
         mock_debugpy.wait_for_client = MagicMock(side_effect=InterruptedError)
-        
+
         from ccai.xmodules.debugging import DebugPyAssistant, PORT_DEBUGPY_ASSISTANT
-        
+
         self._assistant = DebugPyAssistant()
-        
-        self.assertEqual(self._assistant.endpoint, ("0.0.0.0", PORT_DEBUGPY_ASSISTANT))
-        self.assertEqual(self._assistant.endpoint, ("0.0.0.0", 5679))
+
+        self.assertEqual(self._assistant.endpoint, ("127.0.0.1", PORT_DEBUGPY_ASSISTANT))
+        self.assertEqual(self._assistant.endpoint, ("127.0.0.1", 5679))
 
     @patch.dict('sys.modules', {'debugpy': MagicMock()})
     def test_custom_endpoint(self):

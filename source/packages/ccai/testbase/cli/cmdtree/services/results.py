@@ -29,11 +29,11 @@ from ccai.testbase.server.resultserver import TestResultServer, TestResultReques
 
 
 HELP_DIRECTORY = "The root directory to serve the test results from."
-HELP_BIND = "The IP address to bind the server to."
+HELP_BIND = 'The IP address to bind the server to (default: 127.0.0.1, loopback only). Pass "" to bind all interfaces.'
 HELP_PORT = "The port to bind the server to."
 
 @arcli.option("--port", default=8880, ptype=IntegerParameter, help=HELP_PORT)
-@arcli.option("--bind", default="", help=HELP_BIND)
+@arcli.option("--bind", default="127.0.0.1", help=HELP_BIND)
 @arcli.option("--directory", default=None, help=HELP_DIRECTORY)
 @arcli.command("results")
 def command_testbase_services_results(directory: Optional[str], bind: str, port: int):

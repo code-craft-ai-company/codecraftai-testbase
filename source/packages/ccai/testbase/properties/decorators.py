@@ -102,7 +102,7 @@ def expect_exception(exception_type: type, reason: str = "") -> callable:
         Decorator that marks a test as expected to raise a specific exception.
 
         This decorator does NOT catch the exception itself. It sets an
-        ``_expected_failure_`` attribute on the function that the test
+        ``_expect_exception_`` attribute on the function that the test
         sequencer reads to determine how to handle the exception at
         test scope exit time.
 

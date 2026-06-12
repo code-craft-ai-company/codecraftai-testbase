@@ -181,5 +181,7 @@ def command_testbase_testing_jobs_run(root: Optional[str], job: str, output: Opt
 
     return
 
-group_testbase_testing_jobs.add_command(command_testbase_testing_jobs_show)
+# Only wire commands that are implemented. 'jobs list' and 'jobs show' remain
+# unimplemented placeholders and are intentionally NOT registered so the CLI does
+# not advertise subcommands that always raise NotImplementedError.
 group_testbase_testing_jobs.add_command(command_testbase_testing_jobs_run)

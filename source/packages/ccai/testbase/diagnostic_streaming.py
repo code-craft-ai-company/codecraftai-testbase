@@ -569,12 +569,17 @@ class WebSocketStreamHandler(DiagnosticStreamHandler):
                 )
                 self._connected = True
                 logger.info(f"WebSocket stream handler connected to: {endpoint}")
+                return True
             else:
-                # Simulated connection when websocket-client is not available
-                self._connected = True
-                logger.info(f"WebSocket stream handler (simulated) connected to: {endpoint}")
-
-            return True
+                # websocket-client is not installed, so no data can actually be
+                # transmitted. Report failure rather than a misleading success so
+                # callers know streaming is not active.
+                logger.warning(
+                    f"WebSocket stream handler: 'websocket-client' not installed; cannot stream to {endpoint}. "
+                    "Install 'websocket-client' to enable WebSocket streaming."
+                )
+                self._connected = False
+                return False
 
         except Exception as e:
             logger.error(f"WebSocket stream handler connection failed: {e}")
@@ -600,11 +605,11 @@ class WebSocketStreamHandler(DiagnosticStreamHandler):
             if self._ws_available and self._ws:
                 self._ws.send(data)
                 logger.debug(f"WebSocket stream handler: Event sent successfully")
+                return True
             else:
-                # Simulated send - just log the event
-                logger.debug(f"WebSocket stream handler (simulated): Would send: {data[:100]}...")
-
-            return True
+                # No real transport available; do not report a successful send.
+                logger.warning("WebSocket stream handler: 'websocket-client' not installed; event not sent.")
+                return False
 
         except Exception as e:
             logger.error(f"WebSocket stream handler: Send failed: {e}")

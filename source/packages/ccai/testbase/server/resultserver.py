@@ -119,23 +119,30 @@ class BugServerInterfaceForJira(BugServerInterface):
                      build_info: Optional[Dict[str, str]]=None, failure_info: Optional[Dict[str, str]]=None) -> str:
         """
             Create an issue in the bug server.
+
+            :raises: NotImplementedError -- JIRA issue creation is not yet implemented.
         """
-        # Implement the create issue logic here
-        return
+        # Raise loudly rather than silently returning None against the -> str contract.
+        errmsg = "BugServerInterfaceForJira.create_issue is not yet implemented."
+        raise NotImplementedError(errmsg)
 
     def search_issues(self, query: str) -> str:
         """
             Search for issues in the bug server.
+
+            :raises: NotImplementedError -- JIRA issue search is not yet implemented.
         """
-        # Implement the search logic here
-        return
-    
+        errmsg = "BugServerInterfaceForJira.search_issues is not yet implemented."
+        raise NotImplementedError(errmsg)
+
     def update_issue(self, issue_id: str, issue_data: dict):
         """
             Update an issue in the bug server.
+
+            :raises: NotImplementedError -- JIRA issue update is not yet implemented.
         """
-        # Implement the update issue logic here
-        return
+        errmsg = "BugServerInterfaceForJira.update_issue is not yet implemented."
+        raise NotImplementedError(errmsg)
 
 
 def try_create_bug_server_interface_from_environment() -> Union[None, 'BugServerInterface']:
@@ -273,14 +280,18 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
 
         
         if path == "/api/v1/environment":
-            response = {
-                RuntimeVariablesDesc.AM_BUG_SERVER_TYPE.name: self._bug_server.server_type,
-                RuntimeVariablesDesc.AM_BUG_SERVER_ENDPOINT.name: self._bug_server.server_endpoint,
-                RuntimeVariablesDesc.AM_BUG_PROJECTS.name: self._bug_server.projects,
-                RuntimeVariablesDesc.AM_BUG_TEAM.name: self._bug_server.team,
-                RuntimeVariablesDesc.AM_BUG_USERNAME.name: self._bug_server.username,
-                RuntimeVariablesDesc.AM_BUG_TOKEN.name: self._bug_server.token
-            }
+            response = {}
+            if self._bug_server is not None:
+                # The bug-server access token is intentionally excluded: this endpoint
+                # is unauthenticated, so it must never disclose the credential. Only
+                # non-secret connection metadata is returned.
+                response = {
+                    RuntimeVariablesDesc.AM_BUG_SERVER_TYPE.name: self._bug_server.server_type,
+                    RuntimeVariablesDesc.AM_BUG_SERVER_ENDPOINT.name: self._bug_server.server_endpoint,
+                    RuntimeVariablesDesc.AM_BUG_PROJECTS.name: self._bug_server.projects,
+                    RuntimeVariablesDesc.AM_BUG_TEAM.name: self._bug_server.team,
+                    RuntimeVariablesDesc.AM_BUG_USERNAME.name: self._bug_server.username,
+                }
 
             rcontent = json.dumps(response).encode('utf-8')
 
@@ -290,8 +301,9 @@ class TestResultRequestHandler(SimpleHTTPRequestHandler):
             self.try_send_bug_server_header()
             self.end_headers()
 
-            self.wfile.write(rcontent.encode('utf-8'))
-            
+            # rcontent is already UTF-8 bytes; do not re-encode (bytes has no .encode).
+            self.wfile.write(rcontent)
+
         else:
             # Handle other API paths
             self.send_response(HTTPStatus.NOT_FOUND)
@@ -571,7 +583,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-d', '--directory', default=os.getcwd(), help='serve this directory (default: current directory)')
 
-    parser.add_argument('-b', '--bind', metavar='ADDRESS', default="", help='bind to this address (default: all interfaces)')
+    parser.add_argument('-b', '--bind', metavar='ADDRESS', default="127.0.0.1", help='bind to this address (default: 127.0.0.1, loopback only). Pass "" to bind all interfaces.')
     
     parser.add_argument('port', default=8880, type=int, nargs='?', help='bind to this port (default: %(default)s)')
     

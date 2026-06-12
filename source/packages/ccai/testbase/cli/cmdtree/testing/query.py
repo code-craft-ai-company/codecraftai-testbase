@@ -73,7 +73,7 @@ def command_testbase_testing_query(root: Optional[str], includes: Optional[List[
     from ccai.testbase.cli.utilities import resolve_test_root
     test_root = resolve_test_root(root)
 
-    AM_RUNTIME_OPTION_OVERRIDES.override_testroot(root)
+    AM_RUNTIME_OPTION_OVERRIDES.override_testroot(test_root)
 
     from ccai.testbase.initialize import initialize_testbase_results
 
@@ -93,8 +93,8 @@ def command_testbase_testing_query(root: Optional[str], includes: Optional[List[
 
     for exmexp in exclude_marker_exp:
         exmexp = exmexp.strip("\"")
-        imexp = imexp.strip("'")
-        mfilter = parse_marker_expression("-" + imexp)
+        exmexp = exmexp.strip("'")
+        mfilter = parse_marker_expression("-" + exmexp)
         metafilters.append(mfilter)
 
     from ccai.xmodules.xlogging.enhancedloggers import getEnhancedLogger

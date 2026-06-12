@@ -834,6 +834,11 @@ class ResultRecorder:
         self._lock.acquire()
         try:
 
+            # Idempotency guard: if finalization already ran, subsequent calls are
+            # no-ops, as documented. The finally block still releases the lock.
+            if self._finalized:
+                return
+
             # Mark as finalized to prevent duplicate finalization
             self._finalized = True
 

@@ -242,7 +242,7 @@ def log_debugger_connection(
         log_debugger_connection(
             event="connected",
             debugger="debugpy",
-            endpoint=("0.0.0.0", 5678)
+            endpoint=("127.0.0.1", 5678)
         )
     """
     if not _should_log(DEBUG_LOG_LEVEL.INFO):

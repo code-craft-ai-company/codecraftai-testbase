@@ -2,12 +2,12 @@
 name = "codecraftai-testbase"
 description = "Code Craft AI - TestBase"
 version = "0.0.1"
-authors = []
+authors = ["Myron Walker <myron.walker@gmail.com>"]
 readme = "README.rst"
-license = "LICENSE.txt"
+license = "LicenseRef-CodeCraftAI-Dual-License"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Operating System :: POSIX"
 ]
 keywords = [
@@ -25,12 +25,11 @@ codecraftai-runtime = { git = "https://github.com/automationmojo/codecraftai-run
 codecraftai-interfaces = { git = "https://github.com/automationmojo/codecraftai-interfaces.git", branch = "main" }
 codecraftai-xmodules = { git = "https://github.com/automationmojo/codecraftai-xmodules.git", branch = "main" }
 codecraftai-waiting = { git = "https://github.com/automationmojo/codecraftai-waiting.git", branch = "main" }
+pyyaml = "^6.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
 hypothesis = "^6.100.0"
-
-[tool.poetry.group.dbio.dependencies]
 
 [tool.poetry.scripts]
 testbase = "ccai.testbase.cli.testbase_command:testbase_root_command"

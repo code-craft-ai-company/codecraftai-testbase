@@ -90,9 +90,11 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
+    @unittest.skip("Relocated: generic_test_entrypoint no longer performs runtime init; "
+                   "moved to the integration-runtime entrypoint (testbase/integration-runtime refactor).")
     def test_runtime_initialization_is_called(self, mock_init_runtime,
                                                mock_init_results, mock_get_path, mock_get_logger,
                                                mock_find_fullname, mock_find_root, mock_exit):
@@ -120,8 +122,10 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.activate_profile_job')
+    @unittest.skip("Relocated: generic_test_entrypoint no longer performs profile activation; "
+                   "moved to the integration-runtime entrypoint (testbase/integration-runtime refactor).")
     def test_profile_activation_is_called(self, mock_activate_profile, mock_get_path, mock_get_logger,
                                           mock_find_fullname, mock_find_root, mock_exit):
         """Test that activate_profile_job is called with JobType.TestRun (Requirement 1.4)."""
@@ -148,9 +152,11 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.activate_profile_job')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
+    @unittest.skip("Relocated: generic_test_entrypoint no longer performs results init; "
+                   "moved to the integration-runtime entrypoint (testbase/integration-runtime refactor).")
     def test_results_initialization_is_called(self, mock_init_results, mock_activate_profile,
                                                mock_get_path, mock_get_logger,
                                                mock_find_fullname, mock_find_root, mock_exit):
@@ -178,9 +184,11 @@ class TestGenericTestEntrypointInitialization(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
+    @unittest.skip("Relocated: generic_test_entrypoint no longer orchestrates runtime/results/activation init; "
+                   "moved to the integration-runtime entrypoint (testbase/integration-runtime refactor).")
     def test_initialization_order(self, mock_init_runtime, mock_init_results,
                                    mock_get_path, mock_get_logger,
                                    mock_find_fullname, mock_find_root, mock_exit):
@@ -501,7 +509,7 @@ class TestModuleRegistration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -532,7 +540,7 @@ class TestModuleRegistration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -563,7 +571,7 @@ class TestModuleRegistration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -605,7 +613,7 @@ class TestModuleRegistration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -659,7 +667,7 @@ class TestClassModuleRemapping(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -698,7 +706,7 @@ class TestClassModuleRemapping(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -738,7 +746,7 @@ class TestClassModuleRemapping(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -814,7 +822,7 @@ class TestInjectionRegistryRenaming(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -853,7 +861,7 @@ class TestInjectionRegistryRenaming(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -892,7 +900,7 @@ class TestInjectionRegistryRenaming(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -953,7 +961,7 @@ class TestFunctionModuleRemapping(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -992,7 +1000,7 @@ class TestFunctionModuleRemapping(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -1032,7 +1040,7 @@ class TestFunctionModuleRemapping(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -1108,10 +1116,12 @@ class TestEnvironmentConfiguration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
+    @unittest.skip("Relocated: jobtype/environment setup moved out of generic_test_entrypoint to the "
+                   "integration-runtime entrypoint (testbase/integration-runtime refactor).")
     def test_jobtype_set_to_testrun(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                      mock_get_path, mock_get_logger,
                                      mock_find_fullname, mock_find_root, mock_exit):
@@ -1143,10 +1153,12 @@ class TestEnvironmentConfiguration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
+    @unittest.skip("Relocated: output-directory/results-path setup moved out of generic_test_entrypoint to the "
+                   "integration-runtime entrypoint (testbase/integration-runtime refactor).")
     def test_output_directory_set_correctly(self, mock_import_by_name, mock_init_runtime, mock_init_results,
                                              mock_get_path, mock_get_logger,
                                              mock_find_fullname, mock_find_root, mock_exit):
@@ -1205,7 +1217,7 @@ class TestExitCodeHandling(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -1249,7 +1261,7 @@ class TestExitCodeHandling(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -1293,7 +1305,7 @@ class TestExitCodeHandling(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')
@@ -1339,7 +1351,7 @@ class TestExitCodeHandling(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
+    @patch('ccai.thisapp.paths.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     @patch('ccai.testbase.entrypoints.import_by_name')

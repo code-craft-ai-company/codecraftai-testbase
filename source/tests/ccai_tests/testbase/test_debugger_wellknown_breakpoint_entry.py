@@ -166,7 +166,7 @@ class DebuggerWellknownBreakpointEntryTests(unittest.TestCase):
             breakpoint_name="testrun-start",
             configured_breakpoints=["testrun-start"]
         )
-        mock_listen.assert_called_once_with(("0.0.0.0", DEFAULT_DEBUG_PORT))
+        mock_listen.assert_called_once_with(("127.0.0.1", DEFAULT_DEBUG_PORT))
 
     @patch('debugpy.breakpoint')
     @patch('debugpy.wait_for_client')

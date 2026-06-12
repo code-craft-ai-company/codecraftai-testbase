@@ -317,7 +317,7 @@ class DebuggerWellknownBreakpointCodeAppendTests(unittest.TestCase):
         )
         listen_line = [line for line in code_lines if 'debugpy.listen' in line]
         self.assertEqual(len(listen_line), 1)
-        self.assertIn(f'debugpy.listen(("0.0.0.0", {DEFAULT_DEBUG_PORT}))', listen_line[0])
+        self.assertIn(f'debugpy.listen(("127.0.0.1", {DEFAULT_DEBUG_PORT}))', listen_line[0])
 
     @patch('ccai.xmodules.debugging.in_vscode_debugger', return_value=True)
     def test_debugpy_appends_wait_for_client_call_when_in_vscode(self, mock_in_vscode):

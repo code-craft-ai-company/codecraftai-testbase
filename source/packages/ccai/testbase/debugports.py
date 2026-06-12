@@ -53,7 +53,7 @@ import socket
 import logging
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 # Default debug port for debugpy
@@ -133,7 +133,7 @@ class PortRangeError(Exception):
         super().__init__(self.message)
 
 
-def is_port_available(port: int, host: str = "0.0.0.0") -> bool:
+def is_port_available(port: int, host: str = "127.0.0.1") -> bool:
     """
     Check if a specific port is available for binding.
 
@@ -141,7 +141,7 @@ def is_port_available(port: int, host: str = "0.0.0.0") -> bool:
     if it is available. It uses a TCP socket to test the port.
 
     :param port: The port number to check (1-65535).
-    :param host: The host address to bind to. Default is "0.0.0.0" (all interfaces).
+    :param host: The host address to bind to. Default is "127.0.0.1" (loopback only).
     :returns: True if the port is available, False if it is in use.
 
     Example::
@@ -183,7 +183,7 @@ def is_port_available(port: int, host: str = "0.0.0.0") -> bool:
     return available
 
 
-def find_available_port(start_port: int, end_port: int, host: str = "0.0.0.0") -> int:
+def find_available_port(start_port: int, end_port: int, host: str = "127.0.0.1") -> int:
     """
     Find an available port within a specified range.
 
@@ -193,7 +193,7 @@ def find_available_port(start_port: int, end_port: int, host: str = "0.0.0.0") -
 
     :param start_port: The starting port of the range (inclusive).
     :param end_port: The ending port of the range (inclusive).
-    :param host: The host address to check. Default is "0.0.0.0".
+    :param host: The host address to check. Default is "127.0.0.1".
     :returns: The first available port in the range.
     :raises PortConflictError: If no port is available in the range.
     :raises ValueError: If the port range is invalid.

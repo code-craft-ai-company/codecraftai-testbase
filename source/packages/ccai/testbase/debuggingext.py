@@ -63,7 +63,7 @@ from ccai.testbase.debuglogging import (
 )
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def debugger_wellknown_breakpoint_entry_with_port(
@@ -142,8 +142,10 @@ def debugger_wellknown_breakpoint_entry_with_port(
                     port=debug_port
                 )
 
-                # When running under VS Code, set up the remote debugging endpoint
-                debugpy.listen(("0.0.0.0", debug_port))
+                # When running under VS Code, set up the remote debugging endpoint.
+                # Bind loopback-only: debugpy has no authentication and exposes an
+                # arbitrary-code-execution surface, so it must not listen on all interfaces.
+                debugpy.listen(("127.0.0.1", debug_port))
 
                 # Log the waiting event
                 log_debugger_connection(
@@ -260,7 +262,7 @@ def debugger_wellknown_breakpoint_code_append_with_port(
                 # Include the remote debugging setup calls with custom port and logging
                 code_lines.append('{}log_debugger_connection(event="listening", debugger="{}", port={})'.format(
                     current_indent, debugger, debug_port))
-                code_lines.append('{}debugpy.listen(("0.0.0.0", {}))'.format(current_indent, debug_port))
+                code_lines.append('{}debugpy.listen(("127.0.0.1", {}))'.format(current_indent, debug_port))
                 code_lines.append('{}log_debugger_connection(event="waiting", debugger="{}", port={})'.format(
                     current_indent, debugger, debug_port))
                 code_lines.append('{}debugpy.wait_for_client()'.format(current_indent))

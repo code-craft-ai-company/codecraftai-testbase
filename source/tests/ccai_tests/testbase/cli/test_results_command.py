@@ -44,11 +44,15 @@ class ResultsCommandDecoratorTests(unittest.TestCase):
         from ccai.testbase.cli.cmdtree.services.results import command_testbase_services_results
         self.assertIn("bind", command_testbase_services_results.options)
 
-    def test_bind_option_default_is_empty_string(self):
-        """Test that bind option default is empty string for all interfaces (Requirement 16.3)."""
+    def test_bind_option_default_is_loopback(self):
+        """Test that bind option default is loopback-only 127.0.0.1 (Requirement 16.3).
+
+        The default binds loopback rather than all interfaces because the result
+        server is an unauthenticated static-file handler; pass "" to bind all interfaces.
+        """
         from ccai.testbase.cli.cmdtree.services.results import command_testbase_services_results
         bind_option = command_testbase_services_results.options["bind"]
-        self.assertEqual(bind_option.default, "")
+        self.assertEqual(bind_option.default, "127.0.0.1")
 
     def test_port_option_exists(self):
         """Test that port option is attached (Requirement 16.4)."""

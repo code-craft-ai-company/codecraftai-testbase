@@ -313,7 +313,7 @@ debugpy.breakpoint()
         breakpoint_code = """
 # The remote debug flag was passed on the commandline so we break here.
 import debugpy
-debugpy.listen(("0.0.0.0", 5678))
+debugpy.listen(("127.0.0.1", 5678))
 debugpy.wait_for_client()
 debugpy.breakpoint()
 """

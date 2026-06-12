@@ -20,7 +20,7 @@ Repository Structure
 - ``repository-setup/`` - Repository homing and setup scripts.
 - ``source/packages/`` - Package source code.
 - ``source/tests/`` - ``unittest``-based tests.
-- ``source/testbase/`` - TestBase framework tests.
+- ``source/testroots/`` - TestBase framework self-tests (testroot).
 - ``specs/`` - Requirements, design, and task documentation.
 - ``userguide/`` - Standards, conventions, and documentation.
 
@@ -59,7 +59,7 @@ Run TestBase tests:
 
 .. code-block:: bash
 
-   testbase testing run --root "source/testbase" --include ccai
+   testbase testing run --root "source/testroots" --include ccai
 
 Standards and Conventions
 =========================

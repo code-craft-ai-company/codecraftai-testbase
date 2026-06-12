@@ -506,6 +506,40 @@ class DiagnosticCompression:
             compression_level=compression_level
         )
 
+    @staticmethod
+    def _is_within_directory(directory: str, target: str) -> bool:
+        """
+            Determines whether ``target`` resolves to a location inside ``directory``.
+
+            :param directory: The base directory that must contain the target.
+            :param target: The candidate path to validate.
+
+            :returns: True if ``target`` is within ``directory``, otherwise False.
+        """
+        abs_directory = os.path.abspath(directory)
+        abs_target = os.path.abspath(target)
+        common_prefix = os.path.commonpath([abs_directory, abs_target])
+        rtnval = common_prefix == abs_directory
+        return rtnval
+
+    @classmethod
+    def _assert_safe_archive_members(cls, output_path: str, member_names: List[str]) -> None:
+        """
+            Validates that every archive member extracts inside ``output_path``,
+            guarding against ``../`` / absolute-path traversal (CVE-2007-4559 class).
+
+            :param output_path: The directory members will be extracted into.
+            :param member_names: The member names declared by the archive.
+
+            :raises: ValueError when a member would escape ``output_path``.
+        """
+        for member_name in member_names:
+            member_target = os.path.join(output_path, member_name)
+            if not cls._is_within_directory(output_path, member_target):
+                err_msg = f"Refusing to extract unsafe archive member outside the target directory: {member_name}"
+                raise ValueError(err_msg)
+        return
+
     @classmethod
     def decompress_file(
         cls,
@@ -576,11 +610,23 @@ class DiagnosticCompression:
                                 shutil.copyfileobj(f_in, f_out)
                     else:
                         os.makedirs(output_path, exist_ok=True)
+                        cls._assert_safe_archive_members(output_path, names)
                         zf.extractall(output_path)
 
             elif format in (CompressionFormat.TAR_GZ, CompressionFormat.TAR_BZ2):
                 os.makedirs(output_path, exist_ok=True)
                 with tarfile.open(compressed_path, 'r:*') as tf:
+                    tar_members = tf.getmembers()
+                    member_names = [member.name for member in tar_members]
+                    cls._assert_safe_archive_members(output_path, member_names)
+                    # Reject link members whose target escapes output_path (tar symlink/hardlink traversal).
+                    for member in tar_members:
+                        if member.issym() or member.islnk():
+                            link_dir = os.path.dirname(member.name)
+                            link_target = os.path.join(output_path, link_dir, member.linkname)
+                            if not cls._is_within_directory(output_path, link_target):
+                                link_err_msg = f"Refusing to extract unsafe archive link outside the target directory: {member.name} -> {member.linkname}"
+                                raise ValueError(link_err_msg)
                     tf.extractall(output_path)
 
             if not keep_compressed:

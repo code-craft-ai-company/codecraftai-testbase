@@ -3189,7 +3189,7 @@ class AsyncMock(Mock):
         return f"AsyncMock(return_value={self._mock_context.return_value}, async_side_effect={self._async_side_effect})"
 
 
-class PatchType(enum.StrEnum):
+class PatchType(str, enum.Enum):
     """
         Enumeration defining the types of targets that can be patched.
         

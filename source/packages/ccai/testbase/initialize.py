@@ -134,7 +134,7 @@ def initialize_testbase_runtime():
     name="ccai"
     home_dir = os.path.join(os.path.expanduser("~"), name)
     
-    establish_app_persona(name=name, home_dir=home_dir, logger_name="TB", log_basename="testrun")
+    establish_app_persona(name=name, presence_dir=home_dir, logger_name="TB", log_basename="testrun")
 
     resolve_runtime_variables()
 

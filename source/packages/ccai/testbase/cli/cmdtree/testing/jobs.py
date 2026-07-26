@@ -96,8 +96,8 @@ def command_testbase_testing_jobs_run(root: Optional[str], job: str, output: Opt
 
         # We perform activation a little later in the testrunner.py file so we can
         # handle exceptions in the context of testrunner_main function
-        from ccai.runtime.activation import activate_runtime, ActivationProfile
-        activate_runtime(profile=ActivationProfile.Console)
+        from ccai.thisapp.activation import activate_profile_console
+        activate_profile_console()
 
         from ccai.runtime.optionoverrides import AM_RUNTIME_OPTION_OVERRIDES
 

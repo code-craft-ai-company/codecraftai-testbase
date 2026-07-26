@@ -172,11 +172,10 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     def test_custom_job_type_is_instantiated(self, mock_init_runtime,
-                                              mock_init_results, mock_get_path, mock_get_logger,
+                                              mock_init_results, mock_get_logger,
                                               mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
         Test that a custom TestJob subclass is instantiated when specified.
@@ -189,7 +188,6 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
         # Setup mocks
         mock_find_root.return_value = self.testroot_dir
         mock_find_fullname.return_value = "tests.test_module"
-        mock_get_path.return_value = self.tempdir.name
         mock_get_logger.return_value = DummyLogger()
         
         # Create a mock test module
@@ -211,11 +209,10 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     def test_custom_job_type_execute_is_called(self, mock_init_runtime,
-                                                mock_init_results, mock_get_path, mock_get_logger,
+                                                mock_init_results, mock_get_logger,
                                                 mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
         Test that the custom TestJob's execute method is called.
@@ -228,7 +225,6 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
         # Setup mocks
         mock_find_root.return_value = self.testroot_dir
         mock_find_fullname.return_value = "tests.test_module"
-        mock_get_path.return_value = self.tempdir.name
         mock_get_logger.return_value = DummyLogger()
         
         # Create a mock test module
@@ -250,11 +246,10 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     def test_custom_job_receives_testroot_parameter(self, mock_init_runtime,
-                                                     mock_init_results, mock_get_path, mock_get_logger,
+                                                     mock_init_results, mock_get_logger,
                                                      mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
         Test that the custom TestJob receives the correct testroot parameter.
@@ -267,7 +262,6 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
         # Setup mocks
         mock_find_root.return_value = self.testroot_dir
         mock_find_fullname.return_value = "tests.test_module"
-        mock_get_path.return_value = self.tempdir.name
         mock_get_logger.return_value = DummyLogger()
         
         # Create a mock test module
@@ -290,11 +284,10 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     def test_custom_job_receives_include_patterns(self, mock_init_runtime,
-                                                   mock_init_results, mock_get_path, mock_get_logger,
+                                                   mock_init_results, mock_get_logger,
                                                    mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
         Test that the custom TestJob receives include patterns from command line.
@@ -307,7 +300,6 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
         # Setup mocks
         mock_find_root.return_value = self.testroot_dir
         mock_find_fullname.return_value = "tests.test_module"
-        mock_get_path.return_value = self.tempdir.name
         mock_get_logger.return_value = DummyLogger()
         
         # Create a mock test module
@@ -330,11 +322,10 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     def test_custom_job_receives_exclude_patterns(self, mock_init_runtime,
-                                                   mock_init_results, mock_get_path, mock_get_logger,
+                                                   mock_init_results, mock_get_logger,
                                                    mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
         Test that the custom TestJob receives exclude patterns from command line.
@@ -347,7 +338,6 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
         # Setup mocks
         mock_find_root.return_value = self.testroot_dir
         mock_find_fullname.return_value = "tests.test_module"
-        mock_get_path.return_value = self.tempdir.name
         mock_get_logger.return_value = DummyLogger()
         
         # Create a mock test module
@@ -370,11 +360,10 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     def test_custom_job_receives_test_module(self, mock_init_runtime,
-                                              mock_init_results, mock_get_path, mock_get_logger,
+                                              mock_init_results, mock_get_logger,
                                               mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
         Test that the custom TestJob receives the test module reference.
@@ -387,7 +376,6 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
         # Setup mocks
         mock_find_root.return_value = self.testroot_dir
         mock_find_fullname.return_value = "tests.test_module"
-        mock_get_path.return_value = self.tempdir.name
         mock_get_logger.return_value = DummyLogger()
         
         # Create a mock test module
@@ -410,11 +398,10 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     def test_custom_job_result_code_passed_to_exit(self, mock_init_runtime,
-                                                    mock_init_results, mock_get_path, mock_get_logger,
+                                                    mock_init_results, mock_get_logger,
                                                     mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
         Test that the custom TestJob's result code is passed to sys.exit.
@@ -427,7 +414,6 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
         # Setup mocks
         mock_find_root.return_value = self.testroot_dir
         mock_find_fullname.return_value = "tests.test_module"
-        mock_get_path.return_value = self.tempdir.name
         mock_get_logger.return_value = DummyLogger()
         
         # Create a mock test module
@@ -448,11 +434,10 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
     @patch('ccai.testbase.entrypoints.find_testmodule_root')
     @patch('ccai.testbase.entrypoints.find_testmodule_fullname')
     @patch('ccai.testbase.entrypoints.getEnhancedLogger')
-    @patch('ccai.testbase.entrypoints.get_path_for_testresults')
     @patch('ccai.testbase.initialize.initialize_testbase_results')
     @patch('ccai.testbase.initialize.initialize_testbase_runtime')
     def test_failing_custom_job_result_code_propagated(self, mock_init_runtime,
-                                                        mock_init_results, mock_get_path, mock_get_logger,
+                                                        mock_init_results, mock_get_logger,
                                                         mock_find_fullname, mock_find_root, mock_import_by_name, mock_exit):
         """
         Test that a failing custom TestJob's result code is propagated.
@@ -465,7 +450,6 @@ class TestCustomJobTypeIntegration(unittest.TestCase):
         # Setup mocks
         mock_find_root.return_value = self.testroot_dir
         mock_find_fullname.return_value = "tests.test_module"
-        mock_get_path.return_value = self.tempdir.name
         mock_get_logger.return_value = DummyLogger()
         
         # Create a mock test module

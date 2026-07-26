@@ -3567,7 +3567,7 @@ class AsyncSideEffectTests(unittest.TestCase):
             return x + y
         
         se = AsyncSideEffect(async_func)
-        result = asyncio.get_event_loop().run_until_complete(se(1, 2))
+        result = asyncio.run(se(1, 2))
         self.assertEqual(result, 3)
 
     def test_async_side_effect_with_default_args(self):
@@ -3576,11 +3576,11 @@ class AsyncSideEffectTests(unittest.TestCase):
             return a * b
         
         se = AsyncSideEffect(async_func, default_args=(5, 10))
-        result = asyncio.get_event_loop().run_until_complete(se())
+        result = asyncio.run(se())
         self.assertEqual(result, 50)
         
         # Override with call-time args
-        result = asyncio.get_event_loop().run_until_complete(se(3, 4))
+        result = asyncio.run(se(3, 4))
         self.assertEqual(result, 12)
 
     def test_async_side_effect_with_default_kwargs(self):
@@ -3589,7 +3589,7 @@ class AsyncSideEffectTests(unittest.TestCase):
             return f"{greeting}, {name}!"
         
         se = AsyncSideEffect(async_func, default_kwargs={"name": "User"})
-        result = asyncio.get_event_loop().run_until_complete(se())
+        result = asyncio.run(se())
         self.assertEqual(result, "Hello, User!")
 
     def test_async_side_effect_requires_coroutine_function(self):
@@ -3608,7 +3608,7 @@ class AsyncSideEffectTests(unittest.TestCase):
         
         se = AsyncSideEffect(raise_error)
         with self.assertRaises(ValueError) as context:
-            asyncio.get_event_loop().run_until_complete(se())
+            asyncio.run(se())
         self.assertEqual(str(context.exception), "Test async error")
 
 
@@ -3618,7 +3618,7 @@ class AsyncMockTests(unittest.TestCase):
     def test_async_mock_basic_return_value(self):
         """Test AsyncMock returns configured return_value when awaited."""
         async_mock = AsyncMock(return_value=42)
-        result = asyncio.get_event_loop().run_until_complete(async_mock())
+        result = asyncio.run(async_mock())
         self.assertEqual(result, 42)
 
     def test_async_mock_with_async_side_effect(self):
@@ -3627,13 +3627,13 @@ class AsyncMockTests(unittest.TestCase):
             return x * 2
         
         async_mock = AsyncMock(side_effect=async_effect)
-        result = asyncio.get_event_loop().run_until_complete(async_mock(5))
+        result = asyncio.run(async_mock(5))
         self.assertEqual(result, 10)
 
     def test_async_mock_records_calls(self):
         """Test AsyncMock records call information."""
         async_mock = AsyncMock(return_value="result")
-        asyncio.get_event_loop().run_until_complete(async_mock(1, 2, key="value"))
+        asyncio.run(async_mock(1, 2, key="value"))
         
         self.assertEqual(async_mock.call_count, 1)
         self.assertEqual(async_mock.call_args, ((1, 2), {"key": "value"}))
@@ -3642,9 +3642,9 @@ class AsyncMockTests(unittest.TestCase):
     def test_async_mock_multiple_calls(self):
         """Test AsyncMock tracks multiple calls."""
         async_mock = AsyncMock(return_value="result")
-        asyncio.get_event_loop().run_until_complete(async_mock("a"))
-        asyncio.get_event_loop().run_until_complete(async_mock("b"))
-        asyncio.get_event_loop().run_until_complete(async_mock("c"))
+        asyncio.run(async_mock("a"))
+        asyncio.run(async_mock("b"))
+        asyncio.run(async_mock("c"))
         
         self.assertEqual(async_mock.call_count, 3)
         self.assertEqual(len(async_mock.call_args_list), 3)
@@ -3653,7 +3653,7 @@ class AsyncMockTests(unittest.TestCase):
     def test_async_mock_assertion_methods(self):
         """Test AsyncMock assertion methods work correctly."""
         async_mock = AsyncMock(return_value="result")
-        asyncio.get_event_loop().run_until_complete(async_mock(1, 2))
+        asyncio.run(async_mock(1, 2))
         
         async_mock.assert_called()
         async_mock.assert_called_once()
@@ -3663,9 +3663,9 @@ class AsyncMockTests(unittest.TestCase):
     def test_async_mock_assert_any_call(self):
         """Test AsyncMock assert_any_call works correctly."""
         async_mock = AsyncMock(return_value="result")
-        asyncio.get_event_loop().run_until_complete(async_mock("first"))
-        asyncio.get_event_loop().run_until_complete(async_mock("second"))
-        asyncio.get_event_loop().run_until_complete(async_mock("third"))
+        asyncio.run(async_mock("first"))
+        asyncio.run(async_mock("second"))
+        asyncio.run(async_mock("third"))
         
         async_mock.assert_any_call("second")
         
@@ -3677,7 +3677,7 @@ class AsyncMockTests(unittest.TestCase):
         async_mock = AsyncMock()
         async_mock.configure(return_value=100)
         
-        result = asyncio.get_event_loop().run_until_complete(async_mock())
+        result = asyncio.run(async_mock())
         self.assertEqual(result, 100)
 
     def test_async_mock_configure_with_side_effect(self):
@@ -3688,7 +3688,7 @@ class AsyncMockTests(unittest.TestCase):
         async_mock = AsyncMock(return_value=0)
         async_mock.configure(side_effect=new_effect)
         
-        result = asyncio.get_event_loop().run_until_complete(async_mock(5))
+        result = asyncio.run(async_mock(5))
         self.assertEqual(result, 105)
 
     def test_async_mock_configure_clear_side_effect(self):
@@ -3699,12 +3699,12 @@ class AsyncMockTests(unittest.TestCase):
         async_mock = AsyncMock(side_effect=effect, return_value=42)
         
         # Side effect takes precedence
-        result = asyncio.get_event_loop().run_until_complete(async_mock(5))
+        result = asyncio.run(async_mock(5))
         self.assertEqual(result, 10)
         
         # Clear side effect
         async_mock.configure(side_effect=None)
-        result = asyncio.get_event_loop().run_until_complete(async_mock(5))
+        result = asyncio.run(async_mock(5))
         self.assertEqual(result, 42)
 
     def test_async_mock_recursive(self):
@@ -3716,7 +3716,7 @@ class AsyncMockTests(unittest.TestCase):
         
         # Configure child
         child.configure(return_value="child_result")
-        result = asyncio.get_event_loop().run_until_complete(async_mock.child())
+        result = asyncio.run(async_mock.child())
         self.assertEqual(result, "child_result")
 
     def test_async_mock_strict_attrs(self):
@@ -3728,7 +3728,7 @@ class AsyncMockTests(unittest.TestCase):
         
         # return_value should still be configurable
         async_mock.configure(return_value=42)
-        result = asyncio.get_event_loop().run_until_complete(async_mock())
+        result = asyncio.run(async_mock())
         self.assertEqual(result, 42)
 
     def test_async_mock_raises_for_non_async_side_effect(self):
@@ -3749,7 +3749,7 @@ class AsyncMockTests(unittest.TestCase):
         async_mock = AsyncMock(side_effect=se)
         
         self.assertIs(async_mock.async_side_effect, se)
-        result = asyncio.get_event_loop().run_until_complete(async_mock(5))
+        result = asyncio.run(async_mock(5))
         self.assertEqual(result, 105)
 
     def test_async_mock_directly_awaitable(self):
@@ -3759,7 +3759,7 @@ class AsyncMockTests(unittest.TestCase):
         async def test_await():
             return await async_mock
         
-        result = asyncio.get_event_loop().run_until_complete(test_await())
+        result = asyncio.run(test_await())
         self.assertEqual(result, "direct_await")
 
     def test_async_mock_repr(self):
@@ -3782,7 +3782,7 @@ class CreateAsyncMockTests(unittest.TestCase):
     def test_create_async_mock_with_return_value(self):
         """Test create_async_mock with return_value."""
         async_mock = create_async_mock(return_value={"status": "ok"})
-        result = asyncio.get_event_loop().run_until_complete(async_mock())
+        result = asyncio.run(async_mock())
         self.assertEqual(result, {"status": "ok"})
 
     def test_create_async_mock_with_side_effect(self):
@@ -3791,7 +3791,7 @@ class CreateAsyncMockTests(unittest.TestCase):
             return {"url": url, "data": "response"}
         
         async_mock = create_async_mock(side_effect=fetch_data)
-        result = asyncio.get_event_loop().run_until_complete(async_mock("http://example.com"))
+        result = asyncio.run(async_mock("http://example.com"))
         self.assertEqual(result, {"url": "http://example.com", "data": "response"})
 
     def test_create_async_mock_with_recursive(self):
@@ -3820,7 +3820,7 @@ class MockContextAsyncMethodTests(unittest.TestCase):
         ctx.mock_async_method('fetch_data', return_value={'id': 1})
         
         self.assertIsInstance(mock.fetch_data, AsyncMock)
-        result = asyncio.get_event_loop().run_until_complete(mock.fetch_data())
+        result = asyncio.run(mock.fetch_data())
         self.assertEqual(result, {'id': 1})
 
     def test_mock_async_method_with_side_effect(self):
@@ -3833,7 +3833,7 @@ class MockContextAsyncMethodTests(unittest.TestCase):
         
         ctx.mock_async_method('process', side_effect=async_process)
         
-        result = asyncio.get_event_loop().run_until_complete(mock.process(5))
+        result = asyncio.run(mock.process(5))
         self.assertEqual(result, 10)
 
     def test_mock_async_method_tracks_calls(self):
@@ -3843,8 +3843,8 @@ class MockContextAsyncMethodTests(unittest.TestCase):
         
         ctx.mock_async_method('fetch', return_value='data')
         
-        asyncio.get_event_loop().run_until_complete(mock.fetch('arg1'))
-        asyncio.get_event_loop().run_until_complete(mock.fetch('arg2'))
+        asyncio.run(mock.fetch('arg1'))
+        asyncio.run(mock.fetch('arg2'))
         
         self.assertEqual(mock.fetch.call_count, 2)
         mock.fetch.assert_any_call('arg1')

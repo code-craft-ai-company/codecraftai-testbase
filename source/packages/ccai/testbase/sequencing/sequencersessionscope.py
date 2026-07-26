@@ -79,7 +79,6 @@ class SequencerSessionScope(SequencerScopeBase):
             handled = True
 
         self._scope_node.finalize()
-        logger.error("DEBUG STACK BEFORE POP: %s", self._sequencer._scope_stack)
         self._sequencer.scope_id_pop(self._scope_name)
         logger.info("SESSION EXIT: {}".format(self._scope_id))
         return handled

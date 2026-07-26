@@ -76,7 +76,8 @@ class CLIDiagnosticIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=True, postrun_diagnostic=False,
-                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
+                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None,
+                timeout=None
             )
 
         mock_prerun_diag.assert_called_once_with({})
@@ -117,7 +118,8 @@ class CLIDiagnosticIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=True,
-                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
+                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None,
+                timeout=None
             )
 
         mock_postrun_diag.assert_called_once_with({})
@@ -156,7 +158,8 @@ class CLIDiagnosticIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=True, postrun_diagnostic=True,
-                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
+                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None,
+                timeout=None
             )
 
         mock_prerun_diag.assert_called_once_with({})
@@ -197,7 +200,8 @@ class CLIDiagnosticIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
-                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
+                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None,
+                timeout=None
             )
 
         mock_prerun_diag.assert_not_called()
@@ -260,7 +264,8 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
-                diagnostic_level="5", include_marker_exp=None, exclude_marker_exp=None
+                diagnostic_level="5", include_marker_exp=None, exclude_marker_exp=None,
+                timeout=None
             )
 
         mock_set_level.assert_called_once_with(5)
@@ -297,7 +302,8 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
-                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None
+                diagnostic_level=None, include_marker_exp=None, exclude_marker_exp=None,
+                timeout=None
             )
 
         mock_set_level.assert_not_called()
@@ -336,7 +342,8 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                     job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                     debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                     debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
-                    diagnostic_level="10", include_marker_exp=None, exclude_marker_exp=None
+                    diagnostic_level="10", include_marker_exp=None, exclude_marker_exp=None,
+                    timeout=None
                 )
             self.assertIn("between 1 and 9", str(context.exception))
 
@@ -374,7 +381,8 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                     job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                     debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                     debug_log_level=None, prerun_diagnostic=False, postrun_diagnostic=False,
-                    diagnostic_level="abc", include_marker_exp=None, exclude_marker_exp=None
+                    diagnostic_level="abc", include_marker_exp=None, exclude_marker_exp=None,
+                    timeout=None
                 )
             self.assertIn("integer between 1 and 9", str(context.exception))
 
@@ -411,7 +419,8 @@ class CLIDiagnosticLevelIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 debug_log_level=None, prerun_diagnostic=True, postrun_diagnostic=False,
-                diagnostic_level="3", include_marker_exp=None, exclude_marker_exp=None
+                diagnostic_level="3", include_marker_exp=None, exclude_marker_exp=None,
+                timeout=None
             )
 
         mock_prerun_diag.assert_called_once_with({})

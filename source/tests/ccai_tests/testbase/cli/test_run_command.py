@@ -176,7 +176,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_branch.assert_called_once_with("main")
@@ -213,7 +214,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_build.assert_called_once_with("1.0.0")
@@ -250,7 +252,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_flavor.assert_called_once_with("release")
@@ -287,7 +290,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_job_id.assert_called_once_with("test-job-123")
@@ -324,7 +328,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level="DEBUG", logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_console.assert_called_once_with("DEBUG")
@@ -361,7 +366,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_output.assert_called_once_with("/tmp/results")
@@ -397,7 +403,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
             expected_path = os.path.abspath(tmpdir)
@@ -436,7 +443,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=["test-discovery"], debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_breakpoints.assert_called_once_with(["test-discovery"])
@@ -474,7 +482,8 @@ class RunCommandOptionOverrideTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=["test-discovery"], debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_debugger.assert_called_with('debugpy')
@@ -519,7 +528,8 @@ class RunCommandPathResolutionTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         self.assertIn("does not exist", str(context.exception))
@@ -540,7 +550,8 @@ class RunCommandPathResolutionTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         self.assertIn("/nonexistent/path", str(context.exception))
@@ -580,7 +591,8 @@ class RunCommandDefaultRootHandlingTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
             expected_path = os.path.abspath(tmpdir)
@@ -616,7 +628,8 @@ class RunCommandDefaultRootHandlingTests(unittest.TestCase):
             job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
             debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
             prerun_diagnostic=False, postrun_diagnostic=False,
-            include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+            include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+            timeout=None
         )
 
         expected_path = os.path.abspath(".")
@@ -657,7 +670,8 @@ class RunCommandPythonPathExtensionTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
             expected_parent = os.path.dirname(os.path.abspath(tmpdir))

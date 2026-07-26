@@ -70,7 +70,8 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger='pdb', breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         # Verify override_debug_debugger was called (note: implementation uses 'debugpy' for any debugger value)
@@ -104,7 +105,8 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger='debugpy', breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_debugger.assert_called_with('debugpy')
@@ -138,7 +140,8 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=['test-discovery'], debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_breakpoints.assert_called_once_with(['test-discovery'])
@@ -172,7 +175,8 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=['testrun-start'], debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_breakpoints.assert_called_once_with(['testrun-start'])
@@ -207,7 +211,8 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 debugger='debugpy', breakpoints=['test-discovery', 'testrun-start'],
                 debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_breakpoints.assert_called_once_with(['test-discovery', 'testrun-start'])
@@ -242,7 +247,8 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=['testrun-start'], debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         # When breakpoints are provided without debugger, debugger should default to 'debugpy'
@@ -277,7 +283,8 @@ class CLIDebuggingIntegrationTests(unittest.TestCase):
                 job_owner=None, job_seed=None, job_tag=None, console_level=None, logfile_level=None,
                 debugger=None, breakpoints=None, debug_port=None, debug_port_range=None,
                 prerun_diagnostic=False, postrun_diagnostic=False,
-                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None
+                include_marker_exp=None, exclude_marker_exp=None, debug_log_level=None, diagnostic_level=None,
+                timeout=None
             )
 
         mock_debugger.assert_not_called()

@@ -23,6 +23,8 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tupl
 
 import functools
 import random
+import re
+import re._parser as _regex_parser
 import string
 import unicodedata
 
@@ -1409,6 +1411,179 @@ def builds(target: Callable, *arg_strategies: Strategy,
     """
     return BuildsStrategy(target=target, arg_strategies=arg_strategies,
                           kwarg_strategies=kwarg_strategies)
+
+
+class RegexStrategy(Strategy):
+    """
+        Strategy that generates strings matching a regular expression.
+
+        Generation is REGEX-DIRECTED: the pattern is parsed and the tree walked
+        to construct a matching string.  Rejection sampling — generating random
+        text and filtering — was rejected because it effectively never succeeds
+        for anchored patterns like ``^[a-z]([a-z0-9-]{0,12}[a-z0-9])?$``, and
+        would turn a working strategy into a hang.
+
+        Every generated value is verified against the pattern before being
+        returned.  If the walk ever produces a non-matching string that is a
+        bug here, and failing loudly is far better than feeding
+        non-conformant data into a test that assumes conformance.
+
+        :param pattern: A pattern string or compiled pattern.
+        :param fullmatch: When True the whole string must match, which is what
+            an anchored pattern means in practice.
+    """
+
+    # Fallbacks for unbounded repeats and for `.`, which would otherwise have
+    # no upper bound to draw from.
+    _UNBOUNDED_REPEAT_CAP = 8
+    _ANY_CHARACTERS = string.ascii_lowercase + string.digits
+
+    _CATEGORY_CHARACTERS = {
+        "CATEGORY_DIGIT": string.digits,
+        "CATEGORY_NOT_DIGIT": string.ascii_letters,
+        "CATEGORY_SPACE": " \t",
+        "CATEGORY_NOT_SPACE": string.ascii_letters + string.digits,
+        "CATEGORY_WORD": string.ascii_letters + string.digits + "_",
+        "CATEGORY_NOT_WORD": "-.,;:!?",
+    }
+
+    def __init__(self, pattern, fullmatch: bool = False):
+        if hasattr(pattern, "pattern"):
+            self._compiled = pattern
+        else:
+            self._compiled = re.compile(pattern)
+
+        self._fullmatch = fullmatch
+        self._tree = _regex_parser.parse(self._compiled.pattern,
+                                         self._compiled.flags)
+        return
+
+    def generate(self, rng: random.Random) -> str:
+        produced = self._emit(self._tree, rng)
+
+        check = self._compiled.fullmatch if self._fullmatch \
+            else self._compiled.search
+        if check(produced) is None:
+            errmsg = (
+                "from_regex generated {!r}, which does not match {!r}. "
+                "This is a defect in the pattern walk, not in the "
+                "pattern.".format(produced, self._compiled.pattern)
+            )
+            raise ValueError(errmsg)
+
+        return produced
+
+    def shrink(self, value: str):
+        # Shrinking has to preserve the match, so only prefixes that still
+        # match are offered; anything else would hand the test a value the
+        # strategy could never have produced.
+        check = self._compiled.fullmatch if self._fullmatch \
+            else self._compiled.search
+        for size in range(len(value) - 1, 0, -1):
+            candidate = value[:size]
+            if check(candidate) is not None:
+                yield candidate
+
+    def describe(self) -> str:
+        return "from_regex({!r})".format(self._compiled.pattern)
+
+    def _emit(self, nodes, rng: random.Random) -> str:
+        parts = []
+        for op, arg in nodes:
+            name = str(op)
+            if name == "LITERAL":
+                parts.append(chr(arg))
+            elif name == "NOT_LITERAL":
+                choices = [c for c in self._ANY_CHARACTERS if c != chr(arg)]
+                parts.append(rng.choice(choices))
+            elif name == "IN":
+                parts.append(rng.choice(self._in_characters(arg)))
+            elif name == "ANY":
+                parts.append(rng.choice(self._ANY_CHARACTERS))
+            elif name in ("MAX_REPEAT", "MIN_REPEAT"):
+                low, high, sub = arg
+                if high > self._UNBOUNDED_REPEAT_CAP:
+                    high = max(low, self._UNBOUNDED_REPEAT_CAP)
+                count = rng.randint(low, high)
+                for _ in range(count):
+                    parts.append(self._emit(sub, rng))
+            elif name == "SUBPATTERN":
+                parts.append(self._emit(arg[3], rng))
+            elif name == "BRANCH":
+                parts.append(self._emit(rng.choice(arg[1]), rng))
+            elif name == "AT":
+                # Anchors match a position, not a character.
+                continue
+            elif name == "ATOMIC_GROUP":
+                parts.append(self._emit(arg, rng))
+            else:
+                errmsg = (
+                    "from_regex does not support the {} construct in {!r}. "
+                    "Rewrite the pattern or build the strategy "
+                    "explicitly.".format(name, self._compiled.pattern)
+                )
+                raise ValueError(errmsg)
+
+        return "".join(parts)
+
+    def _in_characters(self, items) -> str:
+        """
+            Resolve a character-class node to the characters it admits.
+
+            :param items: The parsed class members.
+
+            :returns: The admissible characters.
+        """
+        negated = any(str(op) == "NEGATE" for op, _a in items)
+
+        collected = []
+        for op, arg in items:
+            name = str(op)
+            if name == "NEGATE":
+                continue
+            if name == "LITERAL":
+                collected.append(chr(arg))
+            elif name == "RANGE":
+                collected.extend(chr(point)
+                                 for point in range(arg[0], arg[1] + 1))
+            elif name == "CATEGORY":
+                collected.extend(
+                    self._CATEGORY_CHARACTERS.get(str(arg), ""))
+            else:
+                errmsg = (
+                    "from_regex does not support {} inside a character class "
+                    "in {!r}.".format(name, self._compiled.pattern)
+                )
+                raise ValueError(errmsg)
+
+        if negated is True:
+            denied = set(collected)
+            collected = [c for c in self._ANY_CHARACTERS if c not in denied]
+
+        if len(collected) == 0:
+            errmsg = (
+                "from_regex found an empty character class in {!r}.".format(
+                    self._compiled.pattern)
+            )
+            raise ValueError(errmsg)
+
+        return "".join(collected)
+
+
+def from_regex(pattern, fullmatch: bool = False) -> RegexStrategy:
+    """
+        Creates a strategy that generates strings matching a regex.
+
+        Example::
+
+            _name = st.from_regex(re.compile(r"^[a-z][a-z0-9-]{0,12}$"),
+                                  fullmatch=True)
+
+        :param pattern: A pattern string or compiled pattern.
+        :param fullmatch: When True the whole generated string must match.
+        :returns: A ``RegexStrategy`` instance.
+    """
+    return RegexStrategy(pattern, fullmatch=fullmatch)
 
 
 # ``SearchStrategy`` is what other property libraries call this base class, and

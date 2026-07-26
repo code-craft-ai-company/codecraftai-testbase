@@ -8,9 +8,11 @@
 
 import unittest
 import random
+import re
 import unicodedata
 
 from ccai.testbase.properties.strategies import (
+    from_regex,
     Strategy,
     IntegerStrategy,
     FloatStrategy,
@@ -1171,6 +1173,78 @@ class CharacterCategoryFilterTests(unittest.TestCase):
         """
         with self.assertRaises(ValueError):
             characters(characters="abc", blacklist_categories=("L",))
+
+
+class RegexStrategyTests(unittest.TestCase):
+    """
+        Verifies regex-directed generation.
+    """
+
+    _DNS_LABEL = r"^[a-z]([a-z0-9-]{0,12}[a-z0-9])?$"
+
+    def test_generates_only_matching_values(self):
+        strategy = from_regex(re.compile(self._DNS_LABEL), fullmatch=True)
+        rng = random.Random(31)
+
+        for _ in range(300):
+            self.assertRegex(strategy.generate(rng), self._DNS_LABEL)
+
+    def test_accepts_a_pattern_string(self):
+        strategy = from_regex(r"^[0-9]{4}$", fullmatch=True)
+        rng = random.Random(32)
+
+        value = strategy.generate(rng)
+        self.assertEqual(len(value), 4)
+        self.assertTrue(value.isdigit())
+
+    def test_branches_are_both_reachable(self):
+        strategy = from_regex(r"^(foo|bar)$", fullmatch=True)
+        rng = random.Random(33)
+
+        seen = {strategy.generate(rng) for _ in range(200)}
+        self.assertEqual(seen, {"foo", "bar"})
+
+    def test_bounded_repeat_respects_its_range(self):
+        strategy = from_regex(r"^[a-z]{2,4}$", fullmatch=True)
+        rng = random.Random(34)
+
+        for _ in range(200):
+            self.assertIn(len(strategy.generate(rng)), (2, 3, 4))
+
+    def test_escape_classes_are_honoured(self):
+        strategy = from_regex(r"^\d{3}$", fullmatch=True)
+        rng = random.Random(35)
+
+        for _ in range(100):
+            self.assertTrue(strategy.generate(rng).isdigit())
+
+    def test_negated_class_excludes_its_members(self):
+        strategy = from_regex(r"^[^0-9]{3}$", fullmatch=True)
+        rng = random.Random(36)
+
+        for _ in range(100):
+            for character in strategy.generate(rng):
+                self.assertFalse(character.isdigit())
+
+    def test_shrink_only_offers_matching_values(self):
+        """
+            A shrunk value must still match, or the test would be handed
+            something the strategy could never have produced.
+        """
+        strategy = from_regex(re.compile(self._DNS_LABEL), fullmatch=True)
+
+        for candidate in strategy.shrink("abc-def-ghi"):
+            self.assertRegex(candidate, self._DNS_LABEL)
+
+    def test_unsupported_construct_is_reported(self):
+        """
+            A lookahead cannot be generated forward, so it raises with the
+            construct named rather than silently producing something else.
+        """
+        strategy = from_regex(re.compile(r"(?=x)y"), fullmatch=True)
+
+        with self.assertRaises(ValueError):
+            strategy.generate(random.Random(37))
 
 
 if __name__ == '__main__':

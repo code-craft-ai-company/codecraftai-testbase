@@ -24,6 +24,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tupl
 import functools
 import random
 import string
+import unicodedata
 
 
 class Strategy:
@@ -332,19 +333,77 @@ class CharacterStrategy(Strategy):
     def __init__(self, categories: Optional[Tuple[str, ...]] = None,
                  characters: Optional[str] = None,
                  min_codepoint: Optional[int] = None,
-                 max_codepoint: Optional[int] = None):
+                 max_codepoint: Optional[int] = None,
+                 whitelist_categories: Optional[Tuple[str, ...]] = None,
+                 blacklist_categories: Optional[Tuple[str, ...]] = None):
+        # whitelist_categories is the same request as categories, under the
+        # name callers coming from other property libraries already use.
+        allowed = categories
+        if allowed is None:
+            allowed = whitelist_categories
+
         if characters is not None:
-            self._characters = characters
+            selected = characters
         elif min_codepoint is not None or max_codepoint is not None:
-            self._characters = self._from_codepoints(
+            selected = self._from_codepoints(
                 min_codepoint=min_codepoint, max_codepoint=max_codepoint)
-        elif categories is not None:
+        elif allowed is not None:
             chars = ""
-            for cat in categories:
+            for cat in allowed:
                 chars += self._CATEGORY_MAP.get(cat, "")
-            self._characters = chars if chars else string.printable
+            selected = chars if chars else string.printable
         else:
-            self._characters = string.printable
+            selected = string.printable
+
+        if blacklist_categories is not None:
+            selected = self._without_categories(
+                selected, excluded=blacklist_categories)
+
+        self._characters = selected
+
+    @classmethod
+    def _without_categories(cls, selected: str, *,
+                            excluded: Tuple[str, ...]) -> str:
+        """
+            Drop characters belonging to any excluded unicode category.
+
+            Matching uses each character's REAL unicode category rather than
+            the approximate ``_CATEGORY_MAP``, because that map only covers a
+            handful of ASCII sets and the categories callers exclude — ``Cs``
+            for surrogates, ``Cc`` for control characters — are not in it.  A
+            one-letter code matches the whole major class, so ``C`` excludes
+            ``Cc``, ``Cf`` and ``Cs`` alike.
+
+            :param selected: The character set to filter.
+            :param excluded: The unicode categories to remove.
+
+            :returns: The filtered character set.
+
+            :raises ValueError: When the exclusion removes everything, which
+                means the request cannot be satisfied and would otherwise fail
+                later inside ``generate``.
+        """
+        wanted = set(excluded)
+        majors = {code for code in wanted if len(code) == 1}
+
+        kept = []
+        for character in selected:
+            category = unicodedata.category(character)
+            if category in wanted:
+                continue
+            if category[:1] in majors:
+                continue
+            kept.append(character)
+
+        if len(kept) == 0:
+            errmsg = (
+                "characters() blacklist_categories={} removes every "
+                "candidate character.".format(tuple(excluded))
+            )
+            raise ValueError(errmsg)
+
+        rtnval = "".join(kept)
+        return rtnval
 
     @classmethod
     def _from_codepoints(cls, *, min_codepoint: Optional[int],
@@ -1147,7 +1206,10 @@ def just(value: Any) -> JustStrategy:
 def characters(categories: Optional[Tuple[str, ...]] = None,
                characters: Optional[str] = None,
                min_codepoint: Optional[int] = None,
-               max_codepoint: Optional[int] = None) -> CharacterStrategy:
+               max_codepoint: Optional[int] = None,
+               whitelist_categories: Optional[Tuple[str, ...]] = None,
+               blacklist_categories: Optional[Tuple[str, ...]] = None
+               ) -> CharacterStrategy:
     """
         Creates a strategy that generates single characters.
 
@@ -1161,11 +1223,18 @@ def characters(categories: Optional[Tuple[str, ...]] = None,
         :param characters: An explicit set of characters to choose from.
         :param min_codepoint: Inclusive lower bound of a codepoint range.
         :param max_codepoint: Inclusive upper bound of a codepoint range.
+        :param whitelist_categories: Unicode categories to generate from; the
+            same request as ``categories``, under the name callers coming from
+            other property libraries use.
+        :param blacklist_categories: Unicode categories to exclude, applied
+            after the base set is chosen so it composes with any of the above.
         :returns: A ``CharacterStrategy`` instance.
     """
     return CharacterStrategy(categories=categories, characters=characters,
                              min_codepoint=min_codepoint,
-                             max_codepoint=max_codepoint)
+                             max_codepoint=max_codepoint,
+                             whitelist_categories=whitelist_categories,
+                             blacklist_categories=blacklist_categories)
 
 
 def explicit(values: Sequence) -> ExplicitStrategy:

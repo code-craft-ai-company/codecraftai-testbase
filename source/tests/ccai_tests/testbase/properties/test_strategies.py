@@ -8,6 +8,7 @@
 
 import unittest
 import random
+import unicodedata
 
 from ccai.testbase.properties.strategies import (
     Strategy,
@@ -1094,6 +1095,82 @@ class CharacterCodepointTests(unittest.TestCase):
 
         for _ in range(50):
             self.assertTrue(strategy.generate(rng).isdigit())
+
+
+class CharacterCategoryFilterTests(unittest.TestCase):
+    """
+        Verifies whitelist/blacklist category support on ``characters()``.
+    """
+
+    def test_whitelist_categories_selects_those_categories(self):
+        strategy = characters(whitelist_categories=("Ll", "Lu"))
+        rng = random.Random(21)
+
+        for _ in range(200):
+            self.assertTrue(strategy.generate(rng).isalpha())
+
+    def test_whitelist_categories_matches_categories(self):
+        """
+            whitelist_categories is the same request as categories.
+        """
+        rng_a = random.Random(22)
+        rng_b = random.Random(22)
+
+        first = characters(categories=("Nd",))
+        second = characters(whitelist_categories=("Nd",))
+
+        self.assertEqual([first.generate(rng_a) for _ in range(20)],
+                         [second.generate(rng_b) for _ in range(20)])
+
+    def test_categories_takes_precedence_over_whitelist(self):
+        strategy = characters(categories=("Nd",),
+                              whitelist_categories=("Lu",))
+        rng = random.Random(23)
+
+        for _ in range(50):
+            self.assertTrue(strategy.generate(rng).isdigit())
+
+    def test_blacklist_excludes_control_and_surrogate_categories(self):
+        """
+            Cc and Cs are the categories callers actually exclude, and neither
+            appears in the approximate _CATEGORY_MAP — so exclusion has to use
+            each character's real unicode category.
+        """
+        strategy = characters(min_codepoint=0, max_codepoint=300,
+                              blacklist_categories=("Cc", "Cs"))
+        rng = random.Random(24)
+
+        for _ in range(500):
+            category = unicodedata.category(strategy.generate(rng))
+            self.assertNotIn(category, ("Cc", "Cs"))
+
+    def test_blacklist_major_class_excludes_its_subcategories(self):
+        """
+            A one-letter code matches the whole major class.
+        """
+        strategy = characters(min_codepoint=0, max_codepoint=300,
+                              blacklist_categories=("C",))
+        rng = random.Random(25)
+
+        for _ in range(300):
+            category = unicodedata.category(strategy.generate(rng))
+            self.assertNotEqual(category[:1], "C")
+
+    def test_blacklist_composes_with_an_explicit_set(self):
+        strategy = characters(characters="ab1!",
+                             blacklist_categories=("Nd",))
+        rng = random.Random(26)
+
+        for _ in range(50):
+            self.assertNotEqual(strategy.generate(rng), "1")
+
+    def test_blacklist_that_removes_everything_is_refused(self):
+        """
+            An exclusion leaving no candidates raises here rather than failing
+            later inside generate().
+        """
+        with self.assertRaises(ValueError):
+            characters(characters="abc", blacklist_categories=("L",))
 
 
 if __name__ == '__main__':

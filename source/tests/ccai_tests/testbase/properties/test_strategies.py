@@ -1015,5 +1015,86 @@ class NewStrategyReproducibilityTests(unittest.TestCase):
         )
 
 
+class CharacterCodepointTests(unittest.TestCase):
+    """
+        Verifies the codepoint range support on ``characters()``.
+    """
+
+    def test_codepoint_range_bounds_the_output(self):
+        """
+            Every generated character falls inside the requested range.
+        """
+        strategy = characters(min_codepoint=33, max_codepoint=126)
+        rng = random.Random(11)
+
+        for _ in range(500):
+            point = ord(strategy.generate(rng))
+            self.assertGreaterEqual(point, 33)
+            self.assertLessEqual(point, 126)
+
+    def test_codepoint_range_is_inclusive_at_both_ends(self):
+        """
+            A single-codepoint range yields exactly that character.
+        """
+        strategy = characters(min_codepoint=65, max_codepoint=65)
+        rng = random.Random(12)
+
+        self.assertEqual(strategy.generate(rng), "A")
+
+    def test_min_codepoint_alone_defaults_the_upper_bound(self):
+        strategy = characters(min_codepoint=48)
+        rng = random.Random(13)
+
+        for _ in range(50):
+            self.assertGreaterEqual(ord(strategy.generate(rng)), 48)
+
+    def test_max_codepoint_alone_defaults_the_lower_bound(self):
+        strategy = characters(max_codepoint=57)
+        rng = random.Random(14)
+
+        for _ in range(50):
+            self.assertLessEqual(ord(strategy.generate(rng)), 57)
+
+    def test_surrogates_are_excluded(self):
+        """
+            Surrogate codepoints are skipped.
+
+            They are not independently encodable, so a generated string
+            containing one cannot be written out — and that failure would
+            surface far away from the strategy that produced it.
+        """
+        strategy = characters(min_codepoint=0xD7FF, max_codepoint=0xE000)
+        rng = random.Random(15)
+
+        for _ in range(300):
+            point = ord(strategy.generate(rng))
+            self.assertFalse(0xD800 <= point <= 0xDFFF)
+
+    def test_explicit_characters_take_precedence(self):
+        strategy = characters(characters="abc", min_codepoint=33,
+                              max_codepoint=126)
+        rng = random.Random(16)
+
+        for _ in range(50):
+            self.assertIn(strategy.generate(rng), "abc")
+
+    def test_inverted_range_is_refused(self):
+        """
+            An inverted range raises rather than silently widening.
+
+            It is always a mistake at the call site, and quietly returning
+            some other character set would hide it.
+        """
+        with self.assertRaises(ValueError):
+            characters(min_codepoint=99, max_codepoint=10)
+
+    def test_categories_still_work_without_codepoints(self):
+        strategy = characters(categories=("Nd",))
+        rng = random.Random(17)
+
+        for _ in range(50):
+            self.assertTrue(strategy.generate(rng).isdigit())
+
+
 if __name__ == '__main__':
     unittest.main()

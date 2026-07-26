@@ -295,12 +295,20 @@ class CharacterStrategy(Strategy):
     """
         Strategy that generates single characters.
 
-        Can generate from unicode categories or an explicit character set.
+        Can generate from a codepoint range, unicode categories, or an
+        explicit character set.
+
+        Precedence is: ``characters``, then a codepoint range, then
+        ``categories``, then all printable characters.
 
         :param categories: Tuple of unicode category identifiers to generate from.
             Currently maps to predefined character sets for simplicity.
         :param characters: An explicit string of characters to choose from.
-            If provided, takes precedence over categories.
+            If provided, takes precedence over everything else.
+        :param min_codepoint: Inclusive lower bound of a codepoint range.
+        :param max_codepoint: Inclusive upper bound of a codepoint range.
+            Either bound may be given alone; the other defaults to 0 or to
+            0x10FFFF respectively.
     """
 
     _CATEGORY_MAP = {
@@ -314,10 +322,22 @@ class CharacterStrategy(Strategy):
         "Z": " \t\n",
     }
 
+    # Codepoints that cannot stand alone in a str: the surrogate range is not
+    # encodable, so including it would make generated text unserialisable.
+    _SURROGATE_FIRST = 0xD800
+    _SURROGATE_LAST = 0xDFFF
+
+    _MAX_CODEPOINT = 0x10FFFF
+
     def __init__(self, categories: Optional[Tuple[str, ...]] = None,
-                 characters: Optional[str] = None):
+                 characters: Optional[str] = None,
+                 min_codepoint: Optional[int] = None,
+                 max_codepoint: Optional[int] = None):
         if characters is not None:
             self._characters = characters
+        elif min_codepoint is not None or max_codepoint is not None:
+            self._characters = self._from_codepoints(
+                min_codepoint=min_codepoint, max_codepoint=max_codepoint)
         elif categories is not None:
             chars = ""
             for cat in categories:
@@ -325,6 +345,52 @@ class CharacterStrategy(Strategy):
             self._characters = chars if chars else string.printable
         else:
             self._characters = string.printable
+
+    @classmethod
+    def _from_codepoints(cls, *, min_codepoint: Optional[int],
+                         max_codepoint: Optional[int]) -> str:
+        """
+            Build the character set spanning a codepoint range.
+
+            Surrogates are excluded: they are not independently encodable, so
+            a generated string containing one cannot be written out, and the
+            failure would surface far from here.
+
+            :param min_codepoint: Inclusive lower bound, or None for 0.
+            :param max_codepoint: Inclusive upper bound, or None for the
+                maximum codepoint.
+
+            :returns: The character set.
+
+            :raises ValueError: When the range is inverted or empty, which is
+                always a mistake at the call site rather than something to
+                silently widen.
+        """
+        low = min_codepoint if min_codepoint is not None else 0
+        high = max_codepoint if max_codepoint is not None else \
+            cls._MAX_CODEPOINT
+
+        if low > high:
+            errmsg = (
+                "characters() received an inverted codepoint range: "
+                "min_codepoint={} is above max_codepoint={}.".format(low, high)
+            )
+            raise ValueError(errmsg)
+
+        selected = [
+            chr(point) for point in range(low, high + 1)
+            if not (cls._SURROGATE_FIRST <= point <= cls._SURROGATE_LAST)
+        ]
+
+        if len(selected) == 0:
+            errmsg = (
+                "characters() codepoint range {}..{} selects no usable "
+                "characters.".format(low, high)
+            )
+            raise ValueError(errmsg)
+
+        rtnval = "".join(selected)
+        return rtnval
 
     def generate(self, rng: random.Random) -> str:
         return rng.choice(self._characters)
@@ -1079,15 +1145,27 @@ def just(value: Any) -> JustStrategy:
 
 
 def characters(categories: Optional[Tuple[str, ...]] = None,
-               characters: Optional[str] = None) -> CharacterStrategy:
+               characters: Optional[str] = None,
+               min_codepoint: Optional[int] = None,
+               max_codepoint: Optional[int] = None) -> CharacterStrategy:
     """
         Creates a strategy that generates single characters.
 
+        A codepoint range is the usual way to ask for a band such as
+        printable ASCII::
+
+            st.text(alphabet=st.characters(min_codepoint=33,
+                                           max_codepoint=126))
+
         :param categories: Tuple of unicode category identifiers.
         :param characters: An explicit set of characters to choose from.
+        :param min_codepoint: Inclusive lower bound of a codepoint range.
+        :param max_codepoint: Inclusive upper bound of a codepoint range.
         :returns: A ``CharacterStrategy`` instance.
     """
-    return CharacterStrategy(categories=categories, characters=characters)
+    return CharacterStrategy(categories=categories, characters=characters,
+                             min_codepoint=min_codepoint,
+                             max_codepoint=max_codepoint)
 
 
 def explicit(values: Sequence) -> ExplicitStrategy:

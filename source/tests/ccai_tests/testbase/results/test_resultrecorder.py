@@ -453,14 +453,17 @@ class ResultRecorderLifecycleContextManagerTests(unittest.TestCase):
             pipeline_info=self.pipeline_info,
             job_info=self.job_info
         )
-        
-        # Before entering, the summary HTML should not exist in output dir
-        summary_html_dest = os.path.join(self.temp_dir, "testsummary.html")
-        self.assertFalse(os.path.exists(summary_html_dest))
-        
+
+        # In the near-standalone testbase framework, initialize_report's
+        # observable effect is the output-directory catalog.  (Publishing the
+        # HTML summary template is an integration-tier concern -- see
+        # IntegrationJsonResultRecorder in codecraftai-integration-runtime.)
+        catalog_file = os.path.join(self.temp_dir, "catalog.json")
+        self.assertFalse(os.path.exists(catalog_file))
+
         with recorder:
-            # After entering, initialize_report should have copied the template
-            self.assertTrue(os.path.exists(summary_html_dest))
+            # After entering, initialize_report should have written the catalog
+            self.assertTrue(os.path.exists(catalog_file))
 
     def test_enter_calls_update_summary(self):
         """Test that __enter__ calls update_summary (Requirement 24.1)."""
@@ -718,8 +721,14 @@ class ResultRecorderInitializationTests(unittest.TestCase):
         # But should have same content
         self.assertEqual(summary1["runid"], summary2["runid"])
 
-    def test_initialize_report_copies_summary_template(self):
-        """Test that initialize_report copies summary template (Requirement 25.2)."""
+    def test_initialize_report_does_not_publish_html(self):
+        """
+        Pin the near-standalone contract: initialize_report does NOT copy the
+        HTML summary template.  That behaviour was deliberately relocated to
+        IntegrationJsonResultRecorder in codecraftai-integration-runtime,
+        which overrides initialize_report to publish the HTML presentation
+        before delegating here for the catalog.
+        """
         recorder = JsonResultRecorder(
             runid=self.runid,
             start=self.start,
@@ -728,13 +737,12 @@ class ResultRecorderInitializationTests(unittest.TestCase):
             pipeline_info=self.pipeline_info,
             job_info=self.job_info
         )
-        
-        summary_html_dest = os.path.join(self.temp_dir, "testsummary.html")
-        self.assertFalse(os.path.exists(summary_html_dest))
-        
+
         recorder.initialize_report()
-        
-        self.assertTrue(os.path.exists(summary_html_dest))
+
+        summary_html_dest = os.path.join(self.temp_dir, "testsummary.html")
+        self.assertFalse(os.path.exists(summary_html_dest),
+                         "The base recorder must not publish HTML; that is integration-tier behaviour.")
 
     def test_initialize_report_calls_catalog_output_directory(self):
         """Test that initialize_report calls catalog_output_directory (Requirement 25.3)."""
@@ -753,8 +761,12 @@ class ResultRecorderInitializationTests(unittest.TestCase):
         catalog_file = os.path.join(self.temp_dir, "catalog.json")
         self.assertTrue(os.path.exists(catalog_file))
 
-    def test_update_render_environment_copies_static_resources(self):
-        """Test that update_render_environment copies static resources (Requirement 25.4)."""
+    def test_update_render_environment_is_a_noop(self):
+        """
+        Pin the near-standalone contract: update_render_environment copies
+        nothing.  Static-resource publishing was deliberately relocated to
+        IntegrationJsonResultRecorder in codecraftai-integration-runtime.
+        """
         recorder = JsonResultRecorder(
             runid=self.runid,
             start=self.start,
@@ -763,13 +775,14 @@ class ResultRecorderInitializationTests(unittest.TestCase):
             pipeline_info=self.pipeline_info,
             job_info=self.job_info
         )
-        
+
         dest_css = os.path.join(self.static_dest_dir, "style.css")
         self.assertFalse(os.path.exists(dest_css))
-        
+
         recorder.update_render_environment()
-        
-        self.assertTrue(os.path.exists(dest_css))
+
+        self.assertFalse(os.path.exists(dest_css),
+                         "The base recorder must not deploy static resources; that is integration-tier behaviour.")
 
 
 class ResultRecorderFinalizationTests(unittest.TestCase):

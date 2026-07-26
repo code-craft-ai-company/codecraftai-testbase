@@ -519,9 +519,11 @@ class EndToEndRecordingIntegrationTests(unittest.TestCase):
         self.assertIn("files", catalog)
         self.assertIn("folders", catalog)
         
-        # Verify HTML template was copied
+        # The HTML summary template is deliberately NOT copied by the
+        # near-standalone recorder -- publishing the HTML presentation is
+        # IntegrationJsonResultRecorder behaviour (codecraftai-integration-runtime).
         html_file = os.path.join(self.temp_dir, "testsummary.html")
-        self.assertTrue(os.path.exists(html_file))
+        self.assertFalse(os.path.exists(html_file))
 
     def test_context_manager_handles_exception_gracefully(self):
         """

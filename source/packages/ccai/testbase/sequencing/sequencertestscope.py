@@ -127,12 +127,21 @@ class SequencerTestScope:
         self._parent_scope_id, self._scope_id = self._sequencer.scope_id_create(self._context_identifier)
         logger.info("TEST SCOPE ENTER: {}, {}".format(self._context_identifier, self._scope_id))
 
-        self._tc_byproducts_folder = self._sequencer.output_context.get_testcase_byproducts_dir(self._scope_id)
-        self._activity_stream_filename = os.path.join(self._tc_byproducts_folder, "activity.jsos")
-        
-        self._result = self._sequencer.create_test_result_node(self._scope_id, self._test_name, self._monikers, self._pivots, parent_inst=self._parent_scope_id)
-        self._recorder.preview(self._result)
-        self._test_scope_enter()
+        try:
+            self._tc_byproducts_folder = self._sequencer.output_context.get_testcase_byproducts_dir(self._scope_id)
+            self._activity_stream_filename = os.path.join(self._tc_byproducts_folder, "activity.jsos")
+
+            self._result = self._sequencer.create_test_result_node(self._scope_id, self._test_name, self._monikers, self._pivots, parent_inst=self._parent_scope_id)
+            self._recorder.preview(self._result)
+            self._test_scope_enter()
+        except BaseException:
+            # If __enter__ raises, Python never calls __exit__, so the scope
+            # id pushed above would be left on the stack.  Every OUTER scope's
+            # pop would then fail its name check, burying the real error under
+            # a cascade of scope-stack RuntimeErrors.  Pop what we pushed and
+            # let the true failure surface.
+            self._sequencer.scope_id_pop(self._context_identifier)
+            raise
         return self
 
     def __exit__(self, ex_type: Type, ex_inst: BaseException, ex_tb: TracebackType) -> bool:

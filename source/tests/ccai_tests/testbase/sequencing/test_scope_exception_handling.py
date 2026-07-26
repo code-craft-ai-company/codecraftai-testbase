@@ -515,5 +515,71 @@ class TestTestSetupScopeExceptionHandling(unittest.TestCase):
         self.assertGreater(len(result.errors), 0)
 
 
+class TestScopeEnterFailureHygiene(unittest.TestCase):
+    """
+    A scope's __enter__ pushes its id onto the scope stack and then does
+    fallible work (by-products directory creation, result-node recording).
+    If that work raises, Python never calls __exit__, so an unguarded
+    __enter__ leaves its id on the stack -- and every OUTER scope's pop then
+    fails its name check, burying the real error under a cascade of
+    scope-stack RuntimeErrors.  These tests pin that __enter__ cleans up
+    after itself: after a failed enter, the stack is exactly as it was.
+    """
+
+    def setUp(self):
+        self.tempdir = tempfile.TemporaryDirectory()
+
+        self._prev_output_dir = os.environ.get("AM_OUTPUT_DIRECTORY", None)
+        os.environ["AM_OUTPUT_DIRECTORY"] = self.tempdir.name
+
+        self.seq = MockSequencer()
+        self.rec = MockRecorder()
+
+    def tearDown(self):
+        if self._prev_output_dir is None:
+            os.environ.pop("AM_OUTPUT_DIRECTORY", None)
+        else:
+            os.environ["AM_OUTPUT_DIRECTORY"] = self._prev_output_dir
+
+        self.tempdir.cleanup()
+
+    def test_test_scope_enter_failure_leaves_stack_balanced(self):
+        scope = SequencerTestScope(self.seq, self.rec, "test_function")
+
+        def raise_enoent(test_id):
+            raise FileNotFoundError(2, "No such file or directory")
+
+        self.seq.output_context.get_testcase_byproducts_dir = raise_enoent
+
+        with self.assertRaises(FileNotFoundError):
+            scope.__enter__()
+
+        self.assertEqual(len(self.seq._scope_stack), 0,
+                         "A failed __enter__ must pop the scope id it pushed.")
+
+    def test_module_scope_enter_failure_leaves_stack_balanced(self):
+        scope = SequencerModuleScope(self.seq, self.rec, "package.module")
+
+        def raise_from_recorder(result):
+            raise RuntimeError("recorder unavailable")
+
+        self.rec.record = raise_from_recorder
+
+        with self.assertRaises(RuntimeError):
+            scope.__enter__()
+
+        self.assertEqual(len(self.seq._scope_stack), 0,
+                         "A failed __enter__ must pop the scope id it pushed.")
+
+    def test_test_scope_enter_success_leaves_scope_pushed(self):
+        # The guard must not overcorrect: a successful enter leaves the scope
+        # on the stack for __exit__ to pop.
+        scope = SequencerTestScope(self.seq, self.rec, "test_function")
+        scope.__enter__()
+        self.assertEqual(len(self.seq._scope_stack), 1)
+        scope.__exit__(None, None, None)
+        self.assertEqual(len(self.seq._scope_stack), 0)
+
+
 if __name__ == "__main__":
     unittest.main()

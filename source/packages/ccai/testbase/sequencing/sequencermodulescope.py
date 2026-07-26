@@ -52,8 +52,16 @@ class SequencerModuleScope(SequencerScopeBase):
 
     def __enter__(self):
         self._parent_scope_id, self._scope_id = self._sequencer.scope_id_create(self._scope_name)
-        result = self._sequencer.create_test_result_container(self._scope_id, self._scope_name, parent_inst=self._parent_scope_id)
-        self._recorder.record(result)
+        try:
+            result = self._sequencer.create_test_result_container(self._scope_id, self._scope_name, parent_inst=self._parent_scope_id)
+            self._recorder.record(result)
+        except BaseException:
+            # If __enter__ raises, Python never calls __exit__, so the scope
+            # id pushed above would be left on the stack and every outer
+            # scope's pop would fail its name check, burying the real error.
+            # Pop what we pushed and let the true failure surface.
+            self._sequencer.scope_id_pop(self._scope_name)
+            raise
         logger.info("MODULE ENTER: {}, {}".format(self._scope_name, self._scope_id))
         return self
 

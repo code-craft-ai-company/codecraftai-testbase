@@ -32,6 +32,38 @@ from ccai.testbase import environment
 TRANSLATE_TABLE_NORMALIZE_FOR_PATH = str.maketrans(",.:;", "    ")
 
 
+def ensure_directory(target: str) -> None:
+    """
+        Creates a directory and any missing parents WITHOUT consulting
+        ``os.path.exists``.
+
+        ``os.makedirs`` internally checks ``os.path.exists`` to decide whether
+        a parent needs creating -- and ``os.path.exists`` is one of the most
+        commonly patched functions in tests.  A resource factory that patches
+        it to return ``True`` makes ``os.makedirs`` skip a genuinely missing
+        parent and then fail with ``FileNotFoundError`` on the leaf, killing
+        the run from inside the framework.  This helper only issues
+        ``os.mkdir`` calls and classifies the FILESYSTEM's own errors, so a
+        patched ``exists`` cannot mislead it in either direction.
+
+        :param target: The absolute directory path to create.
+    """
+    try:
+        os.mkdir(target)
+    except FileExistsError:
+        return
+    except FileNotFoundError:
+        parent = os.path.dirname(target)
+        if parent == target:
+            raise
+        ensure_directory(parent)
+        try:
+            os.mkdir(target)
+        except FileExistsError:
+            pass
+    return
+
+
 def normalize_name_for_path(name: str) -> str:
     """
         Normalises an identifier so it can be used as a path segment.
@@ -142,19 +174,19 @@ class SimpleOutputContext(IOutputContext):
 
     def get_test_results_dir(self) -> str:
         results_dir = self._base_dir
-        os.makedirs(results_dir, exist_ok=True)
+        ensure_directory(results_dir)
         return results_dir
 
     def get_testcase_byproducts_dir(self, test_id: str) -> str:
         safe_id = normalize_name_for_path(test_id)
         byproducts_dir = os.path.join(self._base_dir, "testcase_byproducts", safe_id)
-        os.makedirs(byproducts_dir, exist_ok=True)
+        ensure_directory(byproducts_dir)
         return byproducts_dir
 
     def get_diagnostics_dir(self, label: str) -> str:
         safe_label = normalize_name_for_path(label)
         diagnostics_dir = os.path.join(self._base_dir, "diagnostics", safe_label)
-        os.makedirs(diagnostics_dir, exist_ok=True)
+        ensure_directory(diagnostics_dir)
         return diagnostics_dir
 
     def get_summary_template_source(self) -> Optional[str]:

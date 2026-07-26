@@ -18,8 +18,8 @@
 
 import unittest
 
-from ccai.testbase.properties import assume, given
-from ccai.testbase.properties import strategies as st
+from hypothesis import given, settings, assume, HealthCheck
+from hypothesis import strategies as st
 
 from ccai.testbase.injection.injectionscope import InjectionScope
 from ccai.testbase.injection.injectionmoment import InjectionMoment
@@ -126,6 +126,7 @@ class InjectionScopePropertyTests(unittest.TestCase):
     """Property-based tests for InjectionScope invariants."""
 
     @given(resource_origin_strategy())
+    @settings(max_examples=100)
     def test_property_registered_resource_origin_is_retrievable(self, origin):
         """
         **Feature: dependencies, Property 1: Registered origins retrievable**
@@ -145,7 +146,8 @@ class InjectionScopePropertyTests(unittest.TestCase):
             f"Origin '{origin.identifier}' at scope '{origin.originating_scope}' should be retrievable"
         )
 
-    @given(validator_origin_strategy(), constraints={"max_examples": 100})
+    @given(validator_origin_strategy())
+    @settings(max_examples=100)
     def test_property_registered_validator_origin_is_retrievable(self, validator):
         """
         **Feature: dependencies, Property 1: Registered origins retrievable**
@@ -165,7 +167,8 @@ class InjectionScopePropertyTests(unittest.TestCase):
             f"Validator '{validator.identifier}' at scope '{validator.originating_scope}' should be retrievable"
         )
 
-    @given(multiple_origins_strategy(), constraints={"max_examples": 100})
+    @given(multiple_origins_strategy())
+    @settings(max_examples=100, suppress_health_check=[HealthCheck.too_slow])
     def test_property_all_registered_origins_are_retrievable(self, origins):
         """
         **Feature: dependencies, Property 1: Registered origins retrievable**
@@ -187,7 +190,8 @@ class InjectionScopePropertyTests(unittest.TestCase):
                 f"Origin '{origin.identifier}' at scope '{origin.originating_scope}' should be retrievable"
             )
 
-    @given(resource_origin_strategy(), constraints={"max_examples": 100})
+    @given(resource_origin_strategy())
+    @settings(max_examples=100)
     def test_property_scope_lookup_returns_correct_scope(self, origin):
         """
         **Feature: dependencies, Property 1: Registered origins retrievable**
@@ -224,7 +228,8 @@ class InjectionScopePruningPropertyTests(unittest.TestCase):
         mock_func.__name__ = func_name
         return InjectionMoment(mock_func)
 
-    @given(scope_path_strategy(), constraints={"max_examples": 100})
+    @given(scope_path_strategy())
+    @settings(max_examples=100)
     def test_property_pruning_preserves_relevant_scopes(self, scope_path):
         """
         **Feature: dependencies, Property 2: Pruning preserves relevant scopes**
@@ -257,7 +262,8 @@ class InjectionScopePruningPropertyTests(unittest.TestCase):
             f"Scope '{scope_path}' should be preserved after pruning"
         )
 
-    @given(st.lists(scope_path_strategy(), min_size=1, max_size=5, unique=True), constraints={"max_examples": 100})
+    @given(st.lists(scope_path_strategy(), min_size=1, max_size=5, unique=True))
+    @settings(max_examples=100)
     def test_property_pruning_preserves_all_relevant_scope_paths(self, scope_paths):
         """
         **Feature: dependencies, Property 2: Pruning preserves relevant scopes**
@@ -292,7 +298,8 @@ class InjectionScopePruningPropertyTests(unittest.TestCase):
                 f"Scope '{scope_path}' should be preserved after pruning"
             )
 
-    @given(scope_path_strategy(), scope_path_strategy(), constraints={"max_examples": 100})
+    @given(scope_path_strategy(), scope_path_strategy())
+    @settings(max_examples=100)
     def test_property_pruning_removes_non_relevant_scopes(self, relevant_path, non_relevant_path):
         """
         **Feature: dependencies, Property 2: Pruning preserves relevant scopes**
@@ -354,7 +361,8 @@ class InjectionScopeVisibilityPropertyTests(unittest.TestCase):
         mock_func.__name__ = func_name
         return InjectionMoment(mock_func)
 
-    @given(identifier_strategy, scope_path_strategy(), constraints={"max_examples": 100})
+    @given(identifier_strategy, scope_path_strategy())
+    @settings(max_examples=100)
     def test_property_session_params_visible_to_all_scopes(self, identifier, child_scope_path):
         """
         **Feature: dependencies, Property 3: Parameter visibility inheritance**
@@ -392,7 +400,8 @@ class InjectionScopeVisibilityPropertyTests(unittest.TestCase):
             f"Session parameter '{identifier}' should be visible at scope '{child_scope_path}'"
         )
 
-    @given(identifier_strategy, constraints={"max_examples": 100})
+    @given(identifier_strategy)
+    @settings(max_examples=100)
     def test_property_local_params_shadow_parent_params(self, identifier):
         """
         **Feature: dependencies, Property 3: Parameter visibility inheritance**
@@ -426,7 +435,8 @@ class InjectionScopeVisibilityPropertyTests(unittest.TestCase):
         local_origin = scope.parameter_originations[identifier]
         self.assertEqual(local_origin.originating_scope, child_scope)
 
-    @given(st.lists(identifier_strategy, min_size=1, max_size=3, unique=True), constraints={"max_examples": 100})
+    @given(st.lists(identifier_strategy, min_size=1, max_size=3, unique=True))
+    @settings(max_examples=100)
     def test_property_parameter_visibility_accumulates_down_tree(self, identifiers):
         """
         **Feature: dependencies, Property 3: Parameter visibility inheritance**

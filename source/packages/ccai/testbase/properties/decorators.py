@@ -16,11 +16,12 @@ __credits__ = []
 from typing import Optional
 
 import functools
+import inspect
 
 from ccai.testbase.properties.strategies import Strategy
 
 
-def given(**kwargs) -> callable:
+def given(*args, **kwargs) -> callable:
     """
         Decorator that marks a test function as a property-based test.
 
@@ -71,6 +72,18 @@ def given(**kwargs) -> callable:
     # Extract constraints if provided
     prop_constraints = kwargs.pop("constraints", {})
 
+    # Positional strategies bind to the decorated function's parameters in
+    # order, which is how other property libraries allow @given(st.text()).
+    # They are resolved against the signature at decoration time so a
+    # mismatch is reported here rather than as a confusing call error.
+    positional = list(args)
+    for strategy in positional:
+        if not isinstance(strategy, Strategy):
+            raise TypeError(
+                "Expected a Strategy instance for a positional argument, "
+                f"got {type(strategy).__name__}"
+            )
+
     # Validate that all remaining kwargs are Strategy instances
     strategies = {}
     for name, strategy in kwargs.items():
@@ -82,6 +95,26 @@ def given(**kwargs) -> callable:
         strategies[name] = strategy
 
     def decorator(fn):
+        if positional:
+            names = list(inspect.signature(fn).parameters.keys())
+            # Positional strategies fill the LAST parameters, leaving any
+            # leading ones (self, injected fixtures) to testbase's own
+            # injection — matching how the keyword form composes.
+            if len(positional) > len(names):
+                raise TypeError(
+                    f"@given received {len(positional)} positional "
+                    f"strategies but {fn.__name__} takes {len(names)} "
+                    "parameters."
+                )
+            targets = names[len(names) - len(positional):]
+            for name, strategy in zip(targets, positional):
+                if name in strategies:
+                    raise TypeError(
+                        f"@given got both a positional and a keyword "
+                        f"strategy for parameter '{name}'."
+                    )
+                strategies[name] = strategy
+
         @functools.wraps(fn)
         def wrapper(*args, **kw):
             return fn(*args, **kw)

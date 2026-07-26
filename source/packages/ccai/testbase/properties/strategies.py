@@ -335,7 +335,9 @@ class CharacterStrategy(Strategy):
                  min_codepoint: Optional[int] = None,
                  max_codepoint: Optional[int] = None,
                  whitelist_categories: Optional[Tuple[str, ...]] = None,
-                 blacklist_categories: Optional[Tuple[str, ...]] = None):
+                 blacklist_categories: Optional[Tuple[str, ...]] = None,
+                 whitelist_characters: Optional[str] = None,
+                 blacklist_characters: Optional[str] = None):
         # whitelist_categories is the same request as categories, under the
         # name callers coming from other property libraries already use.
         allowed = categories
@@ -358,6 +360,26 @@ class CharacterStrategy(Strategy):
         if blacklist_categories is not None:
             selected = self._without_categories(
                 selected, excluded=blacklist_categories)
+
+        # Character-level allow/deny, applied last so they can rescue or
+        # remove individual characters the category filters got wrong.  These
+        # are distinct from the *_categories arguments: those name unicode
+        # classes, these name literal characters.
+        if whitelist_characters is not None:
+            for character in whitelist_characters:
+                if character not in selected:
+                    selected = selected + character
+
+        if blacklist_characters is not None:
+            denied = set(blacklist_characters)
+            kept = "".join(c for c in selected if c not in denied)
+            if len(kept) == 0:
+                errmsg = (
+                    "characters() blacklist_characters={!r} removes every "
+                    "candidate character.".format(blacklist_characters)
+                )
+                raise ValueError(errmsg)
+            selected = kept
 
         self._characters = selected
 
@@ -472,16 +494,58 @@ class ListStrategy(Strategy):
         :param element: A ``Strategy`` for generating individual list elements.
         :param min_size: Minimum list length. Default is 0.
         :param max_size: Maximum list length. Default is 50.
+        :param unique: When True, no two elements compare equal.
+        :param unique_by: A callable returning the value to compare for
+            uniqueness, e.g. ``unique_by=lambda entry: entry["name"]``.
+            Uniqueness is best-effort: a strategy whose value space is smaller
+            than ``max_size`` yields a shorter list rather than looping.
     """
 
-    def __init__(self, element: Strategy, min_size: int = 0, max_size: int = 50):
+    def __init__(self, element: Strategy, min_size: int = 0,
+                 max_size: int = 50, unique: bool = False,
+                 unique_by=None):
         self._element = element
         self._min_size = min_size
         self._max_size = max_size
+        self._unique = unique
+        self._unique_by = unique_by
+
+    # Uniqueness is best-effort: a strategy with a small value space cannot
+    # always yield max_size distinct values, so generation stops early rather
+    # than looping forever.  min_size is still honoured where the space allows.
+    _UNIQUE_ATTEMPT_FACTOR = 10
 
     def generate(self, rng: random.Random) -> list:
         length = rng.randint(self._min_size, self._max_size)
-        return [self._element.generate(rng) for _ in range(length)]
+
+        if self._unique is False and self._unique_by is None:
+            return [self._element.generate(rng) for _ in range(length)]
+
+        key = self._unique_by
+        if key is None:
+            def key(value):
+                return value
+
+        collected = []
+        seen = set()
+        attempts = 0
+        budget = max(length * self._UNIQUE_ATTEMPT_FACTOR, length + 10)
+
+        while len(collected) < length and attempts < budget:
+            attempts += 1
+            candidate = self._element.generate(rng)
+            marker = key(candidate)
+            try:
+                if marker in seen:
+                    continue
+                seen.add(marker)
+            except TypeError:
+                # An unhashable key still gets uniqueness, just linearly.
+                if marker in [key(v) for v in collected]:
+                    continue
+            collected.append(candidate)
+
+        return collected
 
     def shrink(self, value: list) -> Iterator[list]:
         if len(value) <= self._min_size:
@@ -1134,7 +1198,8 @@ def booleans() -> BooleanStrategy:
     return BooleanStrategy()
 
 
-def lists(element: Strategy, min_size: int = 0, max_size: int = 50) -> ListStrategy:
+def lists(element: Strategy, min_size: int = 0, max_size: int = 50,
+          unique: bool = False, unique_by=None) -> ListStrategy:
     """
         Creates a strategy that generates random lists.
 
@@ -1143,7 +1208,9 @@ def lists(element: Strategy, min_size: int = 0, max_size: int = 50) -> ListStrat
         :param max_size: Maximum list length. Default is 50.
         :returns: A ``ListStrategy`` instance.
     """
-    return ListStrategy(element=element, min_size=min_size, max_size=max_size)
+    return ListStrategy(element=element, min_size=min_size,
+                        max_size=max_size, unique=unique,
+                        unique_by=unique_by)
 
 
 def tuples(*strategies: Strategy) -> TupleStrategy:
@@ -1208,7 +1275,9 @@ def characters(categories: Optional[Tuple[str, ...]] = None,
                min_codepoint: Optional[int] = None,
                max_codepoint: Optional[int] = None,
                whitelist_categories: Optional[Tuple[str, ...]] = None,
-               blacklist_categories: Optional[Tuple[str, ...]] = None
+               blacklist_categories: Optional[Tuple[str, ...]] = None,
+               whitelist_characters: Optional[str] = None,
+               blacklist_characters: Optional[str] = None
                ) -> CharacterStrategy:
     """
         Creates a strategy that generates single characters.
@@ -1234,7 +1303,9 @@ def characters(categories: Optional[Tuple[str, ...]] = None,
                              min_codepoint=min_codepoint,
                              max_codepoint=max_codepoint,
                              whitelist_categories=whitelist_categories,
-                             blacklist_categories=blacklist_categories)
+                             blacklist_categories=blacklist_categories,
+                             whitelist_characters=whitelist_characters,
+                             blacklist_characters=blacklist_characters)
 
 
 def explicit(values: Sequence) -> ExplicitStrategy:
@@ -1338,3 +1409,9 @@ def builds(target: Callable, *arg_strategies: Strategy,
     """
     return BuildsStrategy(target=target, arg_strategies=arg_strategies,
                           kwarg_strategies=kwarg_strategies)
+
+
+# ``SearchStrategy`` is what other property libraries call this base class, and
+# test suites use it in type annotations.  Aliased rather than renamed so
+# existing references to ``Strategy`` keep working.
+SearchStrategy = Strategy

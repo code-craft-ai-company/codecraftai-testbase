@@ -28,7 +28,6 @@ pyyaml = "^6.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
-hypothesis = "^6.100.0"
 
 [tool.poetry.scripts]
 testbase = "ccai.testbase.cli.testbase_command:testbase_root_command"

@@ -2487,6 +2487,14 @@ class TestSequencer:
         # --------------------------------------------------------------------
         for pname, porigin in resource_parameter_originations.items():
 
+            # A parameter this scope already RECEIVES from an ancestor scope is
+            # satisfied -- re-originating it here would both shadow the inherited
+            # value with a fresh one and emit a duplicate argument name into
+            # descendant scope signatures, which is a SyntaxError in the
+            # generated sequence document.
+            if pname in scope_call_args:
+                continue
+
             # Get the parameter names from the factory function signature
             sp_parameter_names = [pn for pn in porigin.source_signature.parameters.keys()]
             sp_constraints = None

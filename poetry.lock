@@ -371,7 +371,7 @@ pymongo = ["pymongo (>=4.13.2,<5.0.0)"]
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-configuration.git"
 reference = "main"
-resolved_reference = "f53b732a0c046c73a65563e1ed5e3b69ce69d2ab"
+resolved_reference = "99bd40962625f5f52ff2e08f1fd6222c4752a968"
 
 [[package]]
 name = "codecraftai-credentials"
@@ -469,7 +469,7 @@ websocket = ["websocket-client (>=1.8.0,<2.0.0)"]
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-integration-runtime.git"
 reference = "main"
-resolved_reference = "553767bb03e8fc1e7abc0253592a3ad1294b1679"
+resolved_reference = "9abb39a0ad6050491c4336c0740436481f58cae4"
 
 [[package]]
 name = "codecraftai-interfaces"
@@ -850,7 +850,7 @@ codecraftai-xmodules = {git = "https://github.com/automationmojo/codecraftai-xmo
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-this-app.git"
 reference = "main"
-resolved_reference = "2716ef86b0fe5ae9532002e9999a56b2e8be3ad7"
+resolved_reference = "663a25692e5c1304b56ca6ec114ac0f0c4810dba"
 
 [[package]]
 name = "codecraftai-waiting"
@@ -887,7 +887,7 @@ debugpy = "^1.8.14"
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-xmodules.git"
 reference = "main"
-resolved_reference = "dfb5191a61ad266c02427aaa2377b0dc53fd4033"
+resolved_reference = "f61677c85978f498664ce6b7ce5ed113964ffd6f"
 
 [[package]]
 name = "colorama"

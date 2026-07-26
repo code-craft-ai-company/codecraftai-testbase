@@ -230,36 +230,19 @@ class IntegrationCoupling(BaseCoupling):
             in registration processes. This enables the framework to ignore couplings
             that are not being included by any test.
 
-            :param kwargs: Variable keyword arguments for framework-specific registration
-                parameters. The specific parameters accepted depend on the derived class
-                implementation.
+            The DEFAULT implementation is a no-op. Framework attachment is an
+            OPTIONAL phase: most couplings do their real work in
+            ``attach_to_environment``, and the near-standalone testbase framework
+            has no framework-level state a coupling must attach to. Integration
+            tiers that do (e.g. the landscape-backed coupling hierarchy) override
+            this hook in their own coupling base classes.
+
+            :param kwargs: Variable keyword arguments for framework-specific
+                registration parameters, forwarded by the sequencer.
 
             :returns: None. This method does not return a value.
-
-            :raises ccai.errors.exceptions.AbstractMethodError: When called on the base
-                :class:`IntegrationCoupling` class without being overloaded by a derived class.
-
-            Example usage::
-
-                class MyIntegration(IntegrationCoupling):
-                    '''
-                        Custom integration implementation.
-                    '''
-
-                    @classmethod
-                    def attach_to_framework(cls, **kwargs):
-                        # Register with framework
-                        framework = kwargs.get('framework')
-                        framework.register_integration(cls)
-                        return
-
-            .. note::
-                This method must be overloaded by derived classes. Calling this method on
-                the base :class:`IntegrationCoupling` class will raise an
-                :class:`AbstractMethodError`.
         """
-        errmsg = "The 'attach_to_framework' method must be overloaded by derived integration coupling types."
-        raise AbstractMethodError(errmsg)
+        return
 
     @classmethod
     def attach_to_environment(cls, **kwargs):

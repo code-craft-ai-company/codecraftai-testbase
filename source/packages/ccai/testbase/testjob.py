@@ -396,18 +396,6 @@ class TestJob(ITestJob):
 
         return
 
-    def fire_activate_configuration(self):
-        self._logger.debug("Firing: fire_activate_configuration")
-        return
-    
-    def fire_activate_integration(self):
-        self._logger.debug("Firing: fire_activate_integration")
-        return
-    
-    def fire_activate_operations(self):
-        self._logger.debug("Firing: fire_activate_operations")
-        return
-
     def fire_diagnostic_capture_post_testrun(self, tseq: TestSequencer, level: int=9):
         """
         Fires the post-run diagnostic capture event, delegating to the TestSequencer.
@@ -510,12 +498,6 @@ class TestJob(ITestJob):
             - :meth:`TestSequencer.diagnostic_capture_pre_testrun`: Performs the capture
         """
         tseq.diagnostic_capture_pre_testrun(level)
-        return
-
-    def fire_establish_presence(self, tseq: TestSequencer):
-
-        tseq.establish_presence()
-
         return
 
     def finalize(self): # pylint: disable=no-self-use

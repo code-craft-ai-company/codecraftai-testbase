@@ -181,19 +181,21 @@ class TestJobLifecycleTests(unittest.TestCase):
         job.fire_attach_to_framework(seq)
         job.fire_diagnostic_capture_pre_testrun(seq, level=1)
         job.fire_diagnostic_capture_post_testrun(seq, level=2)
-        job.fire_establish_presence(seq)
-        job.fire_activate_configuration()
-        job.fire_activate_integration()
-        job.fire_activate_operations()
 
         self.assertIn("env", seq.calls)
         self.assertIn("framework", seq.calls)
         self.assertIn(("pre", 1), seq.calls)
         self.assertIn(("post", 2), seq.calls)
-        self.assertIn("presence", seq.calls)
-        self.assertIn("Firing: fire_activate_configuration", logger.debug_messages)
-        self.assertIn("Firing: fire_activate_integration", logger.debug_messages)
-        self.assertIn("Firing: fire_activate_operations", logger.debug_messages)
+
+    def test_no_landscape_lifecycle_hooks_on_standalone_job(self):
+        # The standalone TestJob deliberately has NO landscape lifecycle hooks:
+        # fire_activate_* and fire_establish_presence belong to the
+        # landscaping-tier LandscapeTestJob.  Pin their absence so they are not
+        # quietly reintroduced here.
+        for hook in ("fire_activate_configuration", "fire_activate_integration",
+                     "fire_activate_operations", "fire_establish_presence"):
+            self.assertFalse(hasattr(TestJob, hook),
+                             "'{}' must not exist on the standalone TestJob.".format(hook))
 
 
 class TestJobStandaloneMetadataTests(unittest.TestCase):

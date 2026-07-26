@@ -143,7 +143,6 @@ class IntegrationCouplingTests(unittest.TestCase):
         """Ensure each abstract method raises ``AbstractMethodError``."""
 
         methods = [
-            IntegrationCoupling.attach_to_framework,
             IntegrationCoupling.attach_to_environment,
             IntegrationCoupling.collect_resources,
             IntegrationCoupling.declare_precedence,
@@ -157,6 +156,16 @@ class IntegrationCouplingTests(unittest.TestCase):
             with self.subTest(method=method):
                 with self.assertRaises(AbstractMethodError):
                     method()
+
+    def test_attach_to_framework_default_is_a_noop(self):
+        """
+            Framework attachment is an OPTIONAL phase: the base default must be
+            a callable no-op, not abstract.  When it raised, EVERY coupling in
+            the landscaping hierarchy (none of which override it) died at the
+            first lifecycle phase of any landscape-backed run.
+        """
+        result = IntegrationCoupling.attach_to_framework(landscape=object())
+        self.assertIsNone(result)
 
     def test_establish_connectivity_raises_abstract_method_error(self):
         """Test that establish_connectivity raises AbstractMethodError when not overloaded."""

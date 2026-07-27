@@ -522,6 +522,15 @@ class InjectionScope:
                     # Step 3a: Iterate through type arguments to find coupling types
                     # For example, List[MyIntegration] has type args (MyIntegration,)
                     for type_arg in typing_get_args(param_resource_type):
+                        # A generic's type args are not all classes.  A
+                        # generator factory annotated
+                        # `Generator[Thing, None, None]` yields the bare `None`
+                        # literal for its send and return parameters, and
+                        # `issubclass(None, ...)` raises TypeError — which took
+                        # down discovery for the whole scope tree rather than
+                        # skipping an argument that cannot be a coupling.
+                        if not isinstance(type_arg, type):
+                            continue
                         if issubclass(type_arg, IntegrationCoupling):
                             # Found an integration coupling - add to integration table
                             # The table is keyed by source function to prevent duplicates
@@ -536,6 +545,11 @@ class InjectionScope:
                 else:
                     # Step 3b: Handle direct (non-generic) coupling types
                     # The resource type itself is the coupling type
+                    if not isinstance(param_resource_type, type):
+                        # Not a class, so it cannot be a coupling; a bare
+                        # annotation like `Any` would otherwise raise here.
+                        continue
+
                     if issubclass(param_resource_type, IntegrationCoupling):
                         # Direct integration coupling type
                         # There should never be more than one fixture with the same well-known or

@@ -21,6 +21,7 @@ from pprint import pformat
 
 from ccai.xmodules.xformatting import indent_lines
 
+from ccai.errors.exceptions import SemanticError
 from ccai.errors.xtraceback import TracebackFormatPolicy
 
 
@@ -583,3 +584,157 @@ def _verify_dict_has_paths_descend(search_path: str, cursor: dict, leaf_parts: l
                 _verify_dict_has_paths_descend(search_path, nxt_val, desc_leaf_parts)
 
     return found
+
+
+class RaisesContext:
+    """
+        The object bound by :func:`raises`, carrying the caught exception.
+
+        The exception is available as :attr:`exception` only after the ``with``
+        block exits, since that is when it has been raised and caught. Reading it
+        inside the block is a mistake worth naming rather than returning ``None``
+        for, so it raises :class:`SemanticError`.
+    """
+
+    def __init__(self, expected: Union[Type[BaseException], tuple],
+                 match: Optional[Union[str, re.Pattern]] = None) -> None:
+        """
+            :param expected: The exception type, or tuple of types, to expect.
+            :param match: Optional pattern the exception's text must contain.
+        """
+        self._expected = expected
+        self._match = match
+        self._exception = None
+        self._complete = False
+        return
+
+    @property
+    def exception(self) -> BaseException:
+        """
+            The exception that was caught.
+
+            :returns: The caught exception.
+
+            :raises SemanticError: If read before the ``with`` block has exited.
+        """
+        if self._complete is False:
+            raise SemanticError(
+                "The 'exception' of a 'raises' block is only available after "
+                "the block exits, because that is when the exception has been "
+                "raised and caught.")
+
+        return self._exception
+
+    @property
+    def value(self) -> BaseException:
+        """
+            Alias of :attr:`exception`.
+
+            :returns: The caught exception.
+        """
+        return self.exception
+
+    def __enter__(self) -> "RaisesContext":
+        """
+            :returns: This context, to be bound by the ``as`` clause.
+        """
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback) -> bool:
+        """
+            Accept the expected exception; let anything else propagate.
+
+            :param exc_type: Type of the raised exception, or ``None``.
+            :param exc_value: The raised exception, or ``None``.
+            :param exc_traceback: The traceback, unused.
+
+            :returns: ``True`` to suppress the expected exception.
+
+            :raises AssertionError: If no exception was raised, or if one was
+                raised whose text does not match the requested pattern.
+        """
+        self._complete = True
+
+        if exc_type is None:
+            expected_name = _describe_exception_types(self._expected)
+            raise AssertionError(
+                "Expected {} to be raised, but the block completed "
+                "normally.".format(expected_name))
+
+        if not issubclass(exc_type, self._expected):
+            # Not what was asked for. Propagating beats reporting a failure
+            # here, because the real exception and its traceback are more
+            # useful than an assertion describing it second-hand.
+            return False
+
+        if self._match is not None:
+            found = str(exc_value)
+            if re.search(self._match, found) is None:
+                raise AssertionError(
+                    "Expected {} matching {!r} to be raised. A {} was raised, "
+                    "but its text does not match:{}{}".format(
+                        _describe_exception_types(self._expected),
+                        self._match if isinstance(self._match, str)
+                        else self._match.pattern,
+                        exc_type.__name__, os.linesep,
+                        indent_lines(found, 1)))
+
+        self._exception = exc_value
+
+        return True
+
+
+def raises(expected: Union[Type[BaseException], tuple],
+           match: Optional[Union[str, re.Pattern]] = None) -> RaisesContext:
+    """
+        Assert that the ``with`` block raises the expected exception.
+
+        Unlike ``expect_exception``, which marks a whole test as expected to
+        raise, this scopes the expectation to the statements in the block, so a
+        test can go on to make assertions about the exception it caught and about
+        anything else.
+
+        A different exception type is not caught. It propagates with its own
+        traceback intact, which says more than an assertion describing it
+        second-hand would.
+
+        Example::
+
+            from ccai import testbase
+
+            with testbase.raises(ValueError):
+                int("not a number")
+
+            with testbase.raises(SchemaSemanticError) as caught:
+                validate(spec=spec)
+
+            assert "inst-a" in str(caught.exception)
+
+            # Or match the text directly, without binding the exception.
+            with testbase.raises(ValueError, match="invalid literal"):
+                int("not a number")
+
+        :param expected: The exception type, or a tuple of types, to expect.
+        :param match: Optional pattern searched for in the exception's text,
+            as a string or compiled pattern.
+
+        :returns: A context manager binding the caught exception.
+
+        :raises AssertionError: If the block raises nothing, or raises an
+            expected type whose text does not match ``match``.
+    """
+    return RaisesContext(expected, match=match)
+
+
+def _describe_exception_types(expected: Union[Type[BaseException], tuple]) -> str:
+    """
+        Name an exception type, or a tuple of them, for a failure message.
+
+        :param expected: The type or tuple of types.
+
+        :returns: A readable description.
+    """
+    if isinstance(expected, tuple):
+        return " or ".join([item.__name__ for item in expected])
+
+    return expected.__name__

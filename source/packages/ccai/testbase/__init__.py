@@ -28,6 +28,7 @@ from ccai.testbase.declaration.parameterization import (
 
 
 from ccai.testbase.verification import (
+    raises,
     assert_dict_response_has_keys,
     assert_dict_response_has_paths,
     assert_equal,

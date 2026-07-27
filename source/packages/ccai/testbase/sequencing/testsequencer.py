@@ -2591,41 +2591,6 @@ class TestSequencer:
                         test_local_args.append((param_name, param_obj))
 
                 # ------------------------------------------------------------
-                # DEPENDENCY CLOSURE
-                # ------------------------------------------------------------
-                # The list so far holds only parameters the test itself takes.
-                # A test-local factory may consume another test-local resource
-                # the test never asks for — a client built on a fake world, say,
-                # where the test wants the client and not the world. That
-                # resource still has to be built, and nothing else builds it:
-                # attaching it at test scope is precisely what takes it out of
-                # the enclosing scope. Left out, generation emits a loop reading
-                # a name that is never bound anywhere, failing with a bare
-                # NameError in the generated document.
-                # ------------------------------------------------------------
-                if test_scope is not None and len(test_local_args) > 0:
-                    local_names = set([pn for pn, _po in test_local_args])
-                    pending = [pn for pn, _po in test_local_args]
-
-                    while len(pending) > 0:
-                        param_name = pending.pop(0)
-                        param_obj = test_scope.parameter_originations[param_name]
-
-                        for required in param_obj.source_signature.parameters:
-                            if required in local_names:
-                                continue
-                            if required not in test_scope.parameter_originations:
-                                # Satisfied by an enclosing scope, or missing
-                                # entirely — resolution reports the latter.
-                                continue
-
-                            local_names.add(required)
-                            test_local_args.append(
-                                (required,
-                                 test_scope.parameter_originations[required]))
-                            pending.append(required)
-
-                # ------------------------------------------------------------
                 # DEPENDENCY ORDERING
                 # ------------------------------------------------------------
                 # Each test-local parameter becomes a nested for loop below, so

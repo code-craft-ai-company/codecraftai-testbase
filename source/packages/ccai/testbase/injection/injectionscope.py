@@ -92,6 +92,10 @@ from ccai.errors.exceptions import SemanticError
 from ccai.testbase.coupling.integrationcoupling import IntegrationCoupling
 from ccai.testbase.coupling.configurationcoupling import ConfigurationCoupling
 
+from ccai.testbase.injection.dependencyorder import (
+    order_originations_by_dependency
+)
+
 from ccai.testbase.origins.resourceorigin import ResourceOrigin
 from ccai.testbase.origins.validatororigin import ValidatorOrigin
 
@@ -2470,6 +2474,14 @@ class InjectionScope:
                 # Step 3: Process all parameter originations at this scope level
                 # We iterate over a snapshot to allow safe modification during iteration
                 origination_items = [(spn, spo) for spn, spo in nxt_scope.parameter_originations.items()]
+
+                # The lateral check below validates each factory's dependencies
+                # against the table as built SO FAR, so a factory declared
+                # before the parameter it consumes has that parameter reported
+                # missing — a working set of factories failing on declaration
+                # order alone. Order by dependency first.
+                origination_items = order_originations_by_dependency(
+                    origination_items, nxt_scope.package)
 
                 for scope_param_name, scope_param_origin in origination_items:
                     

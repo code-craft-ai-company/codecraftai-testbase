@@ -32,6 +32,7 @@ __copyright__ = "Copyright 2026, Code Craft AI LLC"
 __credits__ = []
 
 
+import pathlib
 import shutil
 import tempfile
 
@@ -47,9 +48,14 @@ DEFAULT_TEMPORARY_PREFIX = "ccai-testbase-"
 @register.resource_factory()
 def create_temporary_directory(
         constraints: Optional[Dict[str, Any]] = None
-        ) -> Generator[str, None, None]:
+        ) -> Generator[pathlib.Path, None, None]:
     """
         Yield the path of an empty temporary directory, then remove it.
+
+        The value is a :class:`pathlib.Path`, not a string, so callers can
+        use ``directory / "name"`` to build child paths.  A string works
+        for anything taking a path argument but breaks that operator, and
+        the resulting TypeError names ``str`` rather than the factory.
 
         The directory is removed after the consuming test finishes, whether it
         passed or failed, because the cleanup follows the ``yield`` in a
@@ -81,7 +87,7 @@ def create_temporary_directory(
     prefix = str(settings.get("prefix", DEFAULT_TEMPORARY_PREFIX))
     keep = bool(settings.get("keep", False))
 
-    directory = tempfile.mkdtemp(prefix=prefix)
+    directory = pathlib.Path(tempfile.mkdtemp(prefix=prefix))
 
     try:
         yield directory

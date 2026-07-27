@@ -3,6 +3,7 @@
 """
 
 import os
+import pathlib
 import shutil
 import unittest
 
@@ -13,6 +14,22 @@ class CreateTemporaryDirectoryTests(unittest.TestCase):
     """
         Verifies the temporary-directory factory.
     """
+
+    def test_yields_a_pathlib_path(self):
+        """
+            The value is a Path so callers can use `directory / "name"`.
+            A str would break that operator with a TypeError naming str
+            rather than the factory.
+        """
+        generator = create_temporary_directory()
+        directory = next(generator)
+        try:
+            self.assertIsInstance(directory, pathlib.Path)
+            child = directory / "child.txt"
+            child.write_text("content")
+            self.assertTrue(child.is_file())
+        finally:
+            self._exhaust(generator)
 
     def test_yields_an_empty_existing_directory(self):
         generator = create_temporary_directory()

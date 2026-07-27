@@ -28,10 +28,6 @@ from types import TracebackType
 
 from ccai.errors.exceptions import SemanticError
 
-from ccai.testbase.injection.dependencyorder import (
-    order_originations_by_dependency
-)
-
 from ccai.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 from ccai.xmodules.ximport import import_file
 from ccai.xmodules.jsos import CHAR_RECORD_SEPERATOR
@@ -2589,25 +2585,6 @@ class TestSequencer:
                     if test_scope is not None and param_name in test_scope.parameter_originations:
                         param_obj = test_scope.parameter_originations[param_name]
                         test_local_args.append((param_name, param_obj))
-
-                # ------------------------------------------------------------
-                # DEPENDENCY ORDERING
-                # ------------------------------------------------------------
-                # Each test-local parameter becomes a nested for loop below, so
-                # a parameter whose factory consumes another test-local
-                # parameter has to be generated INSIDE it. The list above is in
-                # the test's signature order, which says nothing about that,
-                # and emitting it directly produces a loop that reads a name
-                # the inner loop has not bound yet:
-                #
-                #   for session_factory in create_session_factory(world):
-                #       for world in create_world():
-                #
-                # which fails at run time with UnboundLocalError rather than
-                # anything that points at the cause.
-                # ------------------------------------------------------------
-                test_local_args = order_originations_by_dependency(
-                    test_local_args, test_scope_name)
 
                 # Variables for building the notables dictionary (used for parameterized tests)
                 notables_map = ""

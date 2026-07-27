@@ -22,6 +22,10 @@ from ccai.testbase.declaration import attachments as attach
 from ccai.testbase.declaration import registrations as register
 from ccai.testbase.declaration import originations as originate
 
+from ccai.testbase.declaration.parameterization import (
+    parametrize, ParametrizedCaseError
+)
+
 
 from ccai.testbase.verification import (
     assert_dict_response_has_keys,

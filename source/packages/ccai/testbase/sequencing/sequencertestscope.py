@@ -110,14 +110,23 @@ class SequencerTestScope:
         if len(self._notables) > 0:
 
             for pname, pobj in self._notables.items():
-                
-                if hasattr(pobj, "moniker"):
-                    monikers.append(pobj.moniker)
+
+                # The attribute is used only when it is of the type this
+                # expects. A `hasattr` check alone is not enough: a mock that
+                # proxies every attribute answers it, and the proxy then fails
+                # the join below with 'sequence item 0: expected str instance'
+                # from inside the sequencer, naming nothing the test author
+                # would recognise. Test doubles that proxy attribute access are
+                # a common idiom, and attaching one is legitimate.
+                moniker = getattr(pobj, "moniker", None)
+                if isinstance(moniker, str):
+                    monikers.append(moniker)
                 else:
                     monikers.append(str(pobj))
-                
-                if hasattr(pobj, "pivots"):
-                    pivots[pname] = pobj.pivots
+
+                resource_pivots = getattr(pobj, "pivots", None)
+                if isinstance(resource_pivots, (dict, OrderedDict)):
+                    pivots[pname] = resource_pivots
                 else:
                     pivots[pname] = str(pobj)
 

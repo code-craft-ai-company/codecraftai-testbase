@@ -177,6 +177,15 @@ class ResultNode:
             self._result_code = ResultCode.FAILED
         elif len(self._errors) > 0:
             self._result_code = ResultCode.ERRORED
+        elif self._result_code == ResultCode.SKIPPED:
+            # A skip is set by mark_skip before finalize runs. Overwriting it
+            # here dropped the result out of every tally: not passed, not
+            # skipped, just absent from a total that still counted it.
+            #
+            # CANCELLED is deliberately NOT preserved here. It finalizes to
+            # UNKOWN, which ResultNodeFinalizeTests asserts; whether that is
+            # intended is a separate question from this one.
+            pass
         elif self._result_code == ResultCode.UNSET or self._result_code == ResultCode.PASSED:
             self._result_code = ResultCode.PASSED
         else:

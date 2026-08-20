@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "codecraftai-testbase"
 description = "Code Craft AI - TestBase"
-version = "0.0.1"
+version = "1.0.0"
 authors = ["Myron Walker <myron.walker@gmail.com>"]
 readme = "README.rst"
 license = "LicenseRef-CodeCraftAI-Dual-License"
@@ -17,13 +17,13 @@ packages = [{include="ccai", from="source/packages"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-codecraftai-errors = { git = "https://github.com/code-craft-ai-company/codecraftai-errors.git", branch = "main" }
-codecraftai-arcli = { git = "https://github.com/code-craft-ai-company/codecraftai-arcli.git", branch = "main" }
-codecraftai-this-app = { git = "https://github.com/code-craft-ai-company/codecraftai-this-app.git", branch = "main" }
-codecraftai-runtime = { git = "https://github.com/code-craft-ai-company/codecraftai-runtime.git", branch = "main" }
-codecraftai-interfaces = { git = "https://github.com/code-craft-ai-company/codecraftai-interfaces.git", branch = "main" }
-codecraftai-xmodules = { git = "https://github.com/code-craft-ai-company/codecraftai-xmodules.git", branch = "main" }
-codecraftai-waiting = { git = "https://github.com/code-craft-ai-company/codecraftai-waiting.git", branch = "main" }
+codecraftai-errors = { version = "<2.0.0", source = "codecraftai" }
+codecraftai-arcli = { version = "<2.0.0", source = "codecraftai" }
+codecraftai-this-app = { version = "<2.0.0", source = "codecraftai" }
+codecraftai-runtime = { version = "<2.0.0", source = "codecraftai" }
+codecraftai-interfaces = { version = "<2.0.0", source = "codecraftai" }
+codecraftai-xmodules = { version = "<2.0.0", source = "codecraftai" }
+codecraftai-waiting = { version = "<2.0.0", source = "codecraftai" }
 pyyaml = "^6.0.2"
 
 
@@ -32,6 +32,11 @@ hypothesis = ">=6.0.0"
 
 [tool.poetry.scripts]
 testbase = "ccai.testbase.cli.testbase_command:testbase_root_command"
+
+[[tool.poetry.source]]
+name = "codecraftai"
+url = "https://code-craft.ai/licensed-repository/simple/"
+priority = "supplemental"
 
 [build-system]
 requires = ["poetry-core"]

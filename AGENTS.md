@@ -34,8 +34,7 @@ streams, and generating summaries suitable for agent-driven automation.
 The package is now **near-standalone**. The test-execution core
 (`TestJob`/`TestSequencer`, the recorders, and the entrypoints) imports none of
 `codecraftai-configuration`, `codecraftai-runtime`, or `codecraftai-this-app`. Its
-declared dependencies are `codecraftai-arcli`, `codecraftai-errors`,
-`codecraftai-interfaces`, `codecraftai-waiting`, and `codecraftai-xmodules`. The core
+declared dependencies are `codecraftai-arcli`, `codecraftai-foundations`, and `codecraftai-xmodules`. The core
 reads its few execution knobs (`AM_DEBUG_*`, `AM_DIAGNOSTICS_*`, `AM_TESTROOT`,
 `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`) directly from
 `os.environ` via the dependency-free `ccai.testbase.environment` module,

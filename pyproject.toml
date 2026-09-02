@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "codecraftai-testbase"
 description = "Code Craft AI - TestBase"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Myron Walker <myron.walker@gmail.com>"]
 readme = "README.rst"
 license = "LicenseRef-CodeCraftAI-Dual-License"
@@ -17,13 +17,11 @@ packages = [{include="ccai", from="source/packages"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-codecraftai-errors = { version = "<2.0.0", source = "codecraftai" }
+codecraftai-foundations = { version = "<2.0.0", source = "codecraftai" }
 codecraftai-arcli = { version = "<2.0.0", source = "codecraftai" }
 codecraftai-this-app = { version = "<2.0.0", source = "codecraftai" }
 codecraftai-runtime = { version = "<2.0.0", source = "codecraftai" }
-codecraftai-interfaces = { version = "<2.0.0", source = "codecraftai" }
 codecraftai-xmodules = { version = "<2.0.0", source = "codecraftai" }
-codecraftai-waiting = { version = "<2.0.0", source = "codecraftai" }
 pyyaml = "^6.0.2"
 
 

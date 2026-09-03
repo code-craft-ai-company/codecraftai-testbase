@@ -462,6 +462,6 @@ class JsonResultRecorder(ResultRecorder):
                 original_error=err
             ) from err
 
-        self.catalog_output_directory()
+        self.catalog_output_directory(force=True)
 
         return

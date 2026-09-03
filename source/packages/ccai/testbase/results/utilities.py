@@ -124,8 +124,16 @@ def catalog_tree(rootdir: str, dont_catalog_dirs: List[str] = DEFAULT_DO_NOT_CAT
 
     catalogfile = os.path.join(rootdir, "catalog.json")
 
+    content = json.dumps(catalog, indent=4)
+    try:
+        with open(catalogfile, 'r') as cf:
+            if cf.read() == content:
+                return
+    except OSError:
+        pass
+
     with open(catalogfile, 'w') as cf:
-        json.dump(catalog, cf, indent=4)
+        cf.write(content)
 
     return
 

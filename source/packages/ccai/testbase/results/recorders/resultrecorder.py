@@ -22,6 +22,7 @@ import copy
 import os
 import shutil
 import threading
+import time
 
 from datetime import datetime
 
@@ -474,7 +475,9 @@ class ResultRecorder:
         return rtnval
 
 
-    def catalog_output_directory(self):
+    CATALOG_MIN_INTERVAL_SECONDS = 5.0
+
+    def catalog_output_directory(self, force: bool = False):
         """
             Triggers catalog generation for the results output directory.
 
@@ -498,8 +501,17 @@ class ResultRecorder:
 
             :returns: None
         """
+        # Cataloguing walks the whole results tree and rewrites a catalog.json in every directory. Doing that
+        # after every record made the cost quadratic in the number of tests, which stalled large suites for
+        # hours. Per-record calls are throttled; the final write of a run passes force=True so the report is
+        # complete.
+        now = time.monotonic()
+        last = getattr(self, "_catalog_last_at", 0.0)
+        if not force and (now - last) < self.CATALOG_MIN_INTERVAL_SECONDS:
+            return
         catalog_tree(self._output_dir, dont_catalog_dirs=DEFAULT_DO_NOT_CATALOG_DIRS,
                      dont_descend_dirs=DEFAULT_DO_NOT_DESCEND_DIRS)
+        self._catalog_last_at = time.monotonic()
         return
 
 

@@ -110,6 +110,12 @@ def validate_marker_expression(value: str) -> str:
     """
     from ccai.errors.exceptions import SemanticError
     
+    # Application/CLI boundary: this is an argparse type-validator, so the
+    # "API misuse" being reported is a malformed expression the operator typed.
+    # Translating it into ArgumentTypeError still terminates the process (argparse
+    # prints the message and exits), which is the application layer exercising the
+    # flow control it owns.  Library code must NOT copy this pattern -- inside a
+    # library a SemanticError has to bubble untouched.
     try:
         # Attempt to parse the expression to validate it
         parse_marker_expression(value)

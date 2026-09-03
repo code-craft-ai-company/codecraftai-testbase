@@ -34,5 +34,7 @@ from ccai.testbase.properties.decorators import (
 
 from ccai.testbase.properties.assumptions import assume
 
+from ccai.testbase.properties.unittestsupport import run_property
+
 from ccai.testbase.properties import strategies
 from ccai.testbase.properties import strategies as st

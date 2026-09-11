@@ -201,7 +201,8 @@ def find_included_modules_under_root(root: str, package: Union[str, None], modul
                         supported_dirnames.append(dname)
                 dirnames[:] = supported_dirnames
 
-            dirleaf = root_pkg + "/" + dirpath[len(root):].lstrip(os.sep)
+            # Normalise to "/" so the prefix comparison below works on Windows too.
+            dirleaf = root_pkg + "/" + dirpath[len(root):].lstrip(os.sep).replace(os.sep, "/")
             dirleaf = dirleaf.rstrip("/")
 
             if dirleaf.startswith(fullpathpfx) or fnmatch.fnmatch(dirleaf, fullpathpfx):
@@ -458,7 +459,10 @@ def find_testmodule_fullname(module, testroot=None) -> str:
     #   2. Strip leading slashes (in case of edge cases)
     #   3. Replace "/" with "." to get dotted module name
     #      tests/unit/test_auth -> tests.unit.test_auth
-    testmodule_fullname = mod_filebase[len(testroot_parent):].strip("/").replace("/", ".")
+    #   The path uses the native separator, so normalise it to "/" first (on
+    #   Windows the separator is "\\" and the name would otherwise keep it).
+    testmodule_relpath = mod_filebase[len(testroot_parent):].replace(os.sep, "/").strip("/")
+    testmodule_fullname = testmodule_relpath.replace("/", ".")
 
     return testmodule_fullname
 

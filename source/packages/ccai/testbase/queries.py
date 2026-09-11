@@ -54,7 +54,7 @@ def collect_test_references(root, included_files, filter_package, filter_module,
         modname = None
         try:
             ifilebase, _ = os.path.splitext(ifile)
-            ifileleaf = ifilebase[rootlen:].strip("/")
+            ifileleaf = ifilebase[rootlen:].replace(os.sep, "/").strip("/")
             modname = "{}.{}".format(root_pkgname, ifileleaf.replace("/", "."))
 
             # Import the module for the file being processed

@@ -22,6 +22,7 @@ from ccai.thisapp.wellknown import ThisApplicationSingleton
 from ccai.runtime.enumerations import JobType
 from ccai.runtime.runtimevariables import RuntimeVariablesDesc
 import ccai.runtime.paths as runtime_paths
+from ccai_tests.testbase.integration.subprocessenv import minimal_subprocess_environment
 
 
 class TestEntrypointEndToEndIntegration(unittest.TestCase):
@@ -890,8 +891,6 @@ def test_good_two():
 """
 
 import ccai.testbase as testbase
-
-from ccai_tests.testbase.integration.subprocessenv import minimal_subprocess_environment
 
 def test_nested_example():
     """A test in a nested package."""

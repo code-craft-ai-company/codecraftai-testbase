@@ -20,6 +20,7 @@ from ccai.thisapp.wellknown import ThisApplicationSingleton
 from ccai.runtime.enumerations import JobType
 from ccai.runtime.runtimevariables import RuntimeVariablesDesc
 import ccai.runtime.paths as runtime_paths
+from ccai_tests.testbase.integration.subprocessenv import minimal_subprocess_environment
 
 
 class TestMockingInTestFixtures(unittest.TestCase):
@@ -677,8 +678,6 @@ def test_assert_has_calls_passes():
 
 import ccai.testbase as testbase
 from ccai.testbase.mocking import Mock
-
-from ccai_tests.testbase.integration.subprocessenv import minimal_subprocess_environment
 
 
 def test_recursive_mock_child_assertions():

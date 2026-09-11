@@ -19,6 +19,8 @@ from ccai.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
 from ccai.testbase.testcollector import TestCollector
 from ccai.testbase.expressions import parse_test_include_expression
 
+from ccai_tests.testbase.integration.subprocessenv import minimal_subprocess_environment
+
 
 class TestCollectorExpressionParsingIntegration(unittest.TestCase):
     """
@@ -205,13 +207,7 @@ class TestCollectorExpressionCLIIntegration(unittest.TestCase):
         for pattern in include_patterns:
             cmd.extend(["-i", pattern])
         
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
         env["PYTHONPATH"] = os.pathsep.join(pythonpath_parts)
@@ -361,13 +357,7 @@ class TestCLIExpressionParsingIntegration(unittest.TestCase):
         for pattern in include_patterns:
             cmd.extend(["-i", pattern])
         
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
         env["PYTHONPATH"] = os.pathsep.join(pythonpath_parts)
@@ -616,13 +606,7 @@ class TestCLIExpressionParsingIntegration(unittest.TestCase):
             "--root", self.testroot_dir
         ]
         
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
         env["PYTHONPATH"] = os.pathsep.join(pythonpath_parts)

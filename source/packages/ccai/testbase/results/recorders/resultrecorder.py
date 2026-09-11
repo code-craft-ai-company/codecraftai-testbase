@@ -348,7 +348,9 @@ class ResultRecorder:
 
         stream_filename = self._render_info.stream_results_filename
         try:
-            self._rout = open(stream_filename, 'w')
+            # newline='' leaves line endings to the recorder (the csv module
+            # writes its own), so Windows does not turn them into \r\r\n.
+            self._rout = open(stream_filename, 'w', newline='')
         except OSError as err:
             errmsg = f"Failed to open stream results file '{stream_filename}' for writing."
             raise ResultRecordingError(

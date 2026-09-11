@@ -92,13 +92,7 @@ class TestExecutionEndToEndIntegration(unittest.TestCase):
         else:
             cmd.extend(["-i", "*"])
         
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
         env["PYTHONPATH"] = os.pathsep.join(pythonpath_parts)
@@ -271,13 +265,7 @@ class TestScopeNestingIntegration(unittest.TestCase):
         else:
             cmd.extend(["-i", "*"])
         
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
         env["PYTHONPATH"] = os.pathsep.join(pythonpath_parts)
@@ -569,13 +557,7 @@ class TestScopeExceptionHandling(unittest.TestCase):
         else:
             cmd.extend(["-i", "*"])
         
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
         env["PYTHONPATH"] = os.pathsep.join(pythonpath_parts)
@@ -676,6 +658,8 @@ def test_value_error():
 """
 
 import ccai.testbase as testbase
+
+from ccai_tests.testbase.integration.subprocessenv import minimal_subprocess_environment
 
 def test_type_error():
     """A test that raises TypeError."""

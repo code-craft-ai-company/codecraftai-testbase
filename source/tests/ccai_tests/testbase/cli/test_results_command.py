@@ -192,7 +192,7 @@ class ResultsCommandServerConfigurationTests(unittest.TestCase):
         mock_print.assert_called_once()
         print_call_args = mock_print.call_args[0][0]
         self.assertIn("8880", print_call_args)
-        self.assertIn("/custom/results", print_call_args)
+        self.assertIn(os.path.abspath("/custom/results"), print_call_args)
 
     @patch('ccai.testbase.cli.cmdtree.services.results.TestResultServer')
     @patch('ccai.testbase.cli.cmdtree.services.results.try_create_bug_server_interface_from_environment')

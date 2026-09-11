@@ -609,7 +609,7 @@ class BreakpointCodePlacementTests(unittest.TestCase):
         with open(output_file, 'r') as f:
             generated_code = f.read()
 
-        lines = generated_code.split(os.linesep)
+        lines = generated_code.splitlines()
 
         # Find the pdb import line
         pdb_import_line = None

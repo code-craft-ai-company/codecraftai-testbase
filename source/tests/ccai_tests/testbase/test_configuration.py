@@ -277,18 +277,19 @@ class TestLoadYamlFile(unittest.TestCase):
 
     def test_load_yaml_file_returns_dict(self):
         """Test loading a valid YAML file returns a dictionary."""
+        # The file is closed before it is read and removed: Windows refuses to
+        # unlink a file that is still open.
         with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
             f.write("includes:\n  - test_*\nconsole_level: DEBUG\n")
-            f.flush()
-            
-            try:
-                result = _load_yaml_file(f.name)
-                
-                self.assertIsInstance(result, dict)
-                self.assertEqual(result["includes"], ["test_*"])
-                self.assertEqual(result["console_level"], "DEBUG")
-            finally:
-                os.unlink(f.name)
+
+        try:
+            result = _load_yaml_file(f.name)
+
+            self.assertIsInstance(result, dict)
+            self.assertEqual(result["includes"], ["test_*"])
+            self.assertEqual(result["console_level"], "DEBUG")
+        finally:
+            os.unlink(f.name)
 
     def test_load_yaml_file_returns_none_for_nonexistent_file(self):
         """Test that None is returned for nonexistent file."""
@@ -300,14 +301,13 @@ class TestLoadYamlFile(unittest.TestCase):
         """Test that None is returned for invalid YAML."""
         with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
             f.write("invalid: yaml: content: [")
-            f.flush()
-            
-            try:
-                result = _load_yaml_file(f.name)
-                
-                self.assertIsNone(result)
-            finally:
-                os.unlink(f.name)
+
+        try:
+            result = _load_yaml_file(f.name)
+
+            self.assertIsNone(result)
+        finally:
+            os.unlink(f.name)
 
 
 class TestLoadEntrypointConfiguration(unittest.TestCase):

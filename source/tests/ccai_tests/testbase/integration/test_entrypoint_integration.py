@@ -179,13 +179,7 @@ def test_third_passing():
                 cmd.extend(["-x", pattern])
         
         # Set up a clean environment
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         # Use sys.path to get all necessary paths including site-packages
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
@@ -442,13 +436,7 @@ class TestEntrypointWithSampleTestModule(unittest.TestCase):
         else:
             cmd.extend(["-i", "*"])
         
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
         env["PYTHONPATH"] = os.pathsep.join(pythonpath_parts)
@@ -679,13 +667,7 @@ def test_example():
             for pattern in exclude_patterns:
                 cmd.extend(["-x", pattern])
         
-        env = {
-            "PATH": os.environ.get("PATH", ""),
-            "HOME": os.environ.get("HOME", ""),
-            "USER": os.environ.get("USER", ""),
-            "LANG": os.environ.get("LANG", "en_US.UTF-8"),
-            "TERM": os.environ.get("TERM", "xterm"),
-        }
+        env = minimal_subprocess_environment()
         
         pythonpath_parts = [p for p in sys.path if p and p != os.getcwd()]
         env["PYTHONPATH"] = os.pathsep.join(pythonpath_parts)
@@ -908,6 +890,8 @@ def test_good_two():
 """
 
 import ccai.testbase as testbase
+
+from ccai_tests.testbase.integration.subprocessenv import minimal_subprocess_environment
 
 def test_nested_example():
     """A test in a nested package."""

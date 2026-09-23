@@ -41,10 +41,8 @@ __copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
-import os
-import json
 import tempfile
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 
 def example_diagnostic_level_overview():

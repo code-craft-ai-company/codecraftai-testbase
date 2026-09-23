@@ -11,9 +11,8 @@ __copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
-from typing import List, Union, Optional
+from typing import List, Optional
 
-import argparse
 import os
 import sys
 
@@ -22,11 +21,6 @@ from ccai.arcli import decorators as arcli
 from ccai.testbase.cli.options import (
     RootOptionGroup,
     FilteringOptionGroup,
-    HELP_ROOT,
-    HELP_EXCLUDES,
-    HELP_INCLUDES,
-    HELP_EXCLUDE_MARKER_EXP,
-    HELP_INCLUDE_MARKER_EXP
 )
 
 @RootOptionGroup.attach(help_fill={"action": "query"})
@@ -108,7 +102,6 @@ def command_testbase_testing_query(root: Optional[str], includes: Optional[List[
 
     # At this point in the code, we either lookup an existing test job or we create a test job
     # from the includes, excludes or test_module
-    result_code = 0
     with TestJobType(logger, test_root, includes=includes, excludes=excludes, metafilters=metafilters) as tjob:
         query_results = tjob.query()
 

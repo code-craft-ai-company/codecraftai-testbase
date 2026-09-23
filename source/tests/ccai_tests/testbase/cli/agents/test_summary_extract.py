@@ -4,7 +4,6 @@
 
 import json
 import os
-import sys
 import tempfile
 import unittest
 from io import StringIO

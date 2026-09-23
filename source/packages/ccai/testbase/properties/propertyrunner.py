@@ -24,15 +24,11 @@ from typing import Any, Callable, Dict, Optional
 import hashlib
 import os
 import random
-import traceback
 import uuid
 
-from datetime import datetime
+from ccai.errors.xtraceback import create_traceback_detail, format_traceback_detail
 
-from ccai.errors.xtraceback import (
-    TracebackDetail,
-    create_traceback_detail
-)
+from ccai.xmodules.xformatting import indent_lines_list
 
 from ccai.testbase.properties.assumptions import UnsatisfiedAssumption
 from ccai.testbase.properties.strategies import Strategy
@@ -192,7 +188,9 @@ class PropertyRunner:
                 ``counterexample`` (if failed), ``strategy_descriptions``,
                 and ``is_property_test``.
             :raises AssertionError: Re-raised after recording when a property
-                test fails (after shrinking).
+                test fails (after shrinking).  It is chained to the ``AssertionError``
+                of the first failing example and its message includes that failure's
+                traceback.
         """
         max_examples = self._max_examples
         examples_run = 0
@@ -329,10 +327,18 @@ class PropertyRunner:
 
             metadata["counterexample"] = safe_counterexample
 
-            raise AssertionError(
+            err_msg_lines = [
                 f"Property falsified after {examples_run} examples. "
-                f"Counterexample: {safe_counterexample}"
-            )
+                f"Counterexample: {safe_counterexample}",
+                "",
+                "FIRST FAILURE:"
+            ]
+            first_failure_lines = format_traceback_detail(first_failure_traceback)
+            first_failure_lines = indent_lines_list(first_failure_lines, 1)
+            err_msg_lines.extend(first_failure_lines)
+
+            errmsg = os.linesep.join(err_msg_lines)
+            raise AssertionError(errmsg) from first_failure_error
 
         return metadata
 

@@ -93,6 +93,7 @@ class ResultsCommandDefaultDirectoryTests(unittest.TestCase):
         try:
             command_testbase_services_results._callable(directory=None, bind="", port=8880)
         except KeyboardInterrupt:
+            # Expected: the mocked serve_forever raises KeyboardInterrupt to end the command.
             pass
 
         expected_directory = os.path.join("/home/user/.ccai", "results")
@@ -123,6 +124,7 @@ class ResultsCommandDefaultDirectoryTests(unittest.TestCase):
             try:
                 command_testbase_services_results._callable(directory=tmpdir, bind="", port=8880)
             except KeyboardInterrupt:
+                # Expected: the mocked serve_forever raises KeyboardInterrupt to end the command.
                 pass
 
             expected_directory = os.path.abspath(tmpdir)
@@ -157,6 +159,7 @@ class ResultsCommandServerConfigurationTests(unittest.TestCase):
         try:
             command_testbase_services_results._callable(directory=None, bind="127.0.0.1", port=9000)
         except KeyboardInterrupt:
+            # Expected: the mocked serve_forever raises KeyboardInterrupt to end the command.
             pass
 
         mock_server.assert_called_once()
@@ -187,6 +190,7 @@ class ResultsCommandServerConfigurationTests(unittest.TestCase):
         try:
             command_testbase_services_results._callable(directory="/custom/results", bind="", port=8880)
         except KeyboardInterrupt:
+            # Expected: the mocked serve_forever raises KeyboardInterrupt to end the command.
             pass
 
         mock_print.assert_called_once()
@@ -217,6 +221,7 @@ class ResultsCommandServerConfigurationTests(unittest.TestCase):
         try:
             command_testbase_services_results._callable(directory=None, bind="", port=8880)
         except KeyboardInterrupt:
+            # Expected: the mocked serve_forever raises KeyboardInterrupt to end the command.
             pass
 
         mock_server_instance.serve_forever.assert_called_once()
@@ -245,6 +250,7 @@ class ResultsCommandServerConfigurationTests(unittest.TestCase):
         try:
             command_testbase_services_results._callable(directory=None, bind="", port=8880)
         except KeyboardInterrupt:
+            # Expected: the mocked serve_forever raises KeyboardInterrupt to end the command.
             pass
 
         mock_server.assert_called_once()

@@ -301,13 +301,13 @@ class InjectionGroupContainerProtocolTests(unittest.TestCase):
         group = InjectionGroup("test")
         group._children["child"] = InjectionGroup("child", package="test")
 
-        self.assertTrue("child" in group)
+        self.assertIn("child", group)
 
     def test_contains_returns_false_for_missing_child(self):
         """Verify __contains__ returns False for missing children."""
         group = InjectionGroup("test")
 
-        self.assertFalse("nonexistent" in group)
+        self.assertNotIn("nonexistent", group)
 
     def test_getitem_returns_child(self):
         """Verify __getitem__ returns the child object."""

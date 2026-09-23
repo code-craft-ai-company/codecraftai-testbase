@@ -2956,13 +2956,14 @@ class AsyncMock(Mock):
                 )
 
         # Initialize the base Mock without side_effect (we handle it ourselves)
-        self._mock_context = MockContext(
-            self, mtype, mock_attributes, 
-            reference=reference if reference is not ... else None, 
-            return_value=return_value if return_value is not ... else None,
+        super().__init__(
+            mock_attributes=mock_attributes,
+            reference=reference,
+            return_value=return_value,
+            mtype=mtype,
             side_effect=None,  # We handle async side_effect separately
-            mock_owner=mock_owner if mock_owner is not ... else None, 
-            recursive=recursive, 
+            mock_owner=mock_owner,
+            recursive=recursive,
             strict_attrs=strict_attrs
         )
 
@@ -3760,6 +3761,8 @@ class SpecMock(Mock):
                     if not param_name.startswith('_'):
                         attributes[param_name] = param.annotation if param.annotation != inspect.Parameter.empty else Any
             except (ValueError, TypeError):
+                # Signature not introspectable (e.g., some built-in or C-implemented
+                # initializers); the spec simply contributes no parameter-derived attributes.
                 pass
         
         # Get type hints for the class (includes annotated attributes)
@@ -3769,6 +3772,8 @@ class SpecMock(Mock):
                 if not name.startswith('_'):
                     attributes[name] = type_hint
         except Exception:
+            # Type hints could not be resolved (e.g., unresolvable forward references);
+            # the spec simply contributes no annotation-derived attributes.
             pass
         
         return attributes

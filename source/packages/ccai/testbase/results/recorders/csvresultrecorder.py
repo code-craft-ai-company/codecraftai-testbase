@@ -18,8 +18,6 @@ import json
 
 from datetime import datetime
 
-from ccai.xmodules.jsos import CHAR_RECORD_SEPERATOR
-
 from ccai.testbase.results.exceptions import ResultRecordingError
 from ccai.testbase.results.model.buildinfo import BuildInfo
 from ccai.testbase.results.model.jobinfo import JobInfo

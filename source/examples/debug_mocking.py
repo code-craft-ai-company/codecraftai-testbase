@@ -103,7 +103,6 @@ def debug_mock_instance_method():
 
 def debug_mock_property_access():
     print("\n--- debug_mock_property_access ---")
-    obj = SomeClass()
     
     # Using the new PropertyMock for property getter/setter mocking
     from ccai.testbase.mocking import PropertyMock, create_property_mock

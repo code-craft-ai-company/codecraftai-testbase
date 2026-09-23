@@ -78,7 +78,7 @@ See Also:
 """
 
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import gzip
 import os

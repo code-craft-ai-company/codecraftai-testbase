@@ -19,7 +19,6 @@
 
 import unittest
 import warnings
-from typing import List
 
 from ccai.testbase.injection.injectionregistry import InjectionRegistry
 from ccai.testbase.injection.injectionmoment import InjectionMoment

@@ -18,8 +18,6 @@ from ccai.testbase.coupling.validatorcoupling import ValidatorCoupling
 from ccai.testbase.declaration import attachments, originations, registrations
 from ccai.testbase.injection import injectionregistry
 from ccai.testbase.injection.injectionscope import InjectionScope
-from ccai.testbase.injection.injectionmoment import InjectionMoment
-from ccai.testbase.resourcelifespan import ResourceLifespan
 from ccai.testbase.sources.integrationsource import IntegrationSource
 from ccai.testbase.sources.resourcesource import ResourceSource
 from ccai.testbase.sources.configurationsource import ConfigurationSource
@@ -56,7 +54,6 @@ class TestRegistrySeparateTables(unittest.TestCase):
         # Create test coupling classes
         class TestIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         class TestConfig(ConfigurationCoupling):
             pass
@@ -162,7 +159,6 @@ class TestSourceLookup(unittest.TestCase):
         
         class TestIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         @registrations.integration_factory()
         def my_integration() -> typing.Generator[TestIntegration, None, None]:
@@ -246,7 +242,6 @@ class TestEndToEndRegistrationFlow(unittest.TestCase):
         
         class TestIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         # Step 1: Register via decorator
         @registrations.integration_factory()
@@ -372,7 +367,6 @@ class TestMultipleRegistrationsScoping(unittest.TestCase):
         
         class TestIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         @registrations.integration_factory()
         def session_resource() -> typing.Generator[TestIntegration, None, None]:
@@ -552,7 +546,6 @@ class TestDuplicateIdentifierValidation(unittest.TestCase):
         """
         class TestIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         @registrations.integration_factory()
         def integration_a() -> typing.Generator[TestIntegration, None, None]:

@@ -9,7 +9,7 @@
 import os
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 from ccai.testbase.diagnostics import DiagnosticLabel, DiagnosticLabelRegistry
 from ccai.testbase.sequencing.testsequencer import TestSequencer

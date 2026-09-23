@@ -7,8 +7,7 @@
 """
 
 import unittest
-import logging
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from ccai.testbase.debuglogging import (
     DEBUG_LOG_LEVEL,
@@ -56,7 +55,6 @@ class DebugLogLevelEnumTests(unittest.TestCase):
     def test_string_comparison(self):
         """Verify enum members can be compared to strings."""
         self.assertEqual(DEBUG_LOG_LEVEL.INFO, "info")
-        self.assertTrue(DEBUG_LOG_LEVEL.INFO == "info")
 
 
 class DebugLogLevelConfigurationTests(unittest.TestCase):

@@ -154,7 +154,14 @@ class TaskingResultFormatter(Protocol):
         Callable protocol for formatting :class:`TaskingResult` objects.
     """
     
-    def __call__(self, result: TaskingResult) -> List[str]: ...
+    def __call__(self, result: TaskingResult) -> List[str]:
+        """
+            Formats a tasking result into a list of output lines.
+
+            :param result: The tasking result to format.
+
+            :returns: The formatted lines.
+        """
 
 
 def default_tasking_result_formatter(result: TaskingResult) -> List[str]:

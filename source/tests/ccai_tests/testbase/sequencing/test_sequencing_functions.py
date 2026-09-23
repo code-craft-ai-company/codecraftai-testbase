@@ -66,8 +66,8 @@ class DummySequencer:
 
     def find_treenode_for_scope(self, scope_name):
         class Node:
-            def finalize(self_inner):
-                self_inner.finalized = True
+            def finalize(self):
+                self.finalized = True
         return Node()
 
     def create_test_result_node(self, inst_id, name, monikers, pivots, parent_inst=None):

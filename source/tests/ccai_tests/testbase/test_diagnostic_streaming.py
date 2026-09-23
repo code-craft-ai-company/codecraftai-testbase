@@ -13,7 +13,6 @@ import json
 import os
 import sys
 import tempfile
-import threading
 import time
 import unittest
 
@@ -26,12 +25,11 @@ from ccai.testbase.diagnostic_streaming import (
     DiagnosticStreamProtocol,
     DiagnosticStreamEvent,
     DiagnosticStreamConfig,
-    DiagnosticStreamHandler,
     HttpStreamHandler,
     WebSocketStreamHandler,
     FileStreamHandler,
     CallbackStreamHandler,
-    DiagnosticStreamManager
+    DiagnosticStreamManager,
 )
 
 
@@ -502,7 +500,7 @@ class TestWebSocketStreamHandler(unittest.TestCase):
         handler = WebSocketStreamHandler(config)
         
         # Note: This will succeed in simulated mode if websocket-client is not installed
-        result = handler.connect()
+        handler.connect()
         
         # Connection may succeed (simulated) or fail (actual attempt)
         # Just verify it doesn't crash

@@ -512,8 +512,8 @@ class TestJob(ITestJob):
         query_results = []
 
         with self._create_sequencer() as tseq:
-            
-            count = tseq.discover(test_module=self._test_module)
+
+            tseq.discover(test_module=self._test_module)
 
             query_results = tseq.references
 

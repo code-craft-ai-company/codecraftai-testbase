@@ -18,7 +18,6 @@ import collections
 import io
 import os
 import tempfile
-import typing
 import unittest
 
 from ccai.testbase.testgroup import TestGroup
@@ -28,7 +27,7 @@ from ccai.testbase.origins.resourceorigin import ResourceOrigin
 from ccai.testbase.resourcelifespan import ResourceLifespan
 from ccai.testbase.sources.sourcebase import SourceBase
 from ccai.testbase.sequencing.testsequencer import TestSequencer
-from ccai.testbase.constraints import ConstraintsCatalog, ConstraintsOrigin
+from ccai.testbase.constraints import ConstraintsCatalog
 
 
 # ============================================================================

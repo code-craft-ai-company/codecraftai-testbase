@@ -17,7 +17,6 @@ from typing import Optional, Type
 
 import argparse
 import inspect
-import os
 import sys
 
 from ccai.xmodules.xlogging.levels import LOG_LEVEL_NAMES

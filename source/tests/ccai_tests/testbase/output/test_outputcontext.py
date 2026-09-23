@@ -11,8 +11,7 @@
 import os
 import tempfile
 import unittest
-
-from unittest import mock
+import unittest.mock
 
 from ccai.testbase.output.outputcontext import SimpleOutputContext, ensure_directory
 
@@ -51,7 +50,7 @@ class EnsureDirectoryTests(unittest.TestCase):
         # THE regression: patched exists says everything exists, parent does
         # not.  os.makedirs fails here; ensure_directory must not.
         target = os.path.join(self.base, "missing_parent", "leaf")
-        with mock.patch("os.path.exists", return_value=True):
+        with unittest.mock.patch("os.path.exists", return_value=True):
             ensure_directory(target)
         self.assertTrue(os.path.isdir(target))
 
@@ -59,14 +58,14 @@ class EnsureDirectoryTests(unittest.TestCase):
         # The inverse lie: exists says nothing exists, everything does.
         target = os.path.join(self.base, "x", "y")
         os.makedirs(target)
-        with mock.patch("os.path.exists", return_value=False):
+        with unittest.mock.patch("os.path.exists", return_value=False):
             ensure_directory(target)
         self.assertTrue(os.path.isdir(target))
 
     def test_unreachable_root_still_raises(self):
         # When the filesystem genuinely refuses, the error must surface, not
         # loop -- dirname('/') == '/' is the recursion's hard stop.
-        with mock.patch("os.mkdir", side_effect=FileNotFoundError(2, "No such file or directory")):
+        with unittest.mock.patch("os.mkdir", side_effect=FileNotFoundError(2, "No such file or directory")):
             with self.assertRaises(FileNotFoundError):
                 ensure_directory("/")
 
@@ -85,7 +84,7 @@ class SimpleOutputContextDirectoryTests(unittest.TestCase):
         # by-products directory must survive a test that patches
         # os.path.exists, because the patch is ACTIVE while the framework
         # enters the test scope.
-        with mock.patch("os.path.exists", return_value=True):
+        with unittest.mock.patch("os.path.exists", return_value=True):
             byproducts = self.ctx.get_testcase_byproducts_dir("some-test-uuid-1")
         self.assertTrue(os.path.isdir(byproducts))
 

@@ -20,7 +20,6 @@ from ccai.testbase.constraints import (
 )
 from ccai.testbase.coupling.integrationcoupling import IntegrationCoupling
 from ccai.testbase.coupling.configurationcoupling import ConfigurationCoupling
-from ccai.testbase.coupling.validatorcoupling import ValidatorCoupling
 
 from ccai.testbase.declaration import attachments, originations, registrations
 from ccai.testbase.injection import injectionregistry
@@ -280,7 +279,8 @@ class TestConstraintsPassedToGenerators(unittest.TestCase):
         # Get the source and create origin directly to test the catalog storage
         source = self.registry.lookup_resource_source(resource_for_catalog_test)
         
-        origin = ResourceOrigin(
+        # Constructing the origin stores its constraints in the catalog.
+        ResourceOrigin(
             "test.catalog.scope",
             "catalog_test_param",
             ResourceLifespan.Package,
@@ -311,7 +311,6 @@ class TestConstraintsAtDifferentScopes(unittest.TestCase):
         """Verify constraints work at session scope (IntegrationCoupling)."""
         class SessionIntegration(IntegrationCoupling):
             _name = None
-            pass
         
         @registrations.integration_factory()
         def session_integration(constraints=None) -> typing.Generator[SessionIntegration, None, None]:

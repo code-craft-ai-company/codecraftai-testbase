@@ -13,28 +13,6 @@ import unicodedata
 
 from ccai.testbase.properties.strategies import (
     from_regex,
-    Strategy,
-    IntegerStrategy,
-    FloatStrategy,
-    TextStrategy,
-    BooleanStrategy,
-    ListStrategy,
-    TupleStrategy,
-    DictionaryStrategy,
-    SampledFromStrategy,
-    OneOfStrategy,
-    JustStrategy,
-    CharacterStrategy,
-    CompositeStrategy,
-    MappedStrategy,
-    FilteredStrategy,
-    FlatMappedStrategy,
-    NoneStrategy,
-    BinaryStrategy,
-    SetStrategy,
-    FrozenSetStrategy,
-    FixedDictionaryStrategy,
-    BuildsStrategy,
     composite,
     integers,
     floats,
@@ -321,7 +299,7 @@ class TupleStrategyTests(unittest.TestCase):
         strat = tuples(integers(), booleans())
         shrinks = list(strat.shrink((5, True)))
         # Should attempt shrinking individual elements
-        self.assertTrue(len(shrinks) > 0)
+        self.assertGreater(len(shrinks), 0)
 
     def test_describe(self):
         strat = tuples(integers(), booleans())

@@ -30,7 +30,7 @@ from ccai.testbase.origins.resourceorigin import ResourceOrigin
 from ccai.testbase.resourcelifespan import ResourceLifespan
 from ccai.testbase.sources.sourcebase import SourceBase
 from ccai.testbase.sequencing.testsequencer import TestSequencer
-from ccai.testbase.constraints import ConstraintsCatalog, ConstraintsOrigin, Constraints
+from ccai.testbase.constraints import ConstraintsCatalog
 
 
 

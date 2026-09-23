@@ -38,7 +38,6 @@ class RegistrationDecoratorTests(unittest.TestCase):
     def test_integration_factory_registers(self):
         class MyIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         @registrations.integration_factory()
         def make_it() -> typing.Generator[MyIntegration, None, None]:
@@ -52,7 +51,6 @@ class RegistrationDecoratorTests(unittest.TestCase):
         """Test that async generator functions are correctly registered as integration sources."""
         class MyAsyncIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         @registrations.integration_factory()
         async def make_async_integration() -> typing.AsyncGenerator[MyAsyncIntegration, None]:
@@ -73,7 +71,6 @@ class RegistrationDecoratorTests(unittest.TestCase):
     def test_integration_factory_return_integration(self):
         class MyIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         with self.assertRaises(SemanticError):
             @registrations.integration_factory()
@@ -295,7 +292,6 @@ class ErrorHandlingVerificationTests(unittest.TestCase):
         """Verify error message when returning instead of yielding integration."""
         class TestIntegration(IntegrationCoupling):
             _name = None
-            pass
 
         try:
             @registrations.integration_factory()
@@ -369,9 +365,6 @@ class ErrorHandlingVerificationTests(unittest.TestCase):
         # Test with a type that has _name attribute (Generator with wrong yield type)
         # The invalid_generator_type test already covers this case
         # Here we verify the error message for direct ConfigurationCoupling subclass check
-        class NotAConfig:
-            pass
-        
         # This case is handled by the issubclass check after Generator check
         # Since int doesn't have _name, it would fail before reaching the issubclass check
         # We test with a Generator that yields a non-ConfigurationCoupling type

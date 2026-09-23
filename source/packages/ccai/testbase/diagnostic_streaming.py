@@ -57,7 +57,7 @@ See Also:
 """
 
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, Optional
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -67,7 +67,6 @@ import os
 import queue
 import threading
 import time
-import traceback
 
 
 __author__ = "Myron Walker"
@@ -864,6 +863,8 @@ class CallbackStreamHandler(DiagnosticStreamHandler):
                 try:
                     self._config.error_callback(event, e)
                 except Exception:
+                    # Best-effort notification; the original callback failure is already
+                    # logged above and a failing error callback must not break the stream.
                     pass
             return False
 

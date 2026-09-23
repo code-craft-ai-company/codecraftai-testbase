@@ -10,15 +10,13 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
-from typing import List, Union, Optional
+from typing import List, Optional
 
 import os
 import sys
-import argparse
 
 from ccai.arcli import decorators as arcli
 
-from ccai.xmodules.xlogging.levels import LOG_LEVEL_NAMES
 from ccai.interfaces.itestjob import ITestJob
 
 from ccai.testbase.cli.options import (
@@ -30,34 +28,6 @@ from ccai.testbase.cli.options import (
     DiagnosticOptionGroup,
     FilteringOptionGroup,
     TimeoutOptionGroup,
-    HELP_ROOT,
-    HELP_EXCLUDES,
-    HELP_INCLUDES,
-    HELP_OUTPUT,
-    HELP_START,
-    HELP_BRANCH,
-    HELP_BUILD,
-    HELP_FLAVOR,
-    HELP_JOB_ID,
-    HELP_JOB_INITIATOR,
-    HELP_JOB_LABEL,
-    HELP_JOB_NAME,
-    HELP_JOB_OWNER,
-    HELP_JOB_SEED,
-    HELP_JOB_TAG,
-    HELP_RUNID,
-    HELP_CONSOLE_LOG_LEVEL,
-    HELP_FILE_LOG_LEVEL,
-    HELP_DEBUGGER,
-    HELP_BREAKPOINT,
-    HELP_DEBUG_PORT,
-    HELP_DEBUG_PORT_RANGE,
-    HELP_DEBUG_LOG_LEVEL,
-    HELP_PRERUN_DIAGNOSTIC,
-    HELP_POSTRUN_DIAGNOSTIC,
-    HELP_INCLUDE_MARKER_EXP,
-    HELP_EXCLUDE_MARKER_EXP,
-    HELP_TIMEOUT
 )
 
 @RootOptionGroup.attach(help_fill={"action": "run"})

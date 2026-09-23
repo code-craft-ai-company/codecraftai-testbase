@@ -130,6 +130,8 @@ def catalog_tree(rootdir: str, dont_catalog_dirs: List[str] = DEFAULT_DO_NOT_CAT
             if cf.read() == content:
                 return
     except OSError:
+        # No readable existing catalog (usually it does not exist yet); the
+        # unchanged-content check is only an optimization, so write it below.
         pass
 
     with open(catalogfile, 'w') as cf:

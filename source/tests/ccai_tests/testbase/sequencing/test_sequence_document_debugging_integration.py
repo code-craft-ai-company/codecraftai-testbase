@@ -19,7 +19,7 @@ import collections
 import os
 import tempfile
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from ccai.testbase.sequencing.testsequencer import TestSequencer
 from ccai.testbase.testgroup import TestGroup

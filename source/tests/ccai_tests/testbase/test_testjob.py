@@ -402,6 +402,7 @@ class TestJobDiagnosticErrorHandlingTests(unittest.TestCase):
         try:
             job.fire_diagnostic_capture_post_testrun(sequencer, level=5)
         except RuntimeError:
+            # Expected: the sequencer raises; this test only checks the method was called first.
             pass
         self.assertTrue(sequencer.post_called)
 

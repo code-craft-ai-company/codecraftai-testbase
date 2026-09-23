@@ -2,6 +2,7 @@ import unittest
 
 from ccai.testbase.verification import (
     assert_dict_response_has_keys,
+    assert_dict_response_has_paths,
     assert_equal,
     assert_expression,
     assert_greater,
@@ -12,6 +13,7 @@ from ccai.testbase.verification import (
     assert_not_equal,
     assert_type,
     verify_dict_has_keys,
+    verify_dict_has_paths,
 )
 
 
@@ -34,6 +36,76 @@ class VerifyDictHasKeysTests(unittest.TestCase):
     def test_no_missing_keys(self):
         missing = verify_dict_has_keys({'a': 1, 'b': 2}, ['a', 'b'])
         self.assertEqual(missing, [])
+
+
+NESTED_RESPONSE = {
+    'metadata': {'name': 'item', 'labels': {'app': 'web'}},
+    'status': None,
+    'spec': {'replicas': 2},
+}
+
+
+class VerifyDictHasPathsTests(unittest.TestCase):
+    def test_single_level_path_present(self):
+        missing = verify_dict_has_paths(NESTED_RESPONSE, ['status'])
+        self.assertEqual(missing, [])
+        return
+
+    def test_nested_paths_present(self):
+        missing = verify_dict_has_paths(NESTED_RESPONSE, ['metadata/name', 'metadata/labels/app', 'spec/replicas'])
+        self.assertEqual(missing, [])
+        return
+
+    def test_intermediate_dictionary_path_present(self):
+        missing = verify_dict_has_paths(NESTED_RESPONSE, ['metadata/labels'])
+        self.assertEqual(missing, [])
+        return
+
+    def test_missing_single_level_path_reported(self):
+        missing = verify_dict_has_paths(NESTED_RESPONSE, ['status', 'kind'])
+        self.assertEqual(missing, ['kind'])
+        return
+
+    def test_missing_nested_path_reported(self):
+        missing = verify_dict_has_paths(NESTED_RESPONSE, ['metadata/labels/tier', 'spec/replicas'])
+        self.assertEqual(missing, ['metadata/labels/tier'])
+        return
+
+    def test_path_through_non_dictionary_value_reported(self):
+        missing = verify_dict_has_paths(NESTED_RESPONSE, ['spec/replicas/count'])
+        self.assertEqual(missing, ['spec/replicas/count'])
+        return
+
+    def test_key_prefix_is_not_a_path_match(self):
+        missing = verify_dict_has_paths({'metadata_extra': {'name': 'x'}}, ['metadata/name'])
+        self.assertEqual(missing, ['metadata/name'])
+        return
+
+    def test_leading_and_trailing_slashes_ignored(self):
+        missing = verify_dict_has_paths(NESTED_RESPONSE, ['/metadata/name/', '/spec/'])
+        self.assertEqual(missing, [])
+        return
+
+    def test_missing_path_list_with_template(self):
+        missing = verify_dict_has_paths(NESTED_RESPONSE, ['metadata/uid'], template="missing {}")
+        self.assertEqual(missing, ['missing metadata/uid'])
+        return
+
+
+class AssertDictResponseHasPathsTests(unittest.TestCase):
+    def test_success_when_paths_present(self):
+        assert_dict_response_has_paths(NESTED_RESPONSE, ['metadata/labels/app', 'spec/replicas'])
+        return
+
+    def test_error_when_paths_missing(self):
+        with self.assertRaises(AssertionError) as ctx:
+            assert_dict_response_has_paths(NESTED_RESPONSE, ['metadata/name', 'metadata/uid', 'spec/selector'], api='API')
+        errmsg = str(ctx.exception)
+        self.assertIn("'API' API result verification failed", errmsg)
+        self.assertIn("'metadata/uid' path not found.", errmsg)
+        self.assertIn("'spec/selector' path not found.", errmsg)
+        self.assertNotIn("'metadata/name' path not found.", errmsg)
+        return
 
 
 class AssertionFunctionTests(unittest.TestCase):
@@ -71,6 +143,30 @@ class AssertionFunctionTests(unittest.TestCase):
         """Ensure assert_not_equal raises AssertionError when values match."""
         with self.assertRaises(AssertionError):
             assert_not_equal(1, 1)
+
+    def test_assert_equal_multiline_values_keep_whole_lines(self):
+        """Multi-line values are reported as indented whole lines, with a single EXPECTED header."""
+        expected = {"items": list(range(40))}
+        found = {"items": list(range(41))}
+        with self.assertRaises(AssertionError) as context:
+            assert_equal(found, expected)
+        message_lines = str(context.exception).splitlines()
+        single_character_lines = [line for line in message_lines if len(line.strip()) == 1 and line.strip() not in "[]{}"]
+        self.assertEqual(single_character_lines, [])
+        self.assertEqual(message_lines.count("EXPECTED:"), 1)
+        self.assertIn("FOUND:", message_lines)
+        return
+
+    def test_assert_not_equal_multiline_values_keep_whole_lines(self):
+        """The not-equal report shows the value as indented whole lines, without a stray EXPECTED header."""
+        value = {"items": list(range(40))}
+        with self.assertRaises(AssertionError) as context:
+            assert_not_equal(value, dict(value))
+        message_lines = str(context.exception).splitlines()
+        self.assertNotIn("EXPECTED:", message_lines)
+        self.assertIn("NOT EXPECTED:", message_lines)
+        self.assertTrue(all(len(line.strip()) > 1 for line in message_lines if line.strip() not in ("", "[", "]", "{", "}")))
+        return
 
 
 if __name__ == '__main__':

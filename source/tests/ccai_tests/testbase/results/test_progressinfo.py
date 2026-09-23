@@ -8,7 +8,6 @@
 
 import unittest
 from datetime import datetime
-from dataclasses import is_dataclass
 
 from ccai.testbase.results.model.progressinfo import ProgressInfo
 from ccai.testbase.results.model.progresscode import ProgressCode

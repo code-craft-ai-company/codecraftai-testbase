@@ -18,7 +18,7 @@ import os
 from ccai.thisapp.wellknown import ThisApplicationSingleton
 from ccai.thisapp.persona import establish_app_persona
 
-from ccai.runtime.enumerations import ActivationProfile, JobType
+from ccai.runtime.enumerations import JobType
 from ccai.runtime.activation import activate_profile_job
 from ccai.runtime.runtimevariables import RuntimeVariables, RuntimeVariablesDesc, resolve_runtime_variables
 

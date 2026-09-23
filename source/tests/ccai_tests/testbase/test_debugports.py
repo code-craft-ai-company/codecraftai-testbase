@@ -13,7 +13,6 @@ __author__ = "CodeCraftX"
 __copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
-import socket
 import unittest
 from unittest.mock import patch, MagicMock
 

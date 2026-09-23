@@ -7,7 +7,7 @@
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from ccai.xmodules.debugging import (
     debugger_wellknown_breakpoint_entry,

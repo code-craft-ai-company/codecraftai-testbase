@@ -12,8 +12,6 @@ __credits__ = []
 
 import sys
 
-from typing import Optional
-
 from ccai.arcli import decorators as arcli
 
 from ccai.testbase.cli.cmdtree.agents.formatting import (

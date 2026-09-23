@@ -19,7 +19,6 @@ from ccai.testbase.results.model.pipelineinfo import PipelineInfo
 from ccai.testbase.results.model.jobinfo import JobInfo
 from ccai.testbase.results.model.renderinfo import RenderInfo
 from ccai.testbase.results.model.resultcode import ResultCode
-from ccai.testbase.results.model.resulttype import ResultType
 from ccai.testbase.results.model.testresult import TestResult
 from ccai.testbase.results.model.jobcontainer import JobContainer
 from ccai.testbase.results.model.testcontainer import TestContainer
@@ -28,7 +27,7 @@ from ccai.testbase.results.model.taskingresult import TaskingResult
 
 from ccai.testbase.results.recorders.jsonresultrecorder import JsonResultRecorder
 
-from ccai.xmodules.jsos import CHAR_RECORD_SEPERATOR, load_jsos_stream_from_file
+from ccai.xmodules.jsos import load_jsos_stream_from_file
 from ccai.errors.xtraceback import OriginDetail, TraceDetail, TracebackDetail
 
 

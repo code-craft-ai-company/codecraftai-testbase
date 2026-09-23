@@ -20,7 +20,6 @@
     - 30.4: Cleanup occurs after successful generation
 """
 
-import ast
 import collections
 import os
 import tempfile

@@ -35,7 +35,6 @@ __credits__ = []
 import os
 import json
 import tempfile
-from typing import Dict, Any, List, Tuple
 
 from ccai.testbase.diagnostics import DiagnosticLabel
 

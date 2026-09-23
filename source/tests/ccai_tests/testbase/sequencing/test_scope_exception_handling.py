@@ -436,8 +436,8 @@ class TestTestScopeExceptionHandling(unittest.TestCase):
         scope.__enter__()
         
         # Exit without exception
-        handled = scope.__exit__(None, None, None)
-        
+        scope.__exit__(None, None, None)
+
         # Verify result was marked as passed
         self.assertEqual(len(self.rec.recorded), 1)
         result = self.rec.recorded[0]

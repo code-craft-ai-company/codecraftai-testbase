@@ -660,7 +660,7 @@ class MockContextResetTests(unittest.TestCase):
         m = Mock()
         m("a")
         m("b")
-        self.assertTrue(len(m.mock_calls) > 0)
+        self.assertGreater(len(m.mock_calls), 0)
         
         m.mock_context().reset()
         
@@ -765,7 +765,6 @@ class PatchTests(unittest.TestCase):
         self.assertIs(os.path.exists, original)
 
     def test_class_patch(self):
-        orig = SampleClass.cmethod("x")
         with create_class_patch(SampleClass, "cmethod") as mock_cm:
             mock_cm.configure(return_value="patched")
             self.assertEqual(SampleClass.cmethod("y"), "patched")
@@ -773,7 +772,6 @@ class PatchTests(unittest.TestCase):
 
     def test_instance_patch(self):
         obj = SampleClass()
-        orig = obj.method(1)
         with create_instance_patch(obj, "method") as mock_m:
             mock_m.configure(return_value=99)
             self.assertEqual(obj.method(2), 99)
@@ -901,23 +899,23 @@ class MockMagicMethodTests(unittest.TestCase):
         """Test that __contains__ checks if item is in return_value (Requirement 11.7)."""
         # Test with list
         m = Mock(return_value=[1, 2, 3, 4, 5])
-        self.assertTrue(2 in m)
-        self.assertFalse(10 in m)
+        self.assertIn(2, m)
+        self.assertNotIn(10, m)
 
         # Test with string
         m2 = Mock(return_value="hello world")
-        self.assertTrue("world" in m2)
-        self.assertFalse("foo" in m2)
+        self.assertIn("world", m2)
+        self.assertNotIn("foo", m2)
 
         # Test with dict (checks keys)
         m3 = Mock(return_value={"a": 1, "b": 2})
-        self.assertTrue("a" in m3)
-        self.assertFalse("c" in m3)
+        self.assertIn("a", m3)
+        self.assertNotIn("c", m3)
 
         # Test with set
         m4 = Mock(return_value={1, 2, 3})
-        self.assertTrue(1 in m4)
-        self.assertFalse(5 in m4)
+        self.assertIn(1, m4)
+        self.assertNotIn(5, m4)
 
     def test_contains_raises_type_error_without_return_value(self):
         """Test that __contains__ raises TypeError when return_value is not set (Requirement 11.8)."""
@@ -995,7 +993,6 @@ class MockMagicMethodTests(unittest.TestCase):
     def test_eq_same_mock_is_equal(self):
         """Test that a mock is equal to itself."""
         m = Mock(return_value=42)
-        self.assertTrue(m == m)
         self.assertEqual(m, m)
 
     def test_eq_mocks_with_same_configuration_are_equal(self):
@@ -1038,7 +1035,6 @@ class MockMagicMethodTests(unittest.TestCase):
         """Test that __ne__ returns True for mocks with different configuration."""
         m1 = Mock(return_value=42)
         m2 = Mock(return_value=100)
-        self.assertTrue(m1 != m2)
         self.assertNotEqual(m1, m2)
 
     def test_ne_mocks_with_same_configuration(self):
@@ -1087,9 +1083,6 @@ class MockMagicMethodTests(unittest.TestCase):
         hash_after = hash(m)
         # Hash is based on id(), so it should remain the same
         self.assertEqual(hash_before, hash_after)
-
-
-import types
 
 
 class PatchTypeValidationTests(unittest.TestCase):
@@ -1435,7 +1428,6 @@ class PatchActivationErrorTests(unittest.TestCase):
                 return "original"
 
         instance = TestClass()
-        original_method = instance.method
 
         # Create first patch and activate it
         patch1 = create_instance_patch(instance, "method")
@@ -1764,11 +1756,6 @@ class MultipleSimultaneousPatchesIntegrationTests(unittest.TestCase):
                 return "original3"
         
         instance = TestClass()
-        
-        # Store original methods
-        original_method1 = instance.method1
-        original_method2 = instance.method2
-        original_method3 = instance.method3
         
         # Create and activate multiple patches
         patch1 = create_instance_patch(instance, "method1")
@@ -2543,7 +2530,7 @@ class NestedMockHierarchyIntegrationTests(unittest.TestCase):
         
         # Verify magic methods work on configured mocks
         self.assertEqual(len(root.level1.level2), 3)
-        self.assertTrue(2 in root.level1.level2)
+        self.assertIn(2, root.level1.level2)
 
     def test_deep_mock_chain_with_ten_levels(self):
         """Test that very deep mock chains (10 levels) work correctly."""

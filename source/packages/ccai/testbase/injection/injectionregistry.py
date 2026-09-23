@@ -36,11 +36,8 @@ from ccai.testbase.injection.introspection import (
     FactoryType,
     FactoryMetadata,
     FactoryListResult,
-    ParameterDependency,
     DependencyAnalysisResult,
     DependencyGraph,
-    DependencyGraphNode,
-    DependencyGraphEdge
 )
 
 
@@ -730,6 +727,8 @@ class InjectionRegistry:
                     param_info["source_function_name"] = origin.source_function_name
                     param_info["source_module"] = origin.source_module_name
                 except (AttributeError, TypeError):
+                    # Informational listing only; an origin whose source does not expose
+                    # function/module names keeps the default of None for those fields.
                     pass
             
             if hasattr(origin, 'life_span') and origin.life_span is not None:
@@ -744,6 +743,8 @@ class InjectionRegistry:
                         if name != "constraints"
                     ]
                 except (AttributeError, TypeError):
+                    # Informational listing only; an origin whose source signature cannot be
+                    # inspected keeps the default empty dependency list.
                     pass
             
             result[key] = param_info

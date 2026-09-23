@@ -13,7 +13,7 @@ import os
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch, MagicMock
 
 from ccai.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
 from ccai.thisapp.wellknown import ThisApplicationSingleton

@@ -8,15 +8,14 @@
 
 import os
 import unittest
-import random
 
 from ccai.testbase.properties.propertyrunner import (
     ENV_MAX_EXAMPLES_CAP,
     PropertyRunner,
     derive_test_seed,
 )
-from ccai.testbase.properties.strategies import integers, text, booleans
-from ccai.testbase.properties.assumptions import assume, UnsatisfiedAssumption
+from ccai.testbase.properties.strategies import integers, text
+from ccai.testbase.properties.assumptions import assume
 
 from ccai.testbase.results.model.checkresult import CheckResult
 from ccai.testbase.results.model.resultcode import ResultCode
@@ -247,6 +246,45 @@ class PropertyRunnerExecutionTests(unittest.TestCase):
 
         self.assertIn("falsified", str(ctx.exception).lower())
 
+    def test_run_failure_chained_to_first_failure(self):
+        """Test that the falsified-property error is chained to the first failing example's error."""
+        constraints = {"max_examples": 100}
+        recorder = MockRecorder()
+        runner = PropertyRunner(constraints, 42, "test_bad", recorder, "parent-001")
+
+        def test_func(x):
+            assert x < 50, "x-was-not-below-fifty"
+
+        strategies = {"x": integers(0, 100)}
+
+        with self.assertRaises(AssertionError) as ctx:
+            runner.run(test_func, strategies, {})
+
+        cause = ctx.exception.__cause__
+        self.assertIsInstance(cause, AssertionError)
+        self.assertIn("x-was-not-below-fifty", str(cause))
+        return
+
+    def test_run_failure_message_includes_first_failure_traceback(self):
+        """Test that the falsified-property message includes the first failing example's traceback."""
+        constraints = {"max_examples": 100}
+        recorder = MockRecorder()
+        runner = PropertyRunner(constraints, 42, "test_bad", recorder, "parent-001")
+
+        def test_func(x):
+            assert x < 50, "x-was-not-below-fifty"
+
+        strategies = {"x": integers(0, 100)}
+
+        with self.assertRaises(AssertionError) as ctx:
+            runner.run(test_func, strategies, {})
+
+        errmsg = str(ctx.exception)
+        self.assertIn("FIRST FAILURE:", errmsg)
+        self.assertIn("x-was-not-below-fifty", errmsg)
+        self.assertIn("in test_func", errmsg)
+        return
+
     def test_run_records_failed_check(self):
         """Test that a failing check is recorded with FAILED status."""
         constraints = {"max_examples": 100}
@@ -261,6 +299,7 @@ class PropertyRunnerExecutionTests(unittest.TestCase):
         try:
             runner.run(test_func, strategies, {})
         except AssertionError:
+            # Expected: the falsified property is re-raised; this test inspects the recorder.
             pass
 
         # At least one check should be FAILED
@@ -389,6 +428,7 @@ class PropertyRunnerShrinkingTests(unittest.TestCase):
         try:
             runner.run(test_func, strategies, {})
         except AssertionError:
+            # Expected: the falsified property is re-raised; only termination is checked here.
             pass
         # Just verify it completes without hanging
 

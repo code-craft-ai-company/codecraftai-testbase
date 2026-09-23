@@ -42,7 +42,7 @@ from ccai.testbase.origins.resourceorigin import ResourceOrigin
 from ccai.testbase.coupling.configurationcoupling import ConfigurationCoupling
 from ccai.testbase.coupling.integrationcoupling import IntegrationCoupling
 
-from ccai.testbase.diagnostics import DiagnosticLabel, DiagnosticLabelRegistry, DiagnosticFilter
+from ccai.testbase.diagnostics import DiagnosticLabel, DiagnosticFilter
 from ccai.testbase.markers import MetaFilter
 
 
@@ -1379,8 +1379,6 @@ class TestSequencer:
                 - :attr:`testtree`: The test tree to be expanded
         """
 
-        context_locals = {}
-
         # Walk the test tree and expand the parameters
         # self._testtree
 
@@ -1702,7 +1700,6 @@ class TestSequencer:
         # ============================================================================
         constraint_imports = set()  # Constraint class imports (e.g., from package import MyConstraint)
         factory_imports = set()     # Parameter factory imports (e.g., from package import create_resource)
-        test_imports = set()        # Test function imports (currently unused, reserved for future)
 
         # ============================================================================
         # PASS 1: GENERATE CODE TO TEMPORARY FILE
@@ -2597,8 +2594,6 @@ class TestSequencer:
                 # Store the test name in a variable for use in scope context calls
                 method_lines.append('{}test_scope_name = "{}"'.format(current_indent, test_scope_name))
                 method_lines.append('')
-
-                constraints = None
 
                 # ------------------------------------------------------------
                 # TEST SETUP SCOPE AND LOCAL PARAMETER GENERATION

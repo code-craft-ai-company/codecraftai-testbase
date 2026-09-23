@@ -18,7 +18,6 @@ import threading
 from datetime import datetime
 
 from ccai.testbase.results.model.progresscode import ProgressCode
-from ccai.testbase.results.model.progresstype import ProgressType
 from ccai.testbase.results.model.progressinfo import ProgressInfo
 from ccai.testbase.results.model.nestedprogressinfo import NestedProgressInfo
 

@@ -607,8 +607,6 @@ class MetaFilterNotEquals(MetaFilterEquals):
 def parse_marker_expression(expression: str):
 
     include = True
-    group = None
-    marker = None
 
     working_expr = expression.strip()
 

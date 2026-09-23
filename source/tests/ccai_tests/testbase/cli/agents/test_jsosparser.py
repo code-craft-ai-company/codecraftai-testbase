@@ -2,7 +2,6 @@
     Tests for the JSOS Parser utility module.
 """
 
-import json
 import os
 import tempfile
 import unittest

@@ -341,7 +341,6 @@ class InjectionScopeVisualizationIntegrationTests(unittest.TestCase):
 
         diagram = root.to_tree_diagram()
         json_str = root.to_json()
-        dict_result = root.to_dict()
 
         self.assertIn("tests", diagram)
         self.assertIn("unit", diagram)

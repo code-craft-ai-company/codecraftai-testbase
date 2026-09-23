@@ -16,7 +16,6 @@
 import ast
 import collections
 import os
-import sys
 import tempfile
 import unittest
 
@@ -28,7 +27,6 @@ from ccai.testbase.injection.injectionregistry import injection_registry
 from ccai.testbase.injection.injectionscope import InjectionScope
 from ccai.testbase.sequencing.testsequencer import TestSequencer
 from ccai.testbase.results.recorders.resultrecorder import ResultRecorder
-from ccai.testbase.results.model.renderinfo import RenderInfo
 
 
 class MockInjectionScope:

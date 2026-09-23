@@ -10,7 +10,6 @@ import gzip
 import json
 import os
 import shutil
-import tarfile
 import tempfile
 import unittest
 import zipfile

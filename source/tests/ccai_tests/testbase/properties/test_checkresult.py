@@ -7,7 +7,6 @@
 """
 
 import unittest
-import uuid
 
 from ccai.testbase.results.model.checkresult import CheckResult
 from ccai.testbase.results.model.resultcode import ResultCode

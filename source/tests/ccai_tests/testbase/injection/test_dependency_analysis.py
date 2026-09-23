@@ -16,8 +16,7 @@ from ccai.testbase.injection.introspection import (
     DependencyGraph,
     DependencyGraphNode,
     DependencyGraphEdge,
-    ParameterDependency,
-    DependencyAnalysisResult
+    DependencyAnalysisResult,
 )
 from ccai.testbase.origins.resourceorigin import ResourceOrigin
 from ccai.testbase.resourcelifespan import ResourceLifespan

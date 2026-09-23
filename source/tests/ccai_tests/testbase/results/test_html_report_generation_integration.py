@@ -19,13 +19,9 @@ from ccai.testbase.results.model.buildinfo import BuildInfo
 from ccai.testbase.results.model.pipelineinfo import PipelineInfo
 from ccai.testbase.results.model.jobinfo import JobInfo
 from ccai.testbase.results.model.renderinfo import RenderInfo
-from ccai.testbase.results.model.resultcode import ResultCode
-from ccai.testbase.results.model.testresult import TestResult
 from ccai.testbase.results.model.jobcontainer import JobContainer
-from ccai.testbase.results.model.testcontainer import TestContainer
 
 from ccai.testbase.results.recorders.jsonresultrecorder import JsonResultRecorder
-from ccai.testbase.results.utilities import catalog_tree
 
 
 class CatalogFileGenerationIntegrationTests(unittest.TestCase):

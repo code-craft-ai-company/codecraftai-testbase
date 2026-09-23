@@ -20,7 +20,6 @@ from types import TracebackType
 import collections
 import copy
 import os
-import shutil
 import threading
 import time
 

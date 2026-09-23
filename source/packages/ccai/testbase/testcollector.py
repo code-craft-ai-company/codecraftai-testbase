@@ -125,7 +125,6 @@ class TestCollector:
         """
 
         referenced_integrations = {}
-        referenced_scopes = {}
 
         # Add implied injected resources
         injection_registry.add_implied_session_resource("sequencer")

@@ -17,14 +17,10 @@ from ccai.testbase.configuration import (
     EntryPointConfiguration,
     find_user_config_file,
     find_project_config_file,
-    load_user_configuration,
-    load_project_configuration,
     load_entrypoint_configuration,
     _load_yaml_file,
     _parse_config_dict,
-    CONFIG_FILE_NAMES,
     USER_CONFIG_DIR,
-    USER_CONFIG_FILE_NAMES,
 )
 
 

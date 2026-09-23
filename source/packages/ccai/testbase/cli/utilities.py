@@ -9,8 +9,6 @@
 import os
 from typing import Optional
 
-from ccai.runtime.runtimevariables import RuntimeVariables
-
 def resolve_test_root(root: Optional[str]) -> str:
     """
     Resolves the test root directory, falling back to RuntimeVariables or '.' if not provided.

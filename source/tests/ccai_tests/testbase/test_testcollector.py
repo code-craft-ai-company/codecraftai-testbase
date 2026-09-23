@@ -2,7 +2,7 @@ import unittest
 import os
 import tempfile
 from types import ModuleType
-from unittest import mock
+import unittest.mock
 
 from ccai.testbase.testcollector import (
     catagorize_exclusions,
@@ -33,13 +33,13 @@ class CollectReferencesTests(unittest.TestCase):
             pass
         tref = TestRef(dummy)
 
-        with mock.patch(
+        with unittest.mock.patch(
             "ccai.testbase.testcollector.parse_test_include_expression"
         ) as pexp, \
-             mock.patch(
+             unittest.mock.patch(
                  "ccai.testbase.testcollector.find_included_modules_under_root"
              ) as finc, \
-             mock.patch(
+             unittest.mock.patch(
                  "ccai.testbase.testcollector.collect_test_references"
              ) as crefs:
 
@@ -69,8 +69,8 @@ class FinalizeCollectionTests(unittest.TestCase):
 
         t1 = TestRef(f1)
         t2 = TestRef(f2)
-        t1.is_member_of_metaset = mock.Mock(return_value=True)
-        t2.is_member_of_metaset = mock.Mock(return_value=False)
+        t1.is_member_of_metaset = unittest.mock.Mock(return_value=True)
+        t2.is_member_of_metaset = unittest.mock.Mock(return_value=False)
 
         col._test_references = {t1.name: t1, t2.name: t2}
 
@@ -107,7 +107,7 @@ class CollectIntegrationsAndConfigurationsTests(unittest.TestCase):
         col = TestCollector(root="/root", excludes=[], metafilters=[])
         col._test_references = {"a": object()}
         fake = self.FakeRegistry()
-        with mock.patch("ccai.testbase.testcollector.injection_registry", fake):
+        with unittest.mock.patch("ccai.testbase.testcollector.injection_registry", fake):
             integrations, configs = col.collect_integrations_and_configurations()
         self.assertEqual(fake.added, ["sequencer"])
         self.assertIs(fake.finalized_with, col._test_references)
@@ -118,7 +118,7 @@ class CollectIntegrationsAndConfigurationsTests(unittest.TestCase):
         col = TestCollector(root="/root", excludes=[], metafilters=[])
         col._test_references = {"a": object()}
         fake = self.FakeRegistry({"x": ["p"]})
-        with mock.patch("ccai.testbase.testcollector.injection_registry", fake):
+        with unittest.mock.patch("ccai.testbase.testcollector.injection_registry", fake):
             with self.assertRaises(Exception):
                 col.collect_integrations_and_configurations()
 
@@ -157,7 +157,7 @@ class QueryCollectionAsyncDetectionTests(unittest.TestCase):
             os.makedirs(root)
             included_file = os.path.join(root, 'test_async_module.py')
 
-            with mock.patch('ccai.testbase.queries.import_by_name', return_value=mod):
+            with unittest.mock.patch('ccai.testbase.queries.import_by_name', return_value=mod):
                 refs, import_errors = collect_test_references(root, [included_file], None, None, None, 'test')
 
         self.assertEqual(import_errors, {})

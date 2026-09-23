@@ -19,7 +19,7 @@ import re
 
 from pprint import pformat
 
-from ccai.xmodules.xformatting import indent_lines
+from ccai.xmodules.xformatting import indent_lines, indent_lines_list
 
 from ccai.errors.exceptions import SemanticError
 from ccai.errors.xtraceback import TracebackFormatPolicy
@@ -73,7 +73,7 @@ def assert_dict_response_has_paths(to_inspect: dict, expected_paths: List[str], 
         is the resposibility of the calling test to raise the returned error.
 
         :param to_inspect: The dictionary being inspected
-        :param expected_keys: The list of expected keys
+        :param expected_paths: The list of expected slash-separated paths, see :func:`verify_dict_has_paths`
         :param api: The name of the API that returned the result being inspected.
         
         :returns: None
@@ -119,8 +119,7 @@ def assert_equal(found: Any, expected: Any, api: Optional[str] = None):
         msg_prefix = PREFIX_STD if api is None else PREFIX_API.format(api)
 
         err_msg_lines = [
-            "{} verification failed because the found value did not match expected value:".format(msg_prefix),
-            "EXPECTED:"
+            "{} verification failed because the found value did not match expected value:".format(msg_prefix)
         ]
 
         exp_format_lines = pformat(expected, indent=4).strip().splitlines()
@@ -128,7 +127,7 @@ def assert_equal(found: Any, expected: Any, api: Optional[str] = None):
             err_msg_lines.append("EXPECTED: {}".format(exp_format_lines[0]))
         elif len(exp_format_lines) > 1:
             err_msg_lines.append("EXPECTED:")
-            exp_format_lines = indent_lines(exp_format_lines, 1)
+            exp_format_lines = indent_lines_list(exp_format_lines, 1)
             err_msg_lines.extend(exp_format_lines)
 
         found_format_lines = pformat(found, indent=4).splitlines()
@@ -136,7 +135,7 @@ def assert_equal(found: Any, expected: Any, api: Optional[str] = None):
             err_msg_lines.append("FOUND: {}".format(found_format_lines[0]))
         elif len(found_format_lines) > 1:
             err_msg_lines.append("FOUND:")
-            found_format_lines = indent_lines(found_format_lines, 1)
+            found_format_lines = indent_lines_list(found_format_lines, 1)
             err_msg_lines.extend(found_format_lines)
 
         errmsg = os.linesep.join(err_msg_lines)
@@ -205,7 +204,7 @@ def assert_true(found: Any, api: Optional[str] = None):
             err_msg_lines.append("FOUND: {}".format(found_format_lines[0]))
         elif len(found_format_lines) > 1:
             err_msg_lines.append("FOUND:")
-            found_format_lines = indent_lines(found_format_lines, 1)
+            found_format_lines = indent_lines_list(found_format_lines, 1)
             err_msg_lines.extend(found_format_lines)
 
         errmsg = os.linesep.join(err_msg_lines)
@@ -240,7 +239,7 @@ def assert_false(found: Any, api: Optional[str] = None):
             err_msg_lines.append("FOUND: {}".format(found_format_lines[0]))
         elif len(found_format_lines) > 1:
             err_msg_lines.append("FOUND:")
-            found_format_lines = indent_lines(found_format_lines, 1)
+            found_format_lines = indent_lines_list(found_format_lines, 1)
             err_msg_lines.extend(found_format_lines)
 
         errmsg = os.linesep.join(err_msg_lines)
@@ -277,7 +276,7 @@ def assert_greater(found: Any, boundary: Any, api: Optional[str] = None):
             err_msg_lines.append("BOUNDARY: {}".format(bndry_format_lines[0]))
         elif len(bndry_format_lines) > 1:
             err_msg_lines.append("BOUNDARY:")
-            bndry_format_lines = indent_lines(bndry_format_lines, 1)
+            bndry_format_lines = indent_lines_list(bndry_format_lines, 1)
             err_msg_lines.extend(bndry_format_lines)
 
         found_format_lines = pformat(found, indent=4).splitlines()
@@ -285,7 +284,7 @@ def assert_greater(found: Any, boundary: Any, api: Optional[str] = None):
             err_msg_lines.append("FOUND: {}".format(found_format_lines[0]))
         elif len(found_format_lines) > 1:
             err_msg_lines.append("FOUND:")
-            found_format_lines = indent_lines(found_format_lines, 1)
+            found_format_lines = indent_lines_list(found_format_lines, 1)
             err_msg_lines.extend(found_format_lines)
 
         errmsg = os.linesep.join(err_msg_lines)
@@ -322,7 +321,7 @@ def assert_lessthan(found: Any, boundary: Any, api: Optional[str] = None):
             err_msg_lines.append("BOUNDARY: {}".format(bndry_format_lines[0]))
         elif len(bndry_format_lines) > 1:
             err_msg_lines.append("BOUNDARY:")
-            bndry_format_lines = indent_lines(bndry_format_lines, 1)
+            bndry_format_lines = indent_lines_list(bndry_format_lines, 1)
             err_msg_lines.extend(bndry_format_lines)
 
         found_format_lines = pformat(found, indent=4).splitlines()
@@ -330,7 +329,7 @@ def assert_lessthan(found: Any, boundary: Any, api: Optional[str] = None):
             err_msg_lines.append("FOUND: {}".format(found_format_lines[0]))
         elif len(found_format_lines) > 1:
             err_msg_lines.append("FOUND:")
-            found_format_lines = indent_lines(found_format_lines, 1)
+            found_format_lines = indent_lines_list(found_format_lines, 1)
             err_msg_lines.extend(found_format_lines)
 
         errmsg = os.linesep.join(err_msg_lines)
@@ -463,8 +462,7 @@ def assert_not_equal(found: Any, not_expected: Any, api: Optional[str] = None):
         msg_prefix = PREFIX_STD if api is None else PREFIX_API.format(api)
 
         err_msg_lines = [
-            "{} verification failed because the found value matched the not_expected value:".format(msg_prefix),
-            "EXPECTED:"
+            "{} verification failed because the found value matched the not_expected value:".format(msg_prefix)
         ]
 
         exp_format_lines = pformat(not_expected, indent=4).strip().splitlines()
@@ -472,7 +470,7 @@ def assert_not_equal(found: Any, not_expected: Any, api: Optional[str] = None):
             err_msg_lines.append("NOT EXPECTED: {}".format(exp_format_lines[0]))
         elif len(exp_format_lines) > 1:
             err_msg_lines.append("NOT EXPECTED:")
-            exp_format_lines = indent_lines(exp_format_lines, 1)
+            exp_format_lines = indent_lines_list(exp_format_lines, 1)
             err_msg_lines.extend(exp_format_lines)
 
         found_format_lines = pformat(found, indent=4).splitlines()
@@ -480,7 +478,7 @@ def assert_not_equal(found: Any, not_expected: Any, api: Optional[str] = None):
             err_msg_lines.append("FOUND: {}".format(found_format_lines[0]))
         elif len(found_format_lines) > 1:
             err_msg_lines.append("FOUND:")
-            found_format_lines = indent_lines(found_format_lines, 1)
+            found_format_lines = indent_lines_list(found_format_lines, 1)
             err_msg_lines.extend(found_format_lines)
 
         errmsg = os.linesep.join(err_msg_lines)
@@ -546,42 +544,72 @@ def verify_dict_has_keys(to_inspect: dict, expected_keys: List[str], template: O
 
 def verify_dict_has_paths(to_inspect: dict, expected_paths: List[str], template: Optional[str]=None) -> List[str]:
     """
-        Verifies that the expected keys are found in the dictionary provided.  Returns a list of
-        any keys that are missing.
+        Verifies that the expected paths are found in the dictionary provided.  Returns a list of
+        any paths that are missing.
+
+        A path is a slash-separated list of keys, such as ``"spec/template/metadata"``, that is
+        followed down through nested dictionaries.  Leading and trailing slashes are ignored.  The
+        path is found when the key named by its last segment exists, whatever the value of that
+        key is.
 
         :param to_inspect: The dictionary being inspected
         :param expected_paths: The list of expected paths to leafs in a dictionary
-        :param template: Optional template used with missing key names to produce error messages.
+        :param template: Optional template used with missing paths to produce error messages.
 
-        :returns: None
-        :raises: :class:`AssertionError` if the verification fails.
+        :returns: A list of the missing paths, formatted with the template when one is provided.
     """
 
     missing_list = []
 
     for next_exp_path in expected_paths:
-        next_exp_path = next_exp_path.strip("/")
+        search_path = next_exp_path.strip("/")
 
         leaf_parts = []
+        found = _verify_dict_has_paths_descend(search_path, to_inspect, leaf_parts)
+
+        if not found:
+            if template is not None:
+                missing_list.append(template.format(next_exp_path))
+            else:
+                missing_list.append(next_exp_path)
 
     return missing_list
 
-def _verify_dict_has_paths_descend(search_path: str, cursor: dict, leaf_parts: list):
+def _verify_dict_has_paths_descend(search_path: str, cursor: dict, leaf_parts: List[str]) -> bool:
+    """
+        Searches the dictionary at ``cursor`` for ``search_path``, descending into nested dictionaries
+        whose accumulated path is a prefix of ``search_path``.
+
+        :param search_path: The slash-separated path being searched for, without leading or trailing slashes.
+        :param cursor: The dictionary at the current level of the descent.
+        :param leaf_parts: The keys that lead from the root dictionary to ``cursor``.
+
+        :returns: True if the path was found at or below ``cursor``, otherwise False.
+    """
 
     found = False
 
     cursor_path = "/".join(leaf_parts)
 
     for nxt_key in cursor.keys():
-        nxt_path = cursor_path + "/" + nxt_key
+        nxt_key_str = str(nxt_key)
+
+        if len(leaf_parts) > 0:
+            nxt_path = cursor_path + "/" + nxt_key_str
+        else:
+            nxt_path = nxt_key_str
+
         if nxt_path == search_path:
             found = True
-        elif search_path.startswith(nxt_path):
+        elif search_path.startswith(nxt_path + "/"):
             nxt_val = cursor[nxt_key]
             if isinstance(nxt_val, dict):
                 desc_leaf_parts = [lp for lp in leaf_parts]
-                desc_leaf_parts.extend(nxt_key)
-                _verify_dict_has_paths_descend(search_path, nxt_val, desc_leaf_parts)
+                desc_leaf_parts.append(nxt_key_str)
+                found = _verify_dict_has_paths_descend(search_path, nxt_val, desc_leaf_parts)
+
+        if found:
+            break
 
     return found
 

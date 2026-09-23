@@ -14,7 +14,7 @@ __credits__ = []
 
 
 
-from typing import Callable, Dict, Optional, TypeVar
+from typing import Callable, Dict, Optional
 
 import inspect
 import os
@@ -37,9 +37,6 @@ from ccai.testbase.sources.resourcesource import ResourceSource
 from ccai.testbase.sources.validatorsource import ValidatorSource
 
 from ccai.testbase.injection.injectionregistry import injection_registry
-
-
-_IntegrationSubscriberType = TypeVar("_IntegrationSubscriberType", bound=Callable[..., object])
 
 
 def integration_factory(*, constraints: Optional[Dict]=None) -> Callable[[Callable], Callable]:

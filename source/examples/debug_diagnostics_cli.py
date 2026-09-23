@@ -48,7 +48,7 @@ __copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
-from ccai.testbase.diagnostics import DiagnosticLabel, RuntimeConfigPaths
+from ccai.testbase.diagnostics import RuntimeConfigPaths
 
 
 def example_cli_options_overview():

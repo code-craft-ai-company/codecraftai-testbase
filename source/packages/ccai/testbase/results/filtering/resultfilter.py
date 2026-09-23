@@ -15,8 +15,8 @@ __copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
 
-from typing import Any, Callable, Dict, List, Optional, Union
-from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
 from datetime import datetime
 import re
 
@@ -335,6 +335,8 @@ class ResultFilter:
                 if re.search(expected, actual):
                     return True
             except re.error:
+                # The expected value is not a valid regex; treat it as a literal and
+                # fall through to the exact-match comparison below.
                 pass
             # Fall back to exact match
             return actual == expected

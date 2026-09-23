@@ -9,9 +9,6 @@
     .. moduleauthor:: CodeCraftX
 """
 
-from types import ModuleType
-from typing import Optional
-
 from ccai.testbase.expressions import parse_test_include_expression
 
 

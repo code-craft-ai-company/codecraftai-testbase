@@ -60,6 +60,8 @@ def ensure_directory(target: str) -> None:
         try:
             os.mkdir(target)
         except FileExistsError:
+            # Another creator made the directory after its parent was created; the
+            # directory now exists, which is the outcome this function guarantees.
             pass
     return
 

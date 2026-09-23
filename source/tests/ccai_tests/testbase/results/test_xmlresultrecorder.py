@@ -10,7 +10,6 @@ import unittest
 import tempfile
 import os
 import shutil
-import xml.etree.ElementTree as ET
 
 from datetime import datetime
 
@@ -19,7 +18,6 @@ from ccai.testbase.results.model.pipelineinfo import PipelineInfo
 from ccai.testbase.results.model.jobinfo import JobInfo
 from ccai.testbase.results.model.renderinfo import RenderInfo
 from ccai.testbase.results.model.resultcode import ResultCode
-from ccai.testbase.results.model.resulttype import ResultType
 from ccai.testbase.results.model.testresult import TestResult
 
 from ccai.testbase.results.recorders.xmlresultrecorder import XmlResultRecorder

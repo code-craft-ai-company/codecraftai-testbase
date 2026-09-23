@@ -12,11 +12,9 @@
 import os
 import sys
 import subprocess
-import tempfile
 import unittest
 
 from ccai.thisapp.persona import APP_PERSONA_ESTABLISHED, establish_app_persona
-from ccai.testbase.testcollector import TestCollector
 from ccai.testbase.expressions import parse_test_include_expression
 from ccai_tests.testbase.integration.subprocessenv import minimal_subprocess_environment
 

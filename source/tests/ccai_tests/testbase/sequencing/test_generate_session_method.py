@@ -20,7 +20,6 @@ import tempfile
 import unittest
 
 from ccai.testbase.testgroup import TestGroup
-from ccai.testbase.testref import TestRef
 from ccai.testbase.injection.injectionregistry import injection_registry
 from ccai.testbase.injection.injectionscope import InjectionScope
 from ccai.testbase.sequencing.testsequencer import TestSequencer

@@ -47,14 +47,10 @@ import logging
 
 from ccai.xmodules.debugging import (
     DEBUGGER,
-    DEFAULT_DEBUG_PORT,
-    in_vscode_debugger
+    in_vscode_debugger,
 )
 
-from ccai.testbase.debugports import (
-    DEFAULT_DEBUG_PORT as TESTBASE_DEFAULT_DEBUG_PORT,
-    get_configured_debug_port
-)
+from ccai.testbase.debugports import get_configured_debug_port
 
 from ccai.testbase.debuglogging import (
     log_breakpoint_triggered,

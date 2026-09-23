@@ -33,7 +33,12 @@ class TaskingProgressCallback(Protocol):
         Callable protocol for receiving task progress updates.
     """
 
-    def __call__(self, progress: List[ProgressInfo]) -> None: ...
+    def __call__(self, progress: List[ProgressInfo]) -> None:
+        """
+            Receives the latest progress updates for the running tasks.
+
+            :param progress: The list of progress information entries.
+        """
 
 
 @dataclass

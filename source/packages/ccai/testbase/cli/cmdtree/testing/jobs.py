@@ -10,15 +10,13 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Code Craft AI LLC"
 __credits__ = []
 
-from typing import Union, Optional
+from typing import Optional
 
 import argparse
 import os
 import sys
 
 from ccai.arcli import decorators as arcli
-from ccai.arcli.model.fields.optionfield import OptionMode
-from ccai.arcli.model.parameters.booleanparameter import BooleanParameter
 
 from ccai.testbase.cli.options import (
     RootOptionGroup,
@@ -27,18 +25,8 @@ from ccai.testbase.cli.options import (
     LoggingOptionGroup,
     DebugOptionGroup,
     TimeoutOptionGroup,
-    HELP_ROOT,
     HELP_FILTER,
     HELP_JOB,
-    HELP_OUTPUT,
-    HELP_START,
-    HELP_BRANCH,
-    HELP_BUILD,
-    HELP_FLAVOR,
-    HELP_CONSOLE_LOG_LEVEL,
-    HELP_FILE_LOG_LEVEL,
-    HELP_DEBUG,
-    HELP_TIMEOUT
 )
 
 @arcli.group("jobs")

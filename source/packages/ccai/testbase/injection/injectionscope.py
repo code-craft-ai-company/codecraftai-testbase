@@ -1013,8 +1013,6 @@ class InjectionScope:
         """
 
         if "__main__" in self._children:
-            last_dot = new_origin.rfind(".")
-
             cobj = self._children["__main__"]
             del self._children["__main__"]
 
@@ -1635,6 +1633,8 @@ class InjectionScope:
                 try:
                     source_func_name = origin.source_function_name
                 except (AttributeError, TypeError):
+                    # Descriptive metadata only; an origin whose source does not expose
+                    # function/module names keeps the default of None for those fields.
                     pass
             
             if hasattr(origin, 'life_span') and origin.life_span is not None:
@@ -1846,6 +1846,8 @@ class InjectionScope:
                 source_func_name = origin.source_function_name
                 source_module = origin.source_module_name
             except (AttributeError, TypeError):
+                # Descriptive metadata only; an origin whose source does not expose
+                # function/module names keeps the default of None for those fields.
                 pass
         
         if hasattr(origin, 'life_span') and origin.life_span is not None:
@@ -1897,6 +1899,8 @@ class InjectionScope:
                             dep_source_func = dep_origin.source_function_name
                             dep_source_module = dep_origin.source_module_name
                         except (AttributeError, TypeError):
+                            # Descriptive metadata only; an origin whose source does not expose
+                            # function/module names keeps the default of None for those fields.
                             pass
                     
                     if hasattr(dep_origin, 'life_span') and dep_origin.life_span is not None:
@@ -1961,6 +1965,8 @@ class InjectionScope:
                                     dep_source_func = dep_origin.source_function_name
                                     dep_source_module = dep_origin.source_module_name
                                 except (AttributeError, TypeError):
+                                    # Descriptive metadata only; an origin whose source does not expose
+                                    # function/module names keeps the default of None for those fields.
                                     pass
                             
                             if hasattr(dep_origin, 'life_span') and dep_origin.life_span is not None:

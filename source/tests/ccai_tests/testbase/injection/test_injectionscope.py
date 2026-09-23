@@ -8,7 +8,6 @@
     - Parameter resolution with visibility inheritance
 """
 
-import collections
 import unittest
 
 from ccai.errors.exceptions import SemanticError

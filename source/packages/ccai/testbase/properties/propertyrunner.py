@@ -22,6 +22,7 @@ __credits__ = []
 from typing import Any, Callable, Dict, Optional
 
 import hashlib
+import json
 import os
 import random
 import uuid
@@ -35,6 +36,7 @@ from ccai.testbase.properties.strategies import Strategy
 
 from ccai.testbase.results.model.checkresult import CheckResult
 from ccai.testbase.results.model.resultcode import ResultCode
+from ccai.testbase.results.model.testresult import TestResult
 
 
 DEFAULT_MAX_EXAMPLES = 100
@@ -114,10 +116,12 @@ class PropertyRunner:
         :param test_name: The fully qualified test name.
         :param recorder: The result recorder for writing check results.
         :param parent_inst: The instance ID of the parent test result.
+        :param test_result: The parent :class:`TestResult` that receives the property metadata.
     """
 
     def __init__(self, constraints: dict, job_seed: str,
-                 test_name: str, recorder: Any, parent_inst: str):
+                 test_name: str, recorder: Any, parent_inst: str,
+                 test_result: Optional[TestResult] = None):
         """
             Initializes the PropertyRunner.
 
@@ -127,6 +131,11 @@ class PropertyRunner:
             :param test_name: The fully qualified test name.
             :param recorder: The result recorder for writing check results.
             :param parent_inst: The instance ID of the parent test result.
+            :param test_result: Optional parent :class:`TestResult` of the property test.  When
+                given, :meth:`run` attaches the property metadata to it (see
+                :meth:`TestResult.set_property_metadata`) on every outcome: passed, falsified,
+                errored, and aborted for too many rejected assumptions.  Defaults to ``None``,
+                in which case the metadata is only returned by :meth:`run` when it passes.
         """
         configured_max_examples = constraints.get("max_examples", DEFAULT_MAX_EXAMPLES)
         env_cap = _resolve_max_examples_cap()
@@ -140,6 +149,7 @@ class PropertyRunner:
         self._test_name = test_name
         self._recorder = recorder
         self._parent_inst = parent_inst
+        self._test_result = test_result
 
         # The per-test seed is always derived from the job seed and test name.
         # This ensures full reproducibility: same job seed produces the same
@@ -180,6 +190,10 @@ class PropertyRunner:
             the test as FAILED. If an unexpected exception occurs, the test is
             recorded as ERRORED without shrinking.
 
+            When the runner was constructed with a ``test_result``, the property
+            metadata is attached to it before this method returns or raises, so the
+            parent :class:`TestResult` serializes it as ``property_metadata``.
+
             :param test_func: The property test function to invoke.
             :param strategies: Dictionary mapping parameter names to Strategy instances.
             :param injected_args: Dictionary of injection-resolved parameter values.
@@ -191,6 +205,8 @@ class PropertyRunner:
                 test fails (after shrinking).  It is chained to the ``AssertionError``
                 of the first failing example and its message includes that failure's
                 traceback.
+            :raises RuntimeError: When an example raises an unexpected (non-assertion)
+                exception, or when too many generated examples are rejected by ``assume()``.
         """
         max_examples = self._max_examples
         examples_run = 0
@@ -209,6 +225,12 @@ class PropertyRunner:
         while examples_run < max_examples:
             # Check for too many assumption rejections
             if assumptions_rejected >= max_rejections:
+                self._attach_metadata(
+                    examples_run=examples_run,
+                    max_examples=max_examples,
+                    assumptions_rejected=assumptions_rejected,
+                    strategy_descriptions=strategy_descriptions
+                )
                 raise RuntimeError(
                     f"Too many assumption rejections ({assumptions_rejected}) "
                     f"after {examples_run} successful examples. This usually "
@@ -288,45 +310,39 @@ class PropertyRunner:
                 check_result.finalize()
                 self._recorder.record(check_result)
 
-                # Build metadata and re-raise as an error (no shrinking)
-                metadata = {
-                    "is_property_test": True,
-                    "examples_run": examples_run,
-                    "max_examples": max_examples,
-                    "seed": self._test_seed,
-                    "job_seed": self._job_seed,
-                    "assumptions_rejected": assumptions_rejected,
-                    "strategy_descriptions": strategy_descriptions,
-                }
+                # Attach the metadata to the test result, then re-raise as an error (no shrinking)
+                self._attach_metadata(
+                    examples_run=examples_run,
+                    max_examples=max_examples,
+                    assumptions_rejected=assumptions_rejected,
+                    strategy_descriptions=strategy_descriptions
+                )
 
                 raise RuntimeError(
                     f"Property test errored on example {example_index}: {ex!r}"
                 ) from ex
 
-        # Build property metadata
-        metadata = {
-            "is_property_test": True,
-            "examples_run": examples_run,
-            "max_examples": max_examples,
-            "seed": self._test_seed,
-            "job_seed": self._job_seed,
-            "assumptions_rejected": assumptions_rejected,
-            "strategy_descriptions": strategy_descriptions,
-        }
-
+        safe_counterexample = None
         if counterexample is not None:
             # Safely serialize counterexample for metadata
             safe_counterexample = {}
             for k, v in counterexample.items():
                 try:
-                    import json
                     json.dumps(v)
                     safe_counterexample[k] = v
                 except (TypeError, ValueError):
                     safe_counterexample[k] = repr(v)
 
-            metadata["counterexample"] = safe_counterexample
+        # Build the property metadata and attach it to the test result
+        metadata = self._attach_metadata(
+            examples_run=examples_run,
+            max_examples=max_examples,
+            assumptions_rejected=assumptions_rejected,
+            strategy_descriptions=strategy_descriptions,
+            counterexample=safe_counterexample
+        )
 
+        if safe_counterexample is not None:
             err_msg_lines = [
                 f"Property falsified after {examples_run} examples. "
                 f"Counterexample: {safe_counterexample}",
@@ -339,6 +355,42 @@ class PropertyRunner:
 
             errmsg = os.linesep.join(err_msg_lines)
             raise AssertionError(errmsg) from first_failure_error
+
+        return metadata
+
+    def _attach_metadata(self, *, examples_run: int, max_examples: int,
+                         assumptions_rejected: int, strategy_descriptions: Dict[str, str],
+                         counterexample: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+            Builds the property-test metadata and, when the runner was given a parent
+            :class:`TestResult`, attaches it to that result.
+
+            :param examples_run: The number of examples that ran (assumption rejections excluded).
+            :param max_examples: The maximum number of examples for the test.
+            :param assumptions_rejected: The number of examples rejected by ``assume()``.
+            :param strategy_descriptions: The ``describe()`` output of each strategy, by parameter name.
+            :param counterexample: The JSON-safe (shrunk) counterexample when the property was
+                falsified, otherwise ``None``.  Omitted from the metadata when ``None``.
+
+            :returns: The metadata dictionary with the keys ``is_property_test``, ``examples_run``,
+                ``max_examples``, ``seed``, ``job_seed``, ``assumptions_rejected``,
+                ``strategy_descriptions`` and, when falsified, ``counterexample``.
+        """
+        metadata = {
+            "is_property_test": True,
+            "examples_run": examples_run,
+            "max_examples": max_examples,
+            "seed": self._test_seed,
+            "job_seed": self._job_seed,
+            "assumptions_rejected": assumptions_rejected,
+            "strategy_descriptions": strategy_descriptions,
+        }
+
+        if counterexample is not None:
+            metadata["counterexample"] = counterexample
+
+        if self._test_result is not None:
+            self._test_result.set_property_metadata(metadata)
 
         return metadata
 

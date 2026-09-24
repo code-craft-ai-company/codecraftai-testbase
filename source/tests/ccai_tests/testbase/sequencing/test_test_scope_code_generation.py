@@ -1044,10 +1044,40 @@ class PropertyTestCaseNameGenerationTests(unittest.TestCase):
             "Property tests should assign test_case_name"
         )
         self.assertIn(
-            "sequencer.run_property_test(test_property, test_case_name, tscope.recorder, tscope.scope_id, {})",
+            "sequencer.run_property_test(test_property, test_case_name, tscope.recorder, tscope.scope_id, {}, test_result=tscope.result)",
             generated_code,
-            "Property tests should pass test_case_name to run_property_test"
+            "Property tests should pass test_case_name and the scope's TestResult to run_property_test"
         )
+
+    def test_property_test_passes_scope_test_result(self):
+        """Verify property test generation passes the test scope's TestResult so property metadata can be attached."""
+        scope_name = "test_module#test_property"
+        scope_node = create_scope_node_with_property_test(
+            "test_module",
+            "test_property",
+            strategies={"value": object()},
+        )
+        sequencer = self._create_sequencer()
+
+        self._register_test_scope(scope_name)
+
+        output_buffer = io.StringIO()
+        factory_imports = set()
+        constraint_imports = set()
+
+        sequencer._generate_scope_method(
+            output_buffer, "test_module", "test_module", scope_node,
+            ["sequencer"], factory_imports, constraint_imports, "    "
+        )
+
+        generated_code = output_buffer.getvalue()
+
+        self.assertIn(
+            "test_result=tscope.result)",
+            generated_code,
+            "Property tests should pass tscope.result to run_property_test"
+        )
+        return
 
     def test_property_test_keeps_scope_and_case_name_separate(self):
         """Verify property test generation keeps test_scope_name and test_case_name distinct."""

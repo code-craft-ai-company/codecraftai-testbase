@@ -19,6 +19,7 @@ from ccai.testbase.properties.assumptions import assume
 
 from ccai.testbase.results.model.checkresult import CheckResult
 from ccai.testbase.results.model.resultcode import ResultCode
+from ccai.testbase.results.model.testresult import TestResult
 
 
 class MockRecorder:
@@ -594,6 +595,145 @@ class PropertyRunnerAssumeTests(unittest.TestCase):
 
         self.assertIn("assumptions_rejected", metadata)
         self.assertIsInstance(metadata["assumptions_rejected"], int)
+
+
+class PropertyRunnerTestResultMetadataTests(unittest.TestCase):
+    """Tests that PropertyRunner attaches property metadata to the parent TestResult (Requirements 8.4, 8.5, 13.6)."""
+
+    def setUp(self):
+        self.recorder = MockRecorder()
+        self.test_result = TestResult("parent-001", "pkg.module#test_prop", "module-001", [], {})
+        return
+
+    def _create_runner(self, constraints, test_name):
+        runner = PropertyRunner(constraints, 42, test_name, self.recorder, "parent-001",
+                                test_result=self.test_result)
+        return runner
+
+    def test_test_result_defaults_to_none(self):
+        """Test that the runner works without a TestResult (backward compatible construction)."""
+        runner = PropertyRunner({"max_examples": 3}, 42, "test_no_result", self.recorder, "parent-001")
+
+        def test_func(x):
+            pass
+
+        metadata = runner.run(test_func, {"x": integers(0, 10)}, {})
+        self.assertTrue(metadata["is_property_test"])
+        self.assertIsNone(self.test_result.property_metadata)
+        return
+
+    def test_passing_property_attaches_metadata(self):
+        """Test that a passing property attaches the returned metadata to the TestResult."""
+        runner = self._create_runner({"max_examples": 5}, "test_pass")
+
+        def test_func(x):
+            pass
+
+        metadata = runner.run(test_func, {"x": integers(0, 10)}, {})
+
+        self.assertEqual(self.test_result.property_metadata, metadata)
+        return
+
+    def test_passing_property_metadata_has_specified_fields(self):
+        """Test that the attached metadata carries the specified fields and no counterexample on success."""
+        runner = self._create_runner({"max_examples": 5}, "test_pass_fields")
+
+        def test_func(x):
+            pass
+
+        runner.run(test_func, {"x": integers(0, 10)}, {})
+
+        attached = self.test_result.property_metadata
+        self.assertTrue(attached["is_property_test"])
+        self.assertEqual(attached["examples_run"], 5)
+        self.assertEqual(attached["max_examples"], 5)
+        self.assertEqual(attached["seed"], derive_test_seed(42, "test_pass_fields"))
+        self.assertEqual(attached["job_seed"], 42)
+        self.assertIn("x", attached["strategy_descriptions"])
+        self.assertNotIn("counterexample", attached)
+        return
+
+    def test_falsified_property_attaches_metadata_with_counterexample(self):
+        """Test that a falsified property attaches metadata including the counterexample before raising."""
+        runner = self._create_runner({"max_examples": 100}, "test_falsified")
+
+        def test_func(x):
+            assert x < 50
+
+        with self.assertRaises(AssertionError):
+            runner.run(test_func, {"x": integers(0, 100)}, {})
+
+        attached = self.test_result.property_metadata
+        self.assertIsNotNone(attached)
+        self.assertTrue(attached["is_property_test"])
+        self.assertIn("counterexample", attached)
+        self.assertGreaterEqual(attached["counterexample"]["x"], 50)
+        return
+
+    def test_falsified_property_metadata_counts_failing_example(self):
+        """Test that examples_run in the falsified metadata matches the number of recorded checks."""
+        runner = self._create_runner({"max_examples": 100}, "test_falsified_count")
+
+        def test_func(x):
+            assert x < 50
+
+        with self.assertRaises(AssertionError):
+            runner.run(test_func, {"x": integers(0, 100)}, {})
+
+        attached = self.test_result.property_metadata
+        self.assertEqual(attached["examples_run"], len(self.recorder.recorded))
+        return
+
+    def test_errored_property_attaches_metadata(self):
+        """Test that an unexpected error attaches the metadata built in the error path before raising."""
+        runner = self._create_runner({"max_examples": 10}, "test_errored")
+
+        def test_func(x):
+            raise ValueError("unexpected")
+
+        with self.assertRaises(RuntimeError):
+            runner.run(test_func, {"x": integers(0, 10)}, {})
+
+        attached = self.test_result.property_metadata
+        self.assertIsNotNone(attached)
+        self.assertTrue(attached["is_property_test"])
+        self.assertEqual(attached["examples_run"], 0)
+        self.assertEqual(attached["max_examples"], 10)
+        self.assertEqual(attached["job_seed"], 42)
+        self.assertNotIn("counterexample", attached)
+        return
+
+    def test_too_many_rejections_attaches_metadata(self):
+        """Test that aborting on too many assume() rejections attaches the rejection count."""
+        runner = self._create_runner({"max_examples": 2}, "test_rejections")
+
+        def test_func(x):
+            assume(False)
+
+        with self.assertRaises(RuntimeError):
+            runner.run(test_func, {"x": integers(0, 10)}, {})
+
+        attached = self.test_result.property_metadata
+        self.assertIsNotNone(attached)
+        self.assertEqual(attached["assumptions_rejected"], 100)
+        self.assertEqual(attached["examples_run"], 0)
+        return
+
+    def test_attached_metadata_serialized_by_test_result(self):
+        """Test that the TestResult serializes the attached metadata under property_metadata."""
+        runner = self._create_runner({"max_examples": 100}, "test_serialized")
+
+        def test_func(x):
+            assert x < 50
+
+        with self.assertRaises(AssertionError):
+            runner.run(test_func, {"x": integers(0, 100)}, {})
+
+        self.test_result.finalize()
+        dct = self.test_result.as_dict()
+        self.assertIn("property_metadata", dct)
+        self.assertIn("counterexample", dct["property_metadata"])
+        return
 
 
 if __name__ == '__main__':

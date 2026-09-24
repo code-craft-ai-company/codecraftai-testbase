@@ -223,6 +223,64 @@ class TestResultTests(unittest.TestCase):
         self.assertIn("bug", dct["detail"])
 
 
+class TestResultPropertyMetadataTests(unittest.TestCase):
+    """Tests for property-test metadata on TestResult (property-testing Requirements 8.4, 8.5, 13.6)."""
+
+    def setUp(self):
+        self.metadata = {
+            "is_property_test": True,
+            "examples_run": 37,
+            "max_examples": 100,
+            "seed": 839271,
+            "job_seed": 12345,
+            "assumptions_rejected": 0,
+            "counterexample": {"xs": [1, 0, -1]},
+            "strategy_descriptions": {"xs": "lists(integers())"},
+        }
+        return
+
+    def test_property_metadata_defaults_to_none(self):
+        tr = TestResult("1", "tname", "parent", [], {})
+        self.assertIsNone(tr.property_metadata)
+        return
+
+    def test_as_dict_omits_property_metadata_when_not_set(self):
+        tr = TestResult("1", "tname", "parent", [], {})
+        tr.finalize()
+        dct = tr.as_dict()
+        self.assertNotIn("property_metadata", dct)
+        return
+
+    def test_set_property_metadata_is_returned_by_property(self):
+        tr = TestResult("1", "tname", "parent", [], {})
+        tr.set_property_metadata(self.metadata)
+        self.assertEqual(tr.property_metadata, self.metadata)
+        return
+
+    def test_as_dict_includes_property_metadata_at_top_level(self):
+        tr = TestResult("1", "tname", "parent", [], {})
+        tr.set_property_metadata(self.metadata)
+        tr.finalize()
+        dct = tr.as_dict()
+        self.assertEqual(dct["property_metadata"], self.metadata)
+        self.assertNotIn("property_metadata", dct["detail"])
+        return
+
+    def test_to_json_serializes_property_metadata(self):
+        tr = TestResult("1", "tname", "parent", [], {})
+        tr.set_property_metadata(self.metadata)
+        tr.finalize()
+        dct = json.loads(tr.to_json())
+        self.assertEqual(dct["property_metadata"]["counterexample"], {"xs": [1, 0, -1]})
+        return
+
+    def test_set_property_metadata_rejects_non_dict(self):
+        tr = TestResult("1", "tname", "parent", [], {})
+        with self.assertRaises(TypeError):
+            tr.set_property_metadata(["not", "a", "dict"])
+        return
+
+
 class ResultContainerTests(unittest.TestCase):
     """Tests for the ResultContainer base class."""
 

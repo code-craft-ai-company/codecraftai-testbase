@@ -26,7 +26,7 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
 
 ### In Progress
 
-**Phase 5 (remaining):** create_check_result() factory, sequence document generation, property metadata on TestResult
+**Phase 5 (remaining):** create_check_result() factory, sequence document generation
 
 ---
 
@@ -146,9 +146,12 @@ stdlib-only property testing engine to TestBase with `@given` decorator, strateg
   - Handle preview/final merging for CHECK records
   - _Requirements: 7.11_
 
-- [ ] Add property metadata to TestResult
+- [x] Add property metadata to TestResult
   - When test has `_property_` attribute, include `property_metadata` in `as_dict()`
   - Fields: `is_property_test`, `examples_run`, `max_examples`, `seed`, `job_seed`, `counterexample`, `strategy_descriptions`
+  - `TestResult.set_property_metadata()` / `property_metadata`; `PropertyRunner(test_result=...)` attaches the
+    metadata on pass, falsification, error and assumption-rejection abort; the generated sequence document passes
+    `test_result=tscope.result` to `TestSequencer.run_property_test()`
   - _Requirements: 8.4, 8.5_
 
 #### Phase 6: HTML Report Rendering

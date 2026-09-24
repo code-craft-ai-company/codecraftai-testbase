@@ -28,6 +28,7 @@ from ccai.xmodules.xlogging.enhancedloggers import getEnhancedLogger
 
 # Test-case by-products dir is resolved via the sequencer's injected IOutputContext.
 
+from ccai.testbase.results.model.testresult import TestResult
 from ccai.testbase.results.recorders.resultrecorder import ResultRecorder
 from ccai.testbase.sequencing.testactivity import TestActivity
 
@@ -66,6 +67,15 @@ class SequencerTestScope:
     @property
     def recorder(self):
         return self._recorder
+
+    @property
+    def result(self) -> Optional[TestResult]:
+        """
+            The :class:`TestResult` of this test scope.  It is created when the scope is
+            entered and is ``None`` before that.  The generated sequence document passes it
+            to :meth:`TestSequencer.run_property_test` so property metadata can be attached.
+        """
+        return self._result
 
     @property
     def scope_id(self):

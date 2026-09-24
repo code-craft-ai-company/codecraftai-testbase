@@ -14,9 +14,10 @@ __credits__ = []
 
 
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import collections
+import os
 
 from dataclasses import asdict as dataclass_as_dict
 
@@ -51,6 +52,7 @@ class TestResult(ResultNode):
         self._pivots = pivots
         self._reason = None
         self._bug = None
+        self._property_metadata = None
         return
 
 
@@ -67,6 +69,40 @@ class TestResult(ResultNode):
             The name of the result pivots.
         """
         return self._pivots
+
+    @property
+    def property_metadata(self) -> Optional[Dict[str, Any]]:
+        """
+            The property-test metadata attached to this result, or ``None`` when the test is
+            not a property test (or its :class:`PropertyRunner` has not attached any yet).
+        """
+        return self._property_metadata
+
+    def set_property_metadata(self, metadata: Dict[str, Any]) -> None:
+        """
+            Attaches property-test metadata to this result.  The metadata is serialized by
+            :meth:`as_dict` under the ``property_metadata`` key.
+
+            The fields are the ones specified for property tests: ``is_property_test``,
+            ``examples_run``, ``max_examples``, ``seed``, ``job_seed``,
+            ``strategy_descriptions``, ``assumptions_rejected`` and, when the property
+            was falsified, ``counterexample``.
+
+            :param metadata: The property-test metadata dictionary built by the
+                             :class:`PropertyRunner`.
+
+            :raises TypeError: When ``metadata`` is not a dictionary.
+        """
+        if not isinstance(metadata, dict):
+            errmsg_lines = [
+                "The 'metadata' parameter must be a dictionary.",
+                "    RECEIVED TYPE: {}".format(type(metadata).__name__)
+            ]
+            errmsg = os.linesep.join(errmsg_lines)
+            raise TypeError(errmsg)
+
+        self._property_metadata = metadata
+        return
 
     def mark_skip(self, reason: str, bug: str):
         """
@@ -101,6 +137,9 @@ class TestResult(ResultNode):
             ("start", start_datetime),
             ("stop", stop_datetime)
         ])
+
+        if self._property_metadata is not None:
+            rninfo["property_metadata"] = self._property_metadata
 
         if not is_preview:
 

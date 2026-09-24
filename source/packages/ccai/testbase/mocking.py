@@ -22,23 +22,30 @@ import types
 import weakref
 
 
-class SpecViolationError(Exception):
+class SpecViolationError(AttributeError, Exception):
     """
         Exception raised when a mock operation violates its specification.
-        
+
         This exception is raised when:
         - An attribute is accessed that doesn't exist in the spec class
         - A method is called with arguments that don't match the spec's signature
         - An attribute is set that doesn't exist in the spec class
-        
+
+        The exception is also an :class:`AttributeError` so that a spec mock honours
+        the Python attribute protocol: ``hasattr(mock, 'nonexistent')`` returns ``False``
+        and ``getattr(mock, 'nonexistent', default)`` returns ``default`` instead of
+        raising.  Existing ``except SpecViolationError`` and ``except Exception``
+        handlers continue to catch it.
+
         Example::
-        
+
             class MySpec:
                 def method(self, x: int) -> str:
                     pass
-            
+
             mock = create_spec_mock(MySpec)
             mock.nonexistent  # Raises SpecViolationError
+            hasattr(mock, 'nonexistent')  # Returns False
     """
     pass
 

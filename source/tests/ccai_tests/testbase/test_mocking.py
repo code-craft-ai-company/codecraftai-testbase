@@ -3404,6 +3404,82 @@ class SpecMockSpecSetTests(unittest.TestCase):
         mock.side_effect = lambda: "effect"
 
 
+class SpecMockAttributeProtocolTests(unittest.TestCase):
+    """Tests that SpecMock honours the Python attribute protocol (hasattr / getattr with a default)."""
+
+    def setUp(self):
+        """Set up test fixtures."""
+        class ServiceSpec:
+            """A service specification class."""
+
+            def __init__(self):
+                self.endpoint = ""
+
+            def fetch(self, key: str) -> dict:
+                pass
+
+        self.ServiceSpec = ServiceSpec
+        return
+
+    def test_spec_violation_error_is_attribute_error(self):
+        """Test that SpecViolationError is an AttributeError and still an Exception."""
+        self.assertTrue(issubclass(SpecViolationError, AttributeError))
+        self.assertTrue(issubclass(SpecViolationError, Exception))
+        return
+
+    def test_hasattr_returns_false_for_attribute_not_in_spec(self):
+        """Test that hasattr() returns False instead of raising for an attribute not in the spec."""
+        mock = create_spec_mock(self.ServiceSpec)
+        found = hasattr(mock, "nonexistent_attribute")
+        self.assertFalse(found)
+        return
+
+    def test_hasattr_returns_true_for_spec_method(self):
+        """Test that hasattr() returns True for a method defined in the spec."""
+        mock = create_spec_mock(self.ServiceSpec)
+        found = hasattr(mock, "fetch")
+        self.assertTrue(found)
+        return
+
+    def test_hasattr_returns_true_for_spec_attribute(self):
+        """Test that hasattr() returns True for an instance attribute defined in the spec."""
+        mock = create_spec_mock(self.ServiceSpec)
+        found = hasattr(mock, "endpoint")
+        self.assertTrue(found)
+        return
+
+    def test_getattr_with_default_returns_default_for_attribute_not_in_spec(self):
+        """Test that getattr() with a default returns the default for an attribute not in the spec."""
+        mock = create_spec_mock(self.ServiceSpec)
+        sentinel = object()
+        value = getattr(mock, "nonexistent_attribute", sentinel)
+        self.assertIs(value, sentinel)
+        return
+
+    def test_getattr_with_default_returns_spec_method_mock(self):
+        """Test that getattr() with a default still returns the method mock for a spec method."""
+        mock = create_spec_mock(self.ServiceSpec)
+        sentinel = object()
+        value = getattr(mock, "fetch", sentinel)
+        self.assertIsNot(value, sentinel)
+        return
+
+    def test_getattr_without_default_raises_spec_violation_error(self):
+        """Test that getattr() without a default still raises SpecViolationError for an attribute not in the spec."""
+        mock = create_spec_mock(self.ServiceSpec)
+        with self.assertRaises(SpecViolationError):
+            getattr(mock, "nonexistent_attribute")
+        return
+
+    def test_invalid_attribute_access_caught_as_attribute_error(self):
+        """Test that an invalid attribute access can be handled by an 'except AttributeError' clause."""
+        mock = create_spec_mock(self.ServiceSpec)
+        with self.assertRaises(AttributeError) as context:
+            _ = mock.nonexistent_attribute
+        self.assertIsInstance(context.exception, SpecViolationError)
+        return
+
+
 class SpecMockDirTests(unittest.TestCase):
     """Tests for SpecMock __dir__ method."""
 

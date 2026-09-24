@@ -1894,7 +1894,8 @@ class TestSequencer:
 
     def run_property_test(self, test_func: 'Callable', test_name: str,
                           recorder: 'Any', parent_inst: str,
-                          injected_args: 'Dict[str, Any]') -> 'Dict[str, Any]':
+                          injected_args: 'Dict[str, Any]',
+                          test_result: 'Optional[TestResult]' = None) -> 'Dict[str, Any]':
         """
             Runs a property test function using the :class:`PropertyRunner`.
 
@@ -1909,6 +1910,10 @@ class TestSequencer:
             :param parent_inst: The instance ID of the parent test result.
             :param injected_args: Dictionary of all injection-resolved parameter values.
                 Strategy-generated parameters are automatically filtered out.
+            :param test_result: The :class:`TestResult` of the enclosing test scope.  When
+                given, the runner attaches the property metadata to it so the recorded
+                result carries ``property_metadata``.  The generated sequence document
+                passes ``tscope.result``.  Defaults to ``None``.
             :returns: A dictionary containing property test metadata from the runner.
         """
         from ccai.testbase.properties.propertyrunner import PropertyRunner
@@ -1925,10 +1930,12 @@ class TestSequencer:
             job_seed=self.job_seed,
             test_name=test_name,
             recorder=recorder,
-            parent_inst=parent_inst
+            parent_inst=parent_inst,
+            test_result=test_result
         )
 
-        return runner.run(test_func, strategies, filtered_injected)
+        metadata = runner.run(test_func, strategies, filtered_injected)
+        return metadata
 
     def run_async_test(self, test_func: 'Callable', injected_args: 'Dict[str, Any]') -> 'Any':
         """
@@ -2820,10 +2827,10 @@ class TestSequencer:
 
                     if len(injected_only) > 0:
                         args_dict = ", ".join(["'{}': {}".format(a, a) for a in injected_only])
-                        method_lines.append("{}sequencer.run_property_test({}, test_case_name, tscope.recorder, tscope.scope_id, {{{}}})".format(
+                        method_lines.append("{}sequencer.run_property_test({}, test_case_name, tscope.recorder, tscope.scope_id, {{{}}}, test_result=tscope.result)".format(
                             prop_indent, child_node.base_name, args_dict))
                     else:
-                        method_lines.append("{}sequencer.run_property_test({}, test_case_name, tscope.recorder, tscope.scope_id, {{}})".format(
+                        method_lines.append("{}sequencer.run_property_test({}, test_case_name, tscope.recorder, tscope.scope_id, {{}}, test_result=tscope.result)".format(
                             prop_indent, child_node.base_name))
                 elif child_node.is_async:
                     async_indent = current_indent + val_indent

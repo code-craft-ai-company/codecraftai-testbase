@@ -25,6 +25,10 @@ dependencies = [
 [project.scripts]
 testbase = "ccai.testbase.cli.testbase_command:testbase_root_command"
 
+[project.urls]
+Repository = "https://github.com/code-craft-ai-company/codecraftai-testbase"
+Issues = "https://github.com/code-craft-ai-company/codecraftai-testbase/issues"
+
 [dependency-groups]
 dev = [
     "hypothesis>=6.0.0",

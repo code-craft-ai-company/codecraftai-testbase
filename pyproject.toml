@@ -1,6 +1,6 @@
 [project]
 name = "codecraftai-testbase"
-version = "1.3.1"
+version = "1.3.2"
 description = "Code Craft AI - TestBase"
 readme = "README.rst"
 license = "LicenseRef-CodeCraftAI-Source-Available"
@@ -19,6 +19,8 @@ dependencies = [
     "codecraftai-this-app>=1.0.0,<2.0.0",
     "codecraftai-runtime>=1.0.0,<2.0.0",
     "codecraftai-xmodules>=1.0.0,<2.0.0",
+    "codecraftai-extension>=1.0.0,<2.0.0",
+    "debugpy>=1.8.14,<2.0.0",
     "pyyaml>=6.0.2,<7.0.0",
 ]
 

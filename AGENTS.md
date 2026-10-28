@@ -33,8 +33,9 @@ streams, and generating summaries suitable for agent-driven automation.
 
 The package is now **near-standalone**. The test-execution core
 (`TestJob`/`TestSequencer`, the recorders, and the entrypoints) imports none of
-`codecraftai-configuration`, `codecraftai-runtime`, or `codecraftai-this-app`. Its
-declared dependencies are `codecraftai-arcli`, `codecraftai-foundations`, and `codecraftai-xmodules`. The core
+`codecraftai-configuration`, `codecraftai-runtime`, or `codecraftai-this-app`. It
+needs `codecraftai-arcli`, `codecraftai-foundations`, and `codecraftai-xmodules`, and the
+factory protocols come from `codecraftai-extension`. The core
 reads its few execution knobs (`AM_DEBUG_*`, `AM_DIAGNOSTICS_*`, `AM_TESTROOT`,
 `AM_OUTPUT_DIRECTORY`, `AM_RUN_ID`, `AM_TESTRUN_TIMEOUT`) directly from
 `os.environ` via the dependency-free `ccai.testbase.environment` module,
@@ -59,9 +60,8 @@ to plug in `RuntimeOutputContext`, `RuntimeRunMetadata`, and the HTML-capable
 
 > **Pending relocation note:** the test-execution core is decoupled, but
 > `testbase`'s CLI + bootstrap (`initialize.py`, `cli/`, `server/`) still import
-> `codecraftai-runtime` / `codecraftai-this-app` / `codecraftai-configuration`, and the
-> `pyproject.toml` still declares `codecraftai-runtime`, `codecraftai-this-app`, and
-> `codecraftai-configuration`. Those dependency drops are pending the CLI
+> `codecraftai-runtime` / `codecraftai-this-app`, and the `pyproject.toml` still declares
+> both. Those dependency drops are pending the CLI
 > relocation; do not treat them as already removed.
 
 The package is organised into a handful of cohesive subsystems:
